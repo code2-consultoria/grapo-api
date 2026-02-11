@@ -178,7 +178,7 @@ Funcionalidade: Landing Page Grapo
 - [x] Preços e textos corrigidos conforme documentação
 - [x] Responsivo em mobile, tablet e desktop
 - [x] Lighthouse score > 90 em Performance e Acessibilidade
-- [ ] Código revisado e commitado
+- [x] Código revisado e commitado
 
 ## Resultados Lighthouse (Build de Produção)
 
