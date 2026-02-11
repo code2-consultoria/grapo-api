@@ -1,0 +1,207 @@
+FROM nexus.ao3.io:8082/php:8.3-fpm-alpine
+
+ENV CURRENT_PHP_VERSION=8.3.0
+
+ENV ENV="/etc/profile" \
+    FRAMEWORK=laravel \
+    CAROOT=/home/code2/.mkcert \
+    SSL_DOMAIN="code2.localhost" \
+    OPCACHE_MODE="normal" \
+    PHP_MEMORY_LIMIT=256M \
+    XDEBUG_ENABLED=false \
+    XDEBUG_IDE_KEY="code2" \
+    NR_ENABLED=false \
+    NR_APP_NAME="" \
+    NR_LICENSE_KEY="" \
+    TERM=xterm-256color \
+    COLORTERM=truecolor \
+    COMPOSER_PROCESS_TIMEOUT=1200 \
+    NPM_PACKAGES="/home/code2/.cache/npm-packages" \
+    NODE_PATH="/home/code2/.cache/npm-packages/lib/node_modules" \
+    MANPATH="/home/code2/.cache/npm-packages/share/man:/usr/share/man" \
+    PREFIX='/home/code2/.local' \
+    NGINX_HTTP_PORT="8080" \
+    NGINX_HTTPS_PORT="8083" \
+    NGINX_MODE="dual" \
+    NGINX_LISTEN_MODE="dual" \
+    NGINX_FPM_BACKEND_HOST="127.0.0.1" \
+    NGINX_FPM_BACKEND_PORT="9000"
+
+RUN apk add --no-cache mysql-client \
+    gettext \
+    less \
+    vim \
+    ca-certificates \
+    tar \
+    jq \
+    wget \
+    curl \
+    openssh \
+    fontconfig \
+    libxrender \
+    libxext \
+    imagemagick \
+    shadow \
+    unzip \
+    libzip \
+    libpng \
+    libjpeg-turbo \
+    libwebp \
+    freetype \
+    icu \
+    icu-data-full \
+    sudo \
+    s6 \
+    bash \
+    nginx \
+    libpq-dev \
+    libxml2-dev \
+    sqlite-dev \
+    libsodium-dev \
+    libxml2-dev \
+    openssl-dev \
+    curl-dev \
+    supervisor
+
+RUN apk add --no-cache --virtual build-essentials \
+    icu-dev icu-libs zlib-dev g++ make automake autoconf libzip-dev \
+    libpng-dev libwebp-dev libjpeg-turbo-dev freetype-dev && \
+    docker-php-ext-configure gd --enable-gd --with-freetype --with-jpeg --with-webp && \
+    docker-php-ext-install gd && \
+    docker-php-ext-configure pgsql -with-pgsql=/usr/local/pgsql && \
+    docker-php-ext-install pgsql && \
+    docker-php-ext-install pdo_pgsql && \
+    docker-php-ext-install dom && \
+    docker-php-ext-install xml && \
+#    docker-php-ext-install sockets && \
+    docker-php-ext-install session && \
+    docker-php-ext-install phar && \
+    docker-php-ext-install calendar && \
+    docker-php-ext-install bcmath && \
+    docker-php-ext-install mysqli && \
+    docker-php-ext-install pdo_mysql && \
+    docker-php-ext-install curl
+
+RUN pecl channel-update pecl.php.net && \
+   pecl install zip zlib_filter \
+   docker-php-ext-install zip && \
+   docker-php-ext-install opcache && \
+   docker-php-ext-install exif
+
+RUN apk add php83-zlib php83-pecl-apcu php83-pecl-xdebug
+
+RUN apk add --no-cache icu-dev gettext gettext-dev && \
+    docker-php-ext-configure intl && \
+    docker-php-ext-configure gettext && \
+    docker-php-ext-install intl gettext
+
+RUN apk add --no-cache \
+    oniguruma-dev \
+    && docker-php-ext-install mbstring \
+    && docker-php-ext-enable mbstring \
+    && docker-php-ext-install pcntl \
+    && docker-php-ext-configure pcntl --enable-pcntl
+
+#RUN apk --update --no-cache add autoconf g++ make linux-headers && \
+#    pecl install -f xdebug && \
+#    docker-php-ext-enable xdebug && \
+#    apk del --purge autoconf g++ make
+
+#RUN pecl install --configureoptions 'enable-redis-igbinary="no" enable-redis-lzf="no" #enable-redis-zstd="no"' redis
+
+RUN pecl install --onlyreqdeps --nobuild redis-6.0.2 && \
+   cd "$(pecl config-get temp_dir)/redis" && \
+   phpize && \
+   ./configure && \
+   make && make install && \
+   docker-php-ext-enable redis && \
+   pecl install apcu && \
+   docker-php-ext-enable apcu
+
+RUN apk del build-essentials && rm -rf /usr/src/php*
+
+RUN wget https://getcomposer.org/composer-stable.phar -O /usr/local/bin/composer && chmod +x /usr/local/bin/composer
+
+## NGINX and PHP
+
+RUN echo "---> Adding the code2 user" && \
+    adduser -D -u 1000 code2 && \
+    mkdir -p /var/www/app && \
+    chown -R code2:code2 /var/www
+
+COPY ./Docker/etc /etc
+COPY ./Docker/scripts /scripts
+
+RUN chown -R code2:code2 /home/code2 && \
+    chown -R code2:code2 /scripts && \
+    chmod +x /scripts/*.sh && \
+    rm -rf /tmp/* && \
+    echo "code2  ALL = ( ALL ) NOPASSWD: ALL" >> /etc/sudoers
+
+RUN echo "---> Configuring PHP" && \
+    sed -i "/;error_log = .*/c\error_log = /dev/stderr" /usr/local/etc/php-fpm.conf && \
+    sed -i "/;php_admin_value[memory_limit] = .*/c\php_admin_value[memory_limit] = $PHP_MEMORY_LIMIT" /usr/local/etc/php-fpm.conf && \
+    sed -i "/user = .*/c\user = code2" /usr/local/etc/php-fpm.conf && \
+    sed -i "/^group = .*/c\group = code2" /usr/local/etc/php-fpm.conf && \
+    sed -i "/listen.owner = .*/c\listen.owner = code2" /usr/local/etc/php-fpm.conf && \
+    sed -i "/listen.group = .*/c\listen.group = code2" /usr/local/etc/php-fpm.conf && \
+    sed -i "/listen = .*/c\listen = [::]:9000" /usr/local/etc/php-fpm.conf && \
+    sed -i "/;access.log = .*/c\access.log = /dev/stderr" /usr/local/etc/php-fpm.conf && \
+    sed -i "/;decorate_workers_output = .*/c\decorate_workers_output = no" /usr/local/etc/php-fpm.conf && \
+    sed -i "/;clear_env = .*/c\clear_env = no" /usr/local/etc/php-fpm.conf && \
+    sed -i "/;catch_workers_output = .*/c\catch_workers_output = yes" /usr/local/etc/php-fpm.conf && \
+    sed -i "/;log_level = .*/c\log_level = notice" /usr/local/etc/php-fpm.conf && \
+    sed -i "/;log_limit = .*/c\log_limit = 16384" /usr/local/etc/php-fpm.conf && \
+    sed -i "/pid = .*/c\;pid = /run/php/php8-fpm.pid" /usr/local/etc/php-fpm.conf && \
+    sed -i "/;daemonize = .*/c\daemonize = yes" /usr/local/etc/php-fpm.conf && \
+    sed -i "/error_log = .*/c\error_log = /dev/stderr" /usr/local/etc/php-fpm.conf && \
+    sed -i "/;rlimit_files = .*/c\rlimit_files = 8192" /usr/local/etc/php-fpm.conf && \
+    sed -i "/;rlimit_core = .*/c\rlimit_core = unlimited" /usr/local/etc/php-fpm.conf && \
+    sed -i "/post_max_size = .*/c\post_max_size = 1000M" /usr/local/etc/php-fpm.conf && \
+    sed -i "/upload_max_filesize = .*/c\upload_max_filesize = 1000M" /usr/local/etc/php-fpm.conf
+
+USER root
+
+RUN echo "--> Installing Nginx" && \
+    apk add --update --no-cache nginx openssl && \
+    rm -rf /tmp/* /var/tmp/* /usr/share/doc/* && \
+    echo "--> Fixing permissions" && \
+    mkdir /var/tmp/nginx && \
+    chown -R code2:code2 /var/tmp/nginx && \
+    chown -R code2:code2 /var/run/nginx && \
+    chown -R code2:code2 /var/log/nginx && \
+    chown -R code2:code2 /var/lib/nginx && \
+    chown -R code2:code2 /home/code2 && \
+    mv /scripts/start.sh /home/start.sh && \
+    chown -R code2:code2 /home/start.sh && \
+    chmod +x /home/start.sh
+
+USER code2
+
+# Environment variables
+ENV PATH=/scripts:/home/code2/.local/bin:/home/code2/.cache/npm-packages/bin:/home/code2/.yarn/bin:/home/code2/.composer/vendor/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+
+# Application directory
+WORKDIR "/var/www/app"
+
+COPY ./api .
+
+RUN [ -d "bootstrap/cache" ] || mkdir bootstrap/cache 2> /dev/null && \
+    sudo chown -R code2:code2 ./bootstrap/cache storage && \
+    sudo chmod -R ug+w ./bootstrap/cache ./storage
+
+RUN [ -f ".env" ] || cp .env.example .env
+
+RUN composer install --no-dev && \
+   sed -i -e "s/LOG_CHANNEL=.*/LOG_CHANNEL=stderr/g" .env
+
+# Define the entry point that tries to enable newrelic
+ENTRYPOINT ["/scripts/entrypoint.sh"]
+
+# Expose webserver port
+EXPOSE ${NGINX_HTTP_PORT}
+EXPOSE ${NGINX_HTTPS_PORT}
+
+COPY ./Docker/etc/supervisord/default.conf /etc/supervisord.conf
+
+CMD ["supervisord", "--configuration", "/etc/supervisord.conf"]
