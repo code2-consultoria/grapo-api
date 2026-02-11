@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+
+<html lang="pt-BR"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Relatório de Lote e ROI</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "primary": "#135bec",
+              "background-light": "#f6f6f8",
+              "background-dark": "#101622",
+            },
+            fontFamily: {
+              "display": ["Inter", "sans-serif"]
+            },
+            borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+          },
+        },
+      }
+    </script>
+<style>
+        body { font-family: 'Inter', sans-serif; }
+        .ios-status-bar { height: 44px; }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-slate-100 min-h-screen">
+<!-- iOS Status Bar Placeholder -->
+<div class="ios-status-bar w-full flex items-center justify-between px-6 bg-background-light dark:bg-background-dark">
+<span class="text-xs font-semibold">9:41</span>
+<div class="flex gap-1 items-center">
+<span class="material-icons text-sm">signal_cellular_alt</span>
+<span class="material-icons text-sm">wifi</span>
+<span class="material-icons text-sm">battery_full</span>
+</div>
+</div>
+<!-- Navigation Header -->
+<header class="sticky top-0 z-10 bg-background-light/80 dark:bg-background-dark/80 backdrop-blur-md px-4 py-3 border-b border-slate-200 dark:border-slate-800">
+<div class="flex items-center justify-between">
+<button class="text-primary flex items-center">
+<span class="material-icons">chevron_left</span>
+<span class="font-medium">Voltar</span>
+</button>
+<h1 class="text-sm font-semibold uppercase tracking-wider text-slate-500">Detalhes do Lote</h1>
+<button class="text-primary">
+<span class="material-icons">more_horiz</span>
+</button>
+</div>
+</header>
+<main class="p-4 space-y-6 max-w-md mx-auto">
+<!-- Batch Identity -->
+<section class="space-y-1">
+<div class="flex items-center gap-2">
+<h2 class="text-2xl font-bold tracking-tight">Equipamentos de TI</h2>
+<span class="bg-primary/10 text-primary text-[10px] font-bold px-2 py-0.5 rounded-full uppercase">Ativo</span>
+</div>
+<p class="text-slate-500 text-sm flex items-center gap-1">
+                ID: <span class="font-mono bg-slate-200 dark:bg-slate-800 px-1 rounded">LOTE-2023-089</span>
+</p>
+</section>
+<!-- ROI Card -->
+<section class="bg-white dark:bg-slate-900 rounded-xl p-5 shadow-sm border border-slate-200 dark:border-slate-800">
+<div class="flex justify-between items-start mb-6">
+<div>
+<p class="text-xs font-medium text-slate-400 uppercase tracking-widest">Retorno do Investimento</p>
+<h3 class="text-3xl font-bold text-primary">68.4%</h3>
+</div>
+<div class="flex flex-col items-end">
+<div class="flex items-center gap-1 text-xs text-slate-400 mb-1">
+<span class="material-icons text-[14px]">sync_alt</span>
+<span>Via Stripe</span>
+</div>
+<span class="text-[10px] px-2 py-0.5 rounded bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400 font-bold uppercase tracking-tighter">Conectado</span>
+</div>
+</div>
+<!-- Progress Bar -->
+<div class="space-y-3">
+<div class="w-full bg-slate-100 dark:bg-slate-800 h-4 rounded-full overflow-hidden">
+<div class="bg-primary h-full w-[68.4%]" style="width: 68.4%;"></div>
+</div>
+<div class="flex justify-between text-sm">
+<div class="flex flex-col">
+<span class="text-slate-400 text-[10px] uppercase font-bold">Custo Total</span>
+<span class="font-bold">R$ 45.000,00</span>
+</div>
+<div class="flex flex-col items-end text-primary">
+<span class="text-slate-400 text-[10px] uppercase font-bold">Recuperado</span>
+<span class="font-bold">R$ 30.780,00</span>
+</div>
+</div>
+</div>
+<div class="mt-6 pt-4 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between">
+<p class="text-sm text-slate-500">Faltam <span class="text-slate-900 dark:text-white font-bold">R$ 14.220,00</span> para o Breakeven</p>
+<div class="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center text-primary">
+<span class="material-icons text-sm">trending_up</span>
+</div>
+</div>
+</section>
+<!-- Stats Grid -->
+<div class="grid grid-cols-2 gap-4">
+<div class="bg-white dark:bg-slate-900 p-4 rounded-xl border border-slate-200 dark:border-slate-800">
+<span class="text-xs text-slate-400 uppercase font-bold">Itens no Lote</span>
+<p class="text-2xl font-bold mt-1">24</p>
+<p class="text-[10px] text-slate-500 mt-1">8 unidades alugadas</p>
+</div>
+<div class="bg-white dark:bg-slate-900 p-4 rounded-xl border border-slate-200 dark:border-slate-800">
+<span class="text-xs text-slate-400 uppercase font-bold">Mensalidade</span>
+<p class="text-2xl font-bold mt-1 text-emerald-600">R$ 4.2k</p>
+<p class="text-[10px] text-slate-500 mt-1">Receita recorrente</p>
+</div>
+</div>
+<!-- Action Items -->
+<section class="space-y-3 pb-24">
+<h3 class="text-xs font-bold text-slate-400 uppercase tracking-widest pl-1">Ações Rápidas</h3>
+<button class="w-full flex items-center justify-between bg-primary text-white p-4 rounded-xl shadow-lg shadow-primary/20 hover:opacity-90 transition-opacity">
+<div class="flex items-center gap-3">
+<span class="material-icons">add_circle</span>
+<span class="font-semibold text-sm">Adicionar Itens ao Lote</span>
+</div>
+<span class="material-icons">chevron_right</span>
+</button>
+<button class="w-full flex items-center justify-between bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-200 p-4 rounded-xl border border-slate-200 dark:border-slate-800">
+<div class="flex items-center gap-3">
+<span class="material-icons text-primary">description</span>
+<span class="font-semibold text-sm">Exportar Relatório PDF</span>
+</div>
+<span class="material-icons text-slate-300">chevron_right</span>
+</button>
+<button class="w-full flex items-center justify-between bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-200 p-4 rounded-xl border border-slate-200 dark:border-slate-800">
+<div class="flex items-center gap-3">
+<span class="material-icons text-primary">credit_card</span>
+<span class="font-semibold text-sm">Ver Cobranças no Stripe</span>
+</div>
+<span class="material-icons text-slate-300">chevron_right</span>
+</button>
+</section>
+</main>
+<!-- Bottom Tab Bar Placeholder -->
+<nav class="fixed bottom-0 left-0 right-0 bg-white/90 dark:bg-slate-900/90 backdrop-blur-md border-t border-slate-200 dark:border-slate-800 px-6 py-2 pb-8 flex justify-between items-center max-w-md mx-auto">
+<div class="flex flex-col items-center gap-1 text-slate-400">
+<span class="material-icons">dashboard</span>
+<span class="text-[10px]">Home</span>
+</div>
+<div class="flex flex-col items-center gap-1 text-primary">
+<span class="material-icons">inventory_2</span>
+<span class="text-[10px]">Lotes</span>
+</div>
+<div class="flex flex-col items-center gap-1 text-slate-400">
+<span class="material-icons">receipt_long</span>
+<span class="text-[10px]">Contratos</span>
+</div>
+<div class="flex flex-col items-center gap-1 text-slate-400">
+<span class="material-icons">settings</span>
+<span class="text-[10px]">Ajustes</span>
+</div>
+</nav>
+<!-- Background Illustration Elements -->
+<div class="fixed top-0 left-0 w-full h-full pointer-events-none opacity-5 dark:opacity-10 z-0">
+<div class="absolute top-20 right-[-10%] w-64 h-64 bg-primary rounded-full blur-3xl"></div>
+<div class="absolute bottom-40 left-[-10%] w-48 h-48 bg-primary rounded-full blur-3xl"></div>
+</div>
+</body></html>

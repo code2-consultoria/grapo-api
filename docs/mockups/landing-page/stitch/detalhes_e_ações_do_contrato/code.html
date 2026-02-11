@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+
+<html lang="pt-br"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#135bec",
+                        "background-light": "#f6f6f8",
+                        "background-dark": "#101622",
+                    },
+                    fontFamily: {
+                        "display": ["Inter"]
+                    },
+                    borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style>
+        body {
+            font-family: 'Inter', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .ios-blur {
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+        }
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-slate-100 min-h-screen flex justify-center">
+<!-- Mobile Container (iPhone Pro Max aspect ratio simulation) -->
+<div class="w-full max-w-[430px] bg-background-light dark:bg-background-dark min-h-screen relative flex flex-col shadow-2xl overflow-hidden">
+<!-- Status Bar -->
+<div class="h-12 flex items-center justify-between px-8 pt-4 w-full">
+<span class="font-bold text-sm">9:41</span>
+<div class="flex space-x-2">
+<span class="material-icons text-sm">signal_cellular_alt</span>
+<span class="material-icons text-sm">wifi</span>
+<span class="material-icons text-sm">battery_full</span>
+</div>
+</div>
+<!-- Navigation Header -->
+<header class="flex items-center justify-between px-6 py-4">
+<button class="w-10 h-10 flex items-center justify-center rounded-full bg-white dark:bg-slate-800 shadow-sm">
+<span class="material-icons text-primary">arrow_back_ios_new</span>
+</button>
+<h1 class="text-lg font-bold">Detalhes do Contrato</h1>
+<button class="w-10 h-10 flex items-center justify-center rounded-full bg-white dark:bg-slate-800 shadow-sm">
+<span class="material-icons text-slate-400">more_horiz</span>
+</button>
+</header>
+<!-- Main Scrollable Content -->
+<main class="flex-1 overflow-y-auto px-6 pb-32 no-scrollbar">
+<!-- Contract Status & ID -->
+<div class="mt-4 flex items-center justify-between">
+<div>
+<p class="text-xs text-slate-500 uppercase tracking-wider font-semibold">Contrato #CT-2023-0892</p>
+<h2 class="text-2xl font-bold mt-1">Lote Alpha Prime</h2>
+</div>
+<div class="px-3 py-1 rounded-full bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400 text-xs font-bold">
+                    ATIVO
+                </div>
+</div>
+<!-- Stakeholder Card -->
+<div class="mt-8 bg-white dark:bg-slate-800 p-4 rounded-xl shadow-sm border border-slate-100 dark:border-slate-700/50">
+<div class="flex items-center">
+<img alt="Responsável" class="w-12 h-12 rounded-full object-cover mr-4" data-alt="Professional business man portrait headshot" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBoGCr3DesJKniRJbIZZdQpHADqTOs7rbV4DRGsyWwTPQkZy3OW4ByLYJZr402zcN7VNd07T9ay4aYxc0_vy74yHIwJ5UKjN897PtL2nmrQtC6s33I1gIQ95XGeL73eDMY8Uffr02pAfw5w5IQEGPTls-pAvE4Lb8gESPCGEZG0USf2ZQQYNmSEXfrvIyP_6t7Xhln8nBpv0A6cwOmrQcqFF7Do8voeACaYPYEFJJvSgWgmbbE8UFpZc-icupH6KfKIaz8MBrRo-nhc"/>
+<div class="flex-1">
+<h3 class="font-bold text-slate-800 dark:text-slate-100">Ricardo Almeida Santos</h3>
+<p class="text-sm text-slate-500">Construtora Horizonte LTDA</p>
+</div>
+<button class="w-8 h-8 bg-primary/10 dark:bg-primary/20 text-primary rounded-full flex items-center justify-center">
+<span class="material-icons text-lg">call</span>
+</button>
+</div>
+<div class="mt-4 pt-4 border-t border-slate-100 dark:border-slate-700/50 grid grid-cols-2 gap-4">
+<div>
+<p class="text-[10px] text-slate-400 uppercase font-bold tracking-tighter">CNPJ / CPF</p>
+<p class="text-sm font-medium">12.345.678/0001-90</p>
+</div>
+<div>
+<p class="text-[10px] text-slate-400 uppercase font-bold tracking-tighter">Email</p>
+<p class="text-sm font-medium truncate">ricardo@horiz.com.br</p>
+</div>
+</div>
+</div>
+<!-- Timeline Section -->
+<div class="mt-8">
+<h3 class="text-sm font-bold text-slate-400 uppercase tracking-widest mb-4">Cronograma do Contrato</h3>
+<div class="relative bg-white dark:bg-slate-800 p-5 rounded-xl shadow-sm border border-slate-100 dark:border-slate-700/50">
+<div class="flex justify-between items-start mb-6">
+<div class="flex flex-col items-center">
+<div class="w-10 h-10 rounded-full bg-primary flex items-center justify-center text-white mb-2 ring-4 ring-primary/10">
+<span class="material-icons text-lg">play_arrow</span>
+</div>
+<span class="text-xs font-bold">Início</span>
+<span class="text-sm text-slate-500">15 Jan 2023</span>
+</div>
+<div class="flex-1 h-[2px] bg-slate-100 dark:bg-slate-700 mt-5 mx-2 relative">
+<div class="absolute inset-0 bg-primary w-full origin-left"></div>
+</div>
+<div class="flex flex-col items-center">
+<div class="w-10 h-10 rounded-full bg-slate-100 dark:bg-slate-700 flex items-center justify-center text-slate-400 mb-2">
+<span class="material-icons text-lg">event</span>
+</div>
+<span class="text-xs font-bold text-slate-400">Término</span>
+<span class="text-sm text-slate-500">15 Jan 2024</span>
+</div>
+</div>
+<!-- Renewal History Accordion -->
+<details class="group border-t border-slate-100 dark:border-slate-700/50 pt-3">
+<summary class="flex items-center justify-between cursor-pointer list-none">
+<div class="flex items-center space-x-2 text-primary">
+<span class="material-icons text-sm">history</span>
+<span class="text-sm font-semibold">Histórico de Renovações</span>
+</div>
+<span class="material-icons text-slate-400 group-open:rotate-180 transition-transform">expand_more</span>
+</summary>
+<div class="mt-4 space-y-3">
+<div class="flex items-center justify-between text-xs py-2 border-b border-slate-50 dark:border-slate-700/30">
+<span class="text-slate-500">Renovação Automática</span>
+<span class="font-medium">15/01/2023</span>
+</div>
+<div class="flex items-center justify-between text-xs py-2 border-b border-slate-50 dark:border-slate-700/30">
+<span class="text-slate-500">Aditivo de Prazo (+6m)</span>
+<span class="font-medium">10/08/2022</span>
+</div>
+</div>
+</details>
+</div>
+</div>
+<!-- Items Locados List -->
+<div class="mt-8 pb-10">
+<div class="flex items-center justify-between mb-4">
+<h3 class="text-sm font-bold text-slate-400 uppercase tracking-widest">Itens Locados (4)</h3>
+<span class="text-primary font-bold text-sm">R$ 14.500,00</span>
+</div>
+<div class="space-y-3">
+<!-- Item 1 -->
+<div class="flex items-center p-3 bg-white dark:bg-slate-800 rounded-xl border border-slate-100 dark:border-slate-700/50">
+<div class="w-12 h-12 bg-slate-100 dark:bg-slate-700 rounded-lg flex items-center justify-center mr-4">
+<span class="material-icons text-slate-400">construction</span>
+</div>
+<div class="flex-1">
+<h4 class="text-sm font-bold">Betoneira Trifásica 400L</h4>
+<p class="text-[11px] text-slate-500">Qtd: 2 unidades</p>
+</div>
+<div class="text-right">
+<p class="text-sm font-bold text-slate-800 dark:text-slate-100">R$ 800,00</p>
+<p class="text-[10px] text-slate-400">mensal/unid</p>
+</div>
+</div>
+<!-- Item 2 -->
+<div class="flex items-center p-3 bg-white dark:bg-slate-800 rounded-xl border border-slate-100 dark:border-slate-700/50">
+<div class="w-12 h-12 bg-slate-100 dark:bg-slate-700 rounded-lg flex items-center justify-center mr-4">
+<span class="material-icons text-slate-400">layers</span>
+</div>
+<div class="flex-1">
+<h4 class="text-sm font-bold">Andaime Tubular 1.0m</h4>
+<p class="text-[11px] text-slate-500">Qtd: 24 unidades</p>
+</div>
+<div class="text-right">
+<p class="text-sm font-bold text-slate-800 dark:text-slate-100">R$ 120,00</p>
+<p class="text-[10px] text-slate-400">mensal/unid</p>
+</div>
+</div>
+<!-- Item 3 -->
+<div class="flex items-center p-3 bg-white dark:bg-slate-800 rounded-xl border border-slate-100 dark:border-slate-700/50">
+<div class="w-12 h-12 bg-slate-100 dark:bg-slate-700 rounded-lg flex items-center justify-center mr-4">
+<span class="material-icons text-slate-400">electric_bolt</span>
+</div>
+<div class="flex-1">
+<h4 class="text-sm font-bold">Gerador de Energia 10kVA</h4>
+<p class="text-[11px] text-slate-500">Qtd: 1 unidade</p>
+</div>
+<div class="text-right">
+<p class="text-sm font-bold text-slate-800 dark:text-slate-100">R$ 2.400,00</p>
+<p class="text-[10px] text-slate-400">mensal/unid</p>
+</div>
+</div>
+</div>
+</div>
+</main>
+<!-- Fixed Action Bar (iPhone Style) -->
+<div class="absolute bottom-0 left-0 right-0 p-6 ios-blur bg-white/80 dark:bg-background-dark/80 border-t border-slate-200 dark:border-slate-700/50 flex flex-col space-y-3">
+<button class="w-full bg-primary text-white font-bold py-4 rounded-xl shadow-lg shadow-primary/20 flex items-center justify-center active:scale-[0.98] transition-transform">
+<span class="material-icons mr-2">update</span>
+                Renovar Contrato
+            </button>
+<button class="w-full bg-white dark:bg-slate-800 text-red-500 border border-red-100 dark:border-red-900/30 font-bold py-4 rounded-xl active:scale-[0.98] transition-transform flex items-center justify-center">
+<span class="material-icons mr-2">cancel</span>
+                Revogar Contrato
+            </button>
+</div>
+<!-- Renewal Bottom Sheet (Overlay Mockup - Hidden by default in actual interaction but shown here for UI structure) -->
+<!-- This is a visualization of what would appear when clicking Renovar -->
+<div class="hidden absolute inset-0 bg-black/40 z-20 flex flex-col justify-end">
+<div class="bg-white dark:bg-slate-900 rounded-t-3xl p-6 pb-12 shadow-2xl animate-slide-up">
+<div class="w-12 h-1 bg-slate-200 dark:bg-slate-700 rounded-full mx-auto mb-6"></div>
+<h3 class="text-xl font-bold mb-2">Fluxo de Renovação</h3>
+<p class="text-sm text-slate-500 mb-6">Selecione o novo período de vigência para o contrato.</p>
+<div class="space-y-4">
+<div>
+<label class="block text-xs font-bold text-slate-400 uppercase mb-2">Nova Data de Término</label>
+<div class="relative">
+<input class="w-full p-4 rounded-xl bg-slate-50 dark:bg-slate-800 border-none focus:ring-2 focus:ring-primary font-medium" type="date" value="2025-01-15"/>
+</div>
+</div>
+<div>
+<label class="block text-xs font-bold text-slate-400 uppercase mb-2">Observações do Aditivo</label>
+<textarea class="w-full p-4 rounded-xl bg-slate-50 dark:bg-slate-800 border-none focus:ring-2 focus:ring-primary font-medium h-24" placeholder="Descreva alterações no valor ou itens..."></textarea>
+</div>
+<div class="flex space-x-3 mt-4">
+<button class="flex-1 bg-slate-100 dark:bg-slate-800 py-4 rounded-xl font-bold">Cancelar</button>
+<button class="flex-[2] bg-primary text-white py-4 rounded-xl font-bold">Confirmar Renovação</button>
+</div>
+</div>
+</div>
+</div>
+<!-- Revoke Confirmation Dialog (Mockup) -->
+<div class="hidden absolute inset-0 bg-black/40 z-30 flex items-center justify-center px-6">
+<div class="bg-white dark:bg-slate-900 rounded-2xl w-full p-6 shadow-2xl">
+<div class="w-16 h-16 bg-red-100 dark:bg-red-900/30 text-red-500 rounded-full flex items-center justify-center mx-auto mb-4">
+<span class="material-icons text-3xl">warning_amber</span>
+</div>
+<h3 class="text-lg font-bold text-center mb-2">Revogar Contrato?</h3>
+<p class="text-sm text-slate-500 text-center mb-6">Esta ação é irreversível e o contrato será marcado como rescindido imediatamente.</p>
+<div class="space-y-4">
+<input class="w-full p-4 rounded-xl bg-slate-50 dark:bg-slate-800 border-none focus:ring-2 focus:ring-red-500 text-sm" placeholder="Motivo da revogação..." type="text"/>
+<div class="flex flex-col space-y-2">
+<button class="w-full bg-red-500 text-white py-3 rounded-xl font-bold">Sim, Revogar Contrato</button>
+<button class="w-full bg-transparent text-slate-500 py-3 rounded-xl font-semibold">Manter Contrato</button>
+</div>
+</div>
+</div>
+</div>
+</div>
+</body></html>

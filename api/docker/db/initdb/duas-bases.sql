@@ -1,0 +1,2 @@
+-- CREATE DATABASE jukebar;
+CREATE DATABASE whatsapp;

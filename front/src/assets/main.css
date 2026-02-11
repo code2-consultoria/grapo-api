@@ -1,0 +1,114 @@
+@import 'tailwindcss';
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+}
+
+/* Paleta Grapo - Modo Escuro (padrão) */
+:root {
+  --radius: 0.5rem;
+
+  /* Cores principais do Grapo */
+  --background: #12110D;
+  --foreground: #F8F7F6;
+
+  --card: #1E1B12;
+  --card-foreground: #F8F7F6;
+
+  --popover: #1E1B12;
+  --popover-foreground: #F8F7F6;
+
+  /* Dourado como cor primária */
+  --primary: #D4AF37;
+  --primary-foreground: #12110D;
+
+  --secondary: #2A2620;
+  --secondary-foreground: #F8F7F6;
+
+  --muted: #2A2620;
+  --muted-foreground: #9CA3AF;
+
+  --accent: #D4AF37;
+  --accent-foreground: #12110D;
+
+  --destructive: #EF4444;
+
+  --border: rgba(212, 175, 55, 0.1);
+  --input: rgba(212, 175, 55, 0.15);
+  --ring: #D4AF37;
+}
+
+/* Paleta Grapo - Modo Claro */
+.light {
+  --background: #F8F7F6;
+  --foreground: #12110D;
+
+  --card: #FFFFFF;
+  --card-foreground: #12110D;
+
+  --popover: #FFFFFF;
+  --popover-foreground: #12110D;
+
+  --primary: #D4AF37;
+  --primary-foreground: #12110D;
+
+  --secondary: #F3F4F6;
+  --secondary-foreground: #12110D;
+
+  --muted: #F3F4F6;
+  --muted-foreground: #6B7280;
+
+  --accent: #D4AF37;
+  --accent-foreground: #12110D;
+
+  --destructive: #EF4444;
+
+  --border: rgba(18, 17, 13, 0.1);
+  --input: rgba(18, 17, 13, 0.1);
+  --ring: #D4AF37;
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+    font-family: 'Inter', sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+}
+
+#app {
+  min-height: 100dvh;
+}

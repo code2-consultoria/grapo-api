@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+
+<html lang="pt-BR"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Gestão de Contratos</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#135bec",
+                        "background-light": "#f6f6f8",
+                        "background-dark": "#101622",
+                    },
+                    fontFamily: {
+                        "display": ["Inter"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+<style>
+        body {
+            font-family: 'Inter', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .ios-shadow {
+            box-shadow: 0 2px 8px -2px rgba(0, 0, 0, 0.05), 0 4px 12px -4px rgba(0, 0, 0, 0.05);
+        }
+        .hide-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .swipe-container {
+            overflow-x: auto;
+            scroll-snap-type: x mandatory;
+            scrollbar-width: none;
+        }
+        .swipe-content {
+            scroll-snap-align: start;
+            min-width: 100%;
+        }
+        .swipe-actions {
+            scroll-snap-align: end;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-slate-100 min-h-screen pb-24">
+<!-- iOS Status Bar Spacer -->
+<div class="h-11 w-full bg-background-light dark:bg-background-dark sticky top-0 z-50"></div>
+<!-- Header -->
+<header class="bg-background-light/80 dark:bg-background-dark/80 backdrop-blur-md sticky top-11 z-40 px-5 pt-2 pb-4">
+<div class="flex justify-between items-center mb-4">
+<h1 class="text-3xl font-bold tracking-tight">Contratos</h1>
+<button class="bg-primary text-white p-2 rounded-full shadow-lg flex items-center justify-center">
+<span class="material-icons-round">add</span>
+</button>
+</div>
+<!-- Search Bar -->
+<div class="relative mb-4">
+<span class="material-icons-round absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">search</span>
+<input class="w-full bg-slate-200/50 dark:bg-slate-800 border-none rounded-xl py-2.5 pl-10 pr-4 focus:ring-2 focus:ring-primary/50 text-sm" placeholder="Buscar cliente ou produto..." type="text"/>
+</div>
+<!-- Filter Chips -->
+<div class="flex gap-2 overflow-x-auto hide-scrollbar pb-1">
+<button class="whitespace-nowrap px-4 py-1.5 rounded-full bg-primary text-white text-sm font-medium">Todos</button>
+<button class="whitespace-nowrap px-4 py-1.5 rounded-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 text-sm font-medium">Ativos</button>
+<button class="whitespace-nowrap px-4 py-1.5 rounded-full bg-primary/10 border border-primary/20 text-primary text-sm font-semibold">Vencimento 60 dias</button>
+<button class="whitespace-nowrap px-4 py-1.5 rounded-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 text-sm font-medium">Renovados</button>
+</div>
+</header>
+<!-- Contract List -->
+<main class="px-4 space-y-4">
+<!-- Contract Card 1 - Swipeable Container -->
+<div class="swipe-container flex rounded-xl overflow-hidden ios-shadow bg-white dark:bg-slate-900">
+<div class="swipe-content w-full p-4 shrink-0">
+<div class="flex justify-between items-start mb-3">
+<div>
+<p class="text-[10px] uppercase tracking-wider text-slate-400 font-bold mb-0.5">Responsável</p>
+<h3 class="font-bold text-slate-800 dark:text-white text-lg">Ricardo Oliveira S.A.</h3>
+</div>
+<span class="bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400 text-[10px] font-bold px-2 py-1 rounded uppercase">Ativo</span>
+</div>
+<div class="flex items-center gap-4 mb-4">
+<div class="flex items-center gap-1.5">
+<span class="material-icons-round text-primary text-sm">calendar_today</span>
+<div class="text-xs">
+<p class="text-slate-400">Início</p>
+<p class="font-medium">12 Jan 2024</p>
+</div>
+</div>
+<div class="h-6 w-px bg-slate-200 dark:bg-slate-800"></div>
+<div class="flex items-center gap-1.5">
+<span class="material-icons-round text-amber-500 text-sm">event</span>
+<div class="text-xs">
+<p class="text-slate-400">Vencimento</p>
+<p class="font-medium">12 Jan 2025</p>
+</div>
+</div>
+</div>
+<div class="bg-background-light dark:bg-slate-800/50 p-3 rounded-lg">
+<p class="text-[10px] uppercase tracking-wider text-slate-400 font-bold mb-2">Itens Alugados</p>
+<div class="flex flex-wrap gap-2">
+<span class="text-xs bg-white dark:bg-slate-700 px-2 py-1 rounded shadow-sm border border-slate-100 dark:border-slate-600">2x Lote Comercial A</span>
+<span class="text-xs bg-white dark:bg-slate-700 px-2 py-1 rounded shadow-sm border border-slate-100 dark:border-slate-600">1x Maquinário Pesado</span>
+</div>
+</div>
+</div>
+<!-- Swipe Actions -->
+<div class="swipe-actions flex">
+<button class="bg-primary text-white w-20 flex flex-col items-center justify-center gap-1 px-2">
+<span class="material-icons-round">autorenew</span>
+<span class="text-[10px] font-bold">RENOVAR</span>
+</button>
+<button class="bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-300 w-20 flex flex-col items-center justify-center gap-1 px-2">
+<span class="material-icons-round">cancel</span>
+<span class="text-[10px] font-bold">REVOGAR</span>
+</button>
+</div>
+</div>
+<!-- Contract Card 2 -->
+<div class="swipe-container flex rounded-xl overflow-hidden ios-shadow bg-white dark:bg-slate-900">
+<div class="swipe-content w-full p-4 shrink-0">
+<div class="flex justify-between items-start mb-3">
+<div>
+<p class="text-[10px] uppercase tracking-wider text-slate-400 font-bold mb-0.5">Responsável</p>
+<h3 class="font-bold text-slate-800 dark:text-white text-lg">Construtora Horizonte</h3>
+</div>
+<span class="bg-primary/10 text-primary dark:bg-primary/20 text-[10px] font-bold px-2 py-1 rounded uppercase">Renovado</span>
+</div>
+<div class="flex items-center gap-4 mb-4">
+<div class="flex items-center gap-1.5">
+<span class="material-icons-round text-primary text-sm">calendar_today</span>
+<div class="text-xs">
+<p class="text-slate-400">Início</p>
+<p class="font-medium">05 Out 2023</p>
+</div>
+</div>
+<div class="h-6 w-px bg-slate-200 dark:bg-slate-800"></div>
+<div class="flex items-center gap-1.5">
+<span class="material-icons-round text-red-500 text-sm">priority_high</span>
+<div class="text-xs">
+<p class="text-slate-400">Vencimento</p>
+<p class="font-medium text-red-500">22 Abr 2024</p>
+</div>
+</div>
+</div>
+<div class="bg-background-light dark:bg-slate-800/50 p-3 rounded-lg">
+<p class="text-[10px] uppercase tracking-wider text-slate-400 font-bold mb-2">Itens Alugados</p>
+<div class="flex flex-wrap gap-2">
+<span class="text-xs bg-white dark:bg-slate-700 px-2 py-1 rounded shadow-sm border border-slate-100 dark:border-slate-600">5x Betoneira 400L</span>
+</div>
+</div>
+</div>
+<div class="swipe-actions flex">
+<button class="bg-primary text-white w-20 flex flex-col items-center justify-center gap-1 px-2">
+<span class="material-icons-round">autorenew</span>
+<span class="text-[10px] font-bold">RENOVAR</span>
+</button>
+<button class="bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-300 w-20 flex flex-col items-center justify-center gap-1 px-2">
+<span class="material-icons-round">cancel</span>
+<span class="text-[10px] font-bold">REVOGAR</span>
+</button>
+</div>
+</div>
+<!-- Contract Card 3 -->
+<div class="swipe-container flex rounded-xl overflow-hidden ios-shadow bg-white dark:bg-slate-900 opacity-60">
+<div class="swipe-content w-full p-4 shrink-0">
+<div class="flex justify-between items-start mb-3">
+<div>
+<p class="text-[10px] uppercase tracking-wider text-slate-400 font-bold mb-0.5">Responsável</p>
+<h3 class="font-bold text-slate-800 dark:text-white text-lg">Marta S. Ferreira</h3>
+</div>
+<span class="bg-slate-100 text-slate-500 dark:bg-slate-800 dark:text-slate-400 text-[10px] font-bold px-2 py-1 rounded uppercase">Revogado</span>
+</div>
+<div class="flex items-center gap-4 mb-4">
+<div class="flex items-center gap-1.5 text-slate-400">
+<span class="material-icons-round text-sm">calendar_today</span>
+<div class="text-xs">
+<p>Finalizado em</p>
+<p class="font-medium">10 Dez 2023</p>
+</div>
+</div>
+</div>
+<div class="bg-background-light dark:bg-slate-800/50 p-3 rounded-lg">
+<p class="text-[10px] uppercase tracking-wider text-slate-400 font-bold mb-2 text-slate-400">Itens Anteriormente Alugados</p>
+<div class="flex flex-wrap gap-2">
+<span class="text-xs bg-white dark:bg-slate-700 px-2 py-1 rounded shadow-sm border border-slate-100 dark:border-slate-600 text-slate-400">1x Lote Residencial B12</span>
+</div>
+</div>
+</div>
+<div class="swipe-actions flex">
+<button class="bg-primary text-white w-20 flex flex-col items-center justify-center gap-1 px-2">
+<span class="material-icons-round">history</span>
+<span class="text-[10px] font-bold">REATIVAR</span>
+</button>
+</div>
+</div>
+<!-- Contract Card 4 -->
+<div class="swipe-container flex rounded-xl overflow-hidden ios-shadow bg-white dark:bg-slate-900">
+<div class="swipe-content w-full p-4 shrink-0">
+<div class="flex justify-between items-start mb-3">
+<div>
+<p class="text-[10px] uppercase tracking-wider text-slate-400 font-bold mb-0.5">Responsável</p>
+<h3 class="font-bold text-slate-800 dark:text-white text-lg">Condomínio Solar</h3>
+</div>
+<span class="bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400 text-[10px] font-bold px-2 py-1 rounded uppercase">Ativo</span>
+</div>
+<div class="flex items-center gap-4 mb-4">
+<div class="flex items-center gap-1.5">
+<span class="material-icons-round text-primary text-sm">calendar_today</span>
+<div class="text-xs">
+<p class="text-slate-400">Início</p>
+<p class="font-medium">01 Mar 2024</p>
+</div>
+</div>
+<div class="h-6 w-px bg-slate-200 dark:bg-slate-800"></div>
+<div class="flex items-center gap-1.5">
+<span class="material-icons-round text-slate-400 text-sm">event</span>
+<div class="text-xs">
+<p class="text-slate-400">Vencimento</p>
+<p class="font-medium">01 Mar 2025</p>
+</div>
+</div>
+</div>
+<div class="bg-background-light dark:bg-slate-800/50 p-3 rounded-lg">
+<p class="text-[10px] uppercase tracking-wider text-slate-400 font-bold mb-2">Itens Alugados</p>
+<div class="flex flex-wrap gap-2">
+<span class="text-xs bg-white dark:bg-slate-700 px-2 py-1 rounded shadow-sm border border-slate-100 dark:border-slate-600">3x Andaime Tubular</span>
+<span class="text-xs bg-white dark:bg-slate-700 px-2 py-1 rounded shadow-sm border border-slate-100 dark:border-slate-600">1x Guincho Elétrico</span>
+</div>
+</div>
+</div>
+<div class="swipe-actions flex">
+<button class="bg-primary text-white w-20 flex flex-col items-center justify-center gap-1 px-2">
+<span class="material-icons-round">autorenew</span>
+<span class="text-[10px] font-bold">RENOVAR</span>
+</button>
+<button class="bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-300 w-20 flex flex-col items-center justify-center gap-1 px-2">
+<span class="material-icons-round">cancel</span>
+<span class="text-[10px] font-bold">REVOGAR</span>
+</button>
+</div>
+</div>
+</main>
+<!-- Swipe Indicator Note (iOS Style) -->
+<div class="flex justify-center mt-6">
+<div class="bg-slate-200 dark:bg-slate-800 px-3 py-1 rounded-full flex items-center gap-2">
+<span class="material-icons-round text-xs text-slate-400">swipe_left</span>
+<p class="text-[10px] text-slate-500 font-medium">Deslize para ver ações</p>
+</div>
+</div>
+<!-- Tab Bar -->
+<nav class="fixed bottom-0 left-0 right-0 bg-white/90 dark:bg-slate-900/90 backdrop-blur-xl border-t border-slate-200 dark:border-slate-800 px-6 py-2 flex justify-between items-center z-50">
+<button class="flex flex-col items-center text-slate-400">
+<span class="material-icons-round">dashboard</span>
+<span class="text-[10px] font-medium mt-1">Lotes</span>
+</button>
+<button class="flex flex-col items-center text-primary">
+<span class="material-icons-round">description</span>
+<span class="text-[10px] font-bold mt-1">Contratos</span>
+</button>
+<button class="flex flex-col items-center text-slate-400">
+<span class="material-icons-round">payments</span>
+<span class="text-[10px] font-medium mt-1">Cobranças</span>
+</button>
+<button class="flex flex-col items-center text-slate-400">
+<span class="material-icons-round">person_outline</span>
+<span class="text-[10px] font-medium mt-1">Perfil</span>
+</button>
+</nav>
+<!-- iOS Home Indicator -->
+<div class="fixed bottom-1 left-1/2 -translate-x-1/2 w-32 h-1.5 bg-slate-300 dark:bg-slate-700 rounded-full z-50"></div>
+</body></html>

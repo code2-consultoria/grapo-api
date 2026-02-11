@@ -1,0 +1,6 @@
+export { default as Navbar } from './Navbar.vue'
+export { default as Hero } from './Hero.vue'
+export { default as Problems } from './Problems.vue'
+export { default as Features } from './Features.vue'
+export { default as Pricing } from './Pricing.vue'
+export { default as Footer } from './Footer.vue'

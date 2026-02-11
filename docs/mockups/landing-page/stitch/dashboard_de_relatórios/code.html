@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+
+<html lang="pt-BR"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "primary": "#135bec",
+              "background-light": "#f6f6f8",
+              "background-dark": "#101622",
+            },
+            fontFamily: {
+              "display": ["Inter"]
+            },
+            borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+          },
+        },
+      }
+    </script>
+<style>
+        body {
+            font-family: 'Inter', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .chart-bar {
+            transition: height 0.3s ease;
+        }
+        .ios-shadow {
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-slate-100 min-h-screen">
+<!-- Status Bar Spacer (iOS Style) -->
+<div class="h-12 w-full bg-white/80 dark:bg-background-dark/80 backdrop-blur-md sticky top-0 z-50 px-6 flex items-center justify-between">
+<span class="text-sm font-semibold">9:41</span>
+<div class="flex items-center gap-1.5">
+<span class="material-icons text-[14px]">signal_cellular_alt</span>
+<span class="material-icons text-[14px]">wifi</span>
+<span class="material-icons text-[14px]">battery_full</span>
+</div>
+</div>
+<!-- Main Content -->
+<main class="max-w-md mx-auto pb-24">
+<!-- Header -->
+<header class="px-6 py-4 flex justify-between items-center bg-white dark:bg-slate-900/50">
+<div>
+<h1 class="text-2xl font-bold tracking-tight">Relatórios</h1>
+<p class="text-xs text-slate-500 font-medium uppercase tracking-wider">Gestão de Aluguéis</p>
+</div>
+<div class="flex gap-3">
+<button class="w-10 h-10 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-600 dark:text-slate-300">
+<span class="material-icons">notifications_none</span>
+</button>
+<div class="w-10 h-10 rounded-full border-2 border-primary/20 p-0.5">
+<img class="w-full h-full rounded-full object-cover" data-alt="User profile avatar photo" src="https://lh3.googleusercontent.com/aida-public/AB6AXuALSrcRlko1Cqd4_BoKn9jNDKhNqGBr86s7-eT1zQkegy6R-V_dAGNKlyHOPIBwmnj1CEpj3J7tqhNnxgVOs52Qi3D7Ru-eXeuLQrJQBz0WcGfkHdqQ1EjxvFJz74NS0BxWQ-kOz41B2I2mcI-31eKDHgm2ROTFb_AtFZzgP7gPblP4icy0xwt1g6vnVri_5VndZxzLi57InsYzBS12mn6z0ahCV-wci34pcYMMNYExdoFp3-kG1LXyy5Vi5LtHbTCjjFQOJ60zamiJ"/>
+</div>
+</div>
+</header>
+<!-- Period Selector -->
+<div class="px-6 py-4">
+<div class="bg-slate-200/50 dark:bg-slate-800 p-1 rounded-xl flex items-center">
+<button class="flex-1 py-2 text-sm font-semibold rounded-lg bg-white dark:bg-primary shadow-sm text-primary dark:text-white">12 meses</button>
+<button class="flex-1 py-2 text-sm font-semibold text-slate-500 dark:text-slate-400">6 meses</button>
+<button class="flex-1 py-2 text-sm font-semibold text-slate-500 dark:text-slate-400 flex items-center justify-center gap-1">
+<span class="material-icons text-sm">calendar_today</span>
+                    Pers.
+                </button>
+</div>
+</div>
+<!-- Main Chart Section -->
+<section class="px-6 mb-8">
+<div class="bg-white dark:bg-slate-900 p-6 rounded-2xl ios-shadow">
+<div class="flex justify-between items-end mb-8">
+<div>
+<span class="text-sm text-slate-500 font-medium">Arrecadação Total</span>
+<h2 class="text-3xl font-bold">R$ 142.850</h2>
+</div>
+<div class="flex items-center text-emerald-500 font-bold text-sm bg-emerald-50 dark:bg-emerald-500/10 px-2 py-1 rounded-lg">
+<span class="material-icons text-sm">trending_up</span>
+                        12%
+                    </div>
+</div>
+<!-- Mock Bar Chart -->
+<div class="flex items-end justify-between h-40 gap-2 mb-4">
+<div class="flex-1 bg-primary/10 dark:bg-primary/5 rounded-t-md h-24 relative group">
+<div class="absolute inset-x-0 bottom-0 bg-primary/30 rounded-t-md h-1/2"></div>
+</div>
+<div class="flex-1 bg-primary/10 dark:bg-primary/5 rounded-t-md h-32 relative">
+<div class="absolute inset-x-0 bottom-0 bg-primary/40 rounded-t-md h-2/3"></div>
+</div>
+<div class="flex-1 bg-primary/10 dark:bg-primary/5 rounded-t-md h-28 relative">
+<div class="absolute inset-x-0 bottom-0 bg-primary/30 rounded-t-md h-1/2"></div>
+</div>
+<div class="flex-1 bg-primary/10 dark:bg-primary/5 rounded-t-md h-36 relative">
+<div class="absolute inset-x-0 bottom-0 bg-primary/50 rounded-t-md h-3/4"></div>
+</div>
+<div class="flex-1 bg-primary/10 dark:bg-primary/5 rounded-t-md h-40 relative">
+<div class="absolute inset-x-0 bottom-0 bg-primary rounded-t-md h-full"></div>
+<div class="absolute -top-8 left-1/2 -translate-x-1/2 bg-slate-900 text-white text-[10px] px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">R$ 24k</div>
+</div>
+<div class="flex-1 bg-primary/10 dark:bg-primary/5 rounded-t-md h-32 relative">
+<div class="absolute inset-x-0 bottom-0 bg-primary/40 rounded-t-md h-2/3"></div>
+</div>
+</div>
+<div class="flex justify-between text-[10px] text-slate-400 font-bold uppercase">
+<span>Jan</span>
+<span>Fev</span>
+<span>Mar</span>
+<span>Abr</span>
+<span>Mai</span>
+<span>Jun</span>
+</div>
+</div>
+</section>
+<!-- KPI Cards -->
+<section class="px-6 space-y-4">
+<!-- Card 1: Total Recebido -->
+<div class="bg-white dark:bg-slate-900 p-5 rounded-2xl ios-shadow border-l-4 border-primary flex items-center justify-between">
+<div class="flex items-center gap-4">
+<div class="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center text-primary">
+<span class="material-icons">account_balance_wallet</span>
+</div>
+<div>
+<p class="text-sm font-medium text-slate-500">Total Recebido</p>
+<h3 class="text-xl font-bold">R$ 45.320,00</h3>
+</div>
+</div>
+<div class="flex items-center gap-1 text-slate-400">
+<span class="material-icons text-lg">chevron_right</span>
+</div>
+</div>
+<!-- Card 2: Pagamentos Pendentes -->
+<div class="bg-white dark:bg-slate-900 p-5 rounded-2xl ios-shadow border-l-4 border-amber-400 flex items-center justify-between">
+<div class="flex items-center gap-4">
+<div class="w-12 h-12 rounded-xl bg-amber-50 dark:bg-amber-400/10 flex items-center justify-center text-amber-500">
+<span class="material-icons">schedule</span>
+</div>
+<div>
+<p class="text-sm font-medium text-slate-500">Pagamentos Pendentes</p>
+<h3 class="text-xl font-bold">R$ 8.150,00</h3>
+<p class="text-[10px] text-amber-600 font-semibold uppercase mt-1">12 faturas em atraso</p>
+</div>
+</div>
+<div class="flex items-center gap-1 text-slate-400">
+<span class="material-icons text-lg">chevron_right</span>
+</div>
+</div>
+<!-- Card 3: Performance de Lotes -->
+<div class="bg-white dark:bg-slate-900 p-5 rounded-2xl ios-shadow border-l-4 border-emerald-500 flex items-center justify-between">
+<div class="flex items-center gap-4">
+<div class="w-12 h-12 rounded-xl bg-emerald-50 dark:bg-emerald-500/10 flex items-center justify-center text-emerald-600">
+<span class="material-icons">pie_chart</span>
+</div>
+<div>
+<p class="text-sm font-medium text-slate-500">Performance de Lotes</p>
+<h3 class="text-xl font-bold">94.2%</h3>
+<div class="w-32 h-1.5 bg-slate-100 dark:bg-slate-800 rounded-full mt-2 overflow-hidden">
+<div class="h-full bg-emerald-500 rounded-full" style="width: 94%"></div>
+</div>
+</div>
+</div>
+<div class="flex items-center gap-1 text-slate-400">
+<span class="material-icons text-lg">chevron_right</span>
+</div>
+</div>
+</section>
+<!-- Stripe Integration -->
+<div class="px-6 mt-8 flex justify-center">
+<div class="inline-flex items-center gap-2 bg-slate-100 dark:bg-slate-800 px-3 py-1.5 rounded-full">
+<span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Powered by</span>
+<div class="flex items-center text-[#635BFF] font-black text-sm italic">
+                    Stripe
+                </div>
+<div class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></div>
+</div>
+</div>
+</main>
+<!-- Bottom Navigation Bar (iOS Style) -->
+<nav class="fixed bottom-0 left-0 right-0 bg-white/80 dark:bg-slate-900/80 backdrop-blur-lg border-t border-slate-200 dark:border-slate-800 px-6 pb-8 pt-3 flex justify-between items-center z-50">
+<button class="flex flex-col items-center gap-1 text-slate-400">
+<span class="material-icons">dashboard</span>
+<span class="text-[10px] font-medium">Início</span>
+</button>
+<button class="flex flex-col items-center gap-1 text-slate-400">
+<span class="material-icons">business</span>
+<span class="text-[10px] font-medium">Lotes</span>
+</button>
+<div class="relative -top-6">
+<button class="w-14 h-14 bg-primary text-white rounded-full shadow-lg shadow-primary/40 flex items-center justify-center">
+<span class="material-icons text-3xl">add</span>
+</button>
+</div>
+<button class="flex flex-col items-center gap-1 text-primary">
+<span class="material-icons">bar_chart</span>
+<span class="text-[10px] font-medium">Relatórios</span>
+</button>
+<button class="flex flex-col items-center gap-1 text-slate-400">
+<span class="material-icons">settings</span>
+<span class="text-[10px] font-medium">Ajustes</span>
+</button>
+</nav>
+<!-- Home Indicator -->
+<div class="fixed bottom-1 left-1/2 -translate-x-1/2 w-32 h-1.5 bg-slate-300 dark:bg-slate-700 rounded-full z-50"></div>
+</body></html>

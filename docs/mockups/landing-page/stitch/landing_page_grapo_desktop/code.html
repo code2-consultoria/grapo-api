@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="pt-BR"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Grapo - Gestão de Aluguéis de Ativos</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "primary": "#d4af35",
+              "background-light": "#f8f7f6",
+              "background-dark": "#12110d",
+              "card-bg": "#1e1b12",
+            },
+            fontFamily: {
+              "display": ["Inter", "sans-serif"]
+            },
+            borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+          },
+        },
+      }
+    </script>
+<style>
+        body { font-family: 'Inter', sans-serif; }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark text-gray-800 dark:text-gray-100 antialiased">
+<!-- Navigation -->
+<nav class="sticky top-0 z-50 bg-background-dark/90 backdrop-blur-md border-b border-primary/10">
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+<div class="flex justify-between items-center h-16">
+<div class="flex items-center gap-2">
+<div class="w-8 h-8 bg-primary rounded flex items-center justify-center">
+<span class="material-icons text-background-dark text-xl font-bold">account_balance_wallet</span>
+</div>
+<span class="text-xl font-bold tracking-tight text-white uppercase">Grapo</span>
+</div>
+<div class="flex items-center gap-4">
+<a class="text-sm font-medium text-gray-300 hover:text-primary transition-colors" href="#">Entrar</a>
+<button class="bg-primary hover:bg-primary/90 text-background-dark px-4 py-2 rounded font-semibold text-sm transition-all shadow-lg shadow-primary/20">
+                        Começar
+                    </button>
+</div>
+</div>
+</div>
+</nav>
+<!-- Hero Section -->
+<header class="relative pt-16 pb-20 px-4 overflow-hidden">
+<div class="absolute inset-0 z-0">
+<div class="absolute top-[-10%] right-[-10%] w-[300px] h-[300px] bg-primary/10 rounded-full blur-[100px]"></div>
+<div class="absolute bottom-[-10%] left-[-10%] w-[250px] h-[250px] bg-primary/5 rounded-full blur-[80px]"></div>
+</div>
+<div class="relative z-10 max-w-7xl mx-auto text-center">
+<span class="inline-block py-1 px-3 rounded-full bg-primary/10 text-primary text-xs font-bold tracking-widest uppercase mb-6">Plataforma de Gestão de Ativos</span>
+<h1 class="text-4xl md:text-6xl font-bold text-white mb-6 leading-tight">
+                Transforme seus equipamentos <span class="text-primary">parados em renda recorrente</span>
+</h1>
+<p class="text-gray-400 text-lg mb-10 max-w-2xl mx-auto leading-relaxed">
+                A Grapo automatiza todo o ciclo de locação dos seus bens, do contrato ao faturamento, para você escalar seu negócio com segurança.
+            </p>
+<div class="flex flex-col gap-4">
+<button class="bg-primary text-background-dark px-8 py-4 rounded-lg font-bold text-lg shadow-xl shadow-primary/30 active:scale-95 transition-transform">
+                    Criar minha conta grátis
+                </button>
+<button class="flex items-center justify-center gap-2 text-primary font-semibold py-2">
+<span class="material-icons">play_circle_filled</span>
+                    Ver demonstração
+                </button>
+</div>
+</div>
+<div class="mt-16 relative mx-auto max-w-xs md:max-w-4xl">
+<div class="rounded-xl overflow-hidden shadow-2xl shadow-primary/5 border border-primary/20">
+<img class="w-full h-auto grayscale-[20%]" data-alt="Painel de controle analítico com gráficos financeiros dourados" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCpehWRQt5mN1TMygHB4gwr3SK-xGnyimLUh08_k5PLrCDUhDh1ALwEfS24vetb-WhtVzYy1ucMJXBFjVQw7yfGQ14DKwumkAqi9jm0EjOb8zDG0x1h3C--Bin2iX6y4z624Vli535qTz1FvK_p4vCAU3axvjzLaZDOZyIN_zX20hkC7Qn9XCTzUv8c4V79KLUhhO4o5Pa2uEz3IGdDDaeqBbIPQe37isW_PJfA2ZGId8jq1MHitDdxIQvOkW2RUEX0g7w77tO3jMsl"/>
+</div>
+</div>
+</header>
+<!-- Problems Section -->
+<section class="py-20 px-4 bg-background-dark/50">
+<div class="max-w-7xl mx-auto text-center mb-12">
+<h2 class="text-2xl font-bold text-white mb-4">Por que seus ativos estão perdendo valor?</h2>
+<div class="h-1 w-20 bg-primary mx-auto rounded"></div>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-7xl mx-auto">
+<div class="p-6 rounded-xl bg-card-bg border border-white/5 hover:border-primary/30 transition-all group">
+<span class="material-icons text-primary text-4xl mb-4 group-hover:scale-110 transition-transform">inventory_2</span>
+<h3 class="text-xl font-bold text-white mb-2">Equipamentos Ociosos</h3>
+<p class="text-gray-400 leading-relaxed">Máquinas paradas geram apenas custos de manutenção e depreciação. Coloque-as para trabalhar.</p>
+</div>
+<div class="p-6 rounded-xl bg-card-bg border border-white/5 hover:border-primary/30 transition-all group">
+<span class="material-icons text-primary text-4xl mb-4 group-hover:scale-110 transition-transform">history_edu</span>
+<h3 class="text-xl font-bold text-white mb-2">Contratos Manuais</h3>
+<p class="text-gray-400 leading-relaxed">Erros em planilhas e contratos físicos causam prejuízos jurídicos e financeiros constantes.</p>
+</div>
+<div class="p-6 rounded-xl bg-card-bg border border-white/5 hover:border-primary/30 transition-all group">
+<span class="material-icons text-primary text-4xl mb-4 group-hover:scale-110 transition-transform">money_off</span>
+<h3 class="text-xl font-bold text-white mb-2">Inadimplência</h3>
+<p class="text-gray-400 leading-relaxed">A falta de um sistema de cobrança automatizado faz com que você perca o controle do fluxo de caixa.</p>
+</div>
+</div>
+</section>
+<!-- Features Section -->
+<section class="py-20 px-4">
+<div class="max-w-7xl mx-auto text-center mb-16">
+<h2 class="text-3xl font-bold text-white mb-4">Tudo o que você precisa para gerir</h2>
+<p class="text-gray-400">Uma plataforma completa, pensada na eficiência operacional.</p>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-7xl mx-auto">
+<!-- Feature 1 -->
+<div class="flex gap-4 items-start">
+<div class="bg-primary/10 p-3 rounded-lg shrink-0">
+<span class="material-icons text-primary">auto_graph</span>
+</div>
+<div>
+<h4 class="text-lg font-bold text-white mb-2">Dashboard Financeiro</h4>
+<p class="text-sm text-gray-400 leading-relaxed">Acompanhe ROI, receita mensal e taxas de utilização em tempo real.</p>
+</div>
+</div>
+<!-- Feature 2 -->
+<div class="flex gap-4 items-start">
+<div class="bg-primary/10 p-3 rounded-lg shrink-0">
+<span class="material-icons text-primary">description</span>
+</div>
+<div>
+<h4 class="text-lg font-bold text-white mb-2">Gestão de Contratos</h4>
+<p class="text-sm text-gray-400 leading-relaxed">Assinatura digital integrada e renovação automática de termos.</p>
+</div>
+</div>
+<!-- Feature 3 -->
+<div class="flex gap-4 items-start">
+<div class="bg-primary/10 p-3 rounded-lg shrink-0">
+<span class="material-icons text-primary">notifications_active</span>
+</div>
+<div>
+<h4 class="text-lg font-bold text-white mb-2">Alertas de Manutenção</h4>
+<p class="text-sm text-gray-400 leading-relaxed">Nunca mais esqueça as revisões preventivas dos seus ativos.</p>
+</div>
+</div>
+<!-- Feature 4 -->
+<div class="flex gap-4 items-start">
+<div class="bg-primary/10 p-3 rounded-lg shrink-0">
+<span class="material-icons text-primary">qr_code_2</span>
+</div>
+<div>
+<h4 class="text-lg font-bold text-white mb-2">Rastreio via QR Code</h4>
+<p class="text-sm text-gray-400 leading-relaxed">Etiquete seus ativos e tenha controle total de entrada e saída.</p>
+</div>
+</div>
+<!-- Feature 5 -->
+<div class="flex gap-4 items-start">
+<div class="bg-primary/10 p-3 rounded-lg shrink-0">
+<span class="material-icons text-primary">payments</span>
+</div>
+<div>
+<h4 class="text-lg font-bold text-white mb-2">Cobrança Automática</h4>
+<p class="text-sm text-gray-400 leading-relaxed">Emissão de boletos, notas fiscais e lembretes via WhatsApp.</p>
+</div>
+</div>
+<!-- Feature 6 -->
+<div class="flex gap-4 items-start">
+<div class="bg-primary/10 p-3 rounded-lg shrink-0">
+<span class="material-icons text-primary">group</span>
+</div>
+<div>
+<h4 class="text-lg font-bold text-white mb-2">Multi-usuário</h4>
+<p class="text-sm text-gray-400 leading-relaxed">Controle níveis de acesso para sua equipe de vendas e técnica.</p>
+</div>
+</div>
+</div>
+</section>
+<!-- Pricing Section -->
+<section class="py-20 px-4 bg-background-dark/30">
+<div class="max-w-7xl mx-auto text-center mb-16">
+<h2 class="text-3xl font-bold text-white mb-4">Escolha o plano ideal</h2>
+<p class="text-gray-400">Sem taxas escondidas. Cancele quando quiser.</p>
+</div>
+<div class="flex flex-col md:flex-row gap-8 max-w-6xl mx-auto items-center">
+<!-- Basic Plan -->
+<div class="w-full p-8 rounded-xl bg-card-bg border border-white/5 order-2 md:order-1">
+<h3 class="text-xl font-bold text-white mb-2">Mensal</h3>
+<div class="flex items-baseline gap-1 mb-6">
+<span class="text-3xl font-bold text-white">R$ 199</span>
+<span class="text-gray-400 text-sm">/mês</span>
+</div>
+<ul class="space-y-4 mb-8">
+<li class="flex items-center gap-2 text-sm text-gray-300">
+<span class="material-icons text-primary text-sm">check</span>
+                        Até 50 ativos
+                    </li>
+<li class="flex items-center gap-2 text-sm text-gray-300">
+<span class="material-icons text-primary text-sm">check</span>
+                        Relatórios básicos
+                    </li>
+<li class="flex items-center gap-2 text-sm text-gray-300">
+<span class="material-icons text-primary text-sm">check</span>
+                        Suporte por E-mail
+                    </li>
+</ul>
+<button class="w-full py-3 rounded border border-primary text-primary font-bold hover:bg-primary/5 transition-colors">Selecionar</button>
+</div>
+<!-- Pro Plan (Annual Featured) -->
+<div class="w-full p-8 rounded-xl bg-card-bg border-2 border-primary relative shadow-2xl shadow-primary/20 scale-105 z-10 order-1 md:order-2">
+<div class="absolute -top-4 left-1/2 -translate-x-1/2 bg-primary text-background-dark px-4 py-1 rounded-full text-xs font-bold uppercase tracking-wider">Mais Popular</div>
+<h3 class="text-xl font-bold text-white mb-2">Anual</h3>
+<div class="flex items-baseline gap-1 mb-2">
+<span class="text-4xl font-bold text-white">R$ 159</span>
+<span class="text-gray-400 text-sm">/mês*</span>
+</div>
+<p class="text-xs text-primary font-medium mb-6">Economize R$ 480 por ano</p>
+<ul class="space-y-4 mb-8">
+<li class="flex items-center gap-2 text-sm text-gray-100">
+<span class="material-icons text-primary text-sm">check</span>
+                        Ativos ilimitados
+                    </li>
+<li class="flex items-center gap-2 text-sm text-gray-100">
+<span class="material-icons text-primary text-sm">check</span>
+                        Dashboard BI Avançado
+                    </li>
+<li class="flex items-center gap-2 text-sm text-gray-100">
+<span class="material-icons text-primary text-sm">check</span>
+                        Faturamento Automatizado
+                    </li>
+<li class="flex items-center gap-2 text-sm text-gray-100">
+<span class="material-icons text-primary text-sm">check</span>
+                        Suporte Prioritário 24/7
+                    </li>
+</ul>
+<button class="w-full py-4 rounded bg-primary text-background-dark font-bold hover:brightness-110 shadow-lg shadow-primary/20 transition-all">Começar Agora</button>
+</div>
+<!-- Enterprise Plan -->
+<div class="w-full p-8 rounded-xl bg-card-bg border border-white/5 order-3">
+<h3 class="text-xl font-bold text-white mb-2">Custom</h3>
+<div class="flex items-baseline gap-1 mb-6">
+<span class="text-3xl font-bold text-white">Sob consulta</span>
+</div>
+<ul class="space-y-4 mb-8">
+<li class="flex items-center gap-2 text-sm text-gray-300">
+<span class="material-icons text-primary text-sm">check</span>
+                        Integração via API
+                    </li>
+<li class="flex items-center gap-2 text-sm text-gray-300">
+<span class="material-icons text-primary text-sm">check</span>
+                        White-label parcial
+                    </li>
+<li class="flex items-center gap-2 text-sm text-gray-300">
+<span class="material-icons text-primary text-sm">check</span>
+                        Gerente de conta dedicado
+                    </li>
+</ul>
+<button class="w-full py-3 rounded border border-white/20 text-white font-bold hover:bg-white/5 transition-colors">Falar com Consultor</button>
+</div>
+</div>
+</section>
+<!-- Footer -->
+<footer class="bg-black text-white pt-20 pb-10 px-4 border-t border-primary/10">
+<div class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-12 mb-16">
+<div class="col-span-1 md:col-span-2">
+<div class="flex items-center gap-2 mb-6">
+<div class="w-8 h-8 bg-primary rounded flex items-center justify-center">
+<span class="material-icons text-background-dark text-xl font-bold">account_balance_wallet</span>
+</div>
+<span class="text-2xl font-bold tracking-tight text-white uppercase">Grapo</span>
+</div>
+<p class="text-gray-500 max-w-sm leading-relaxed">
+                    Ajudamos locadoras e empresas a profissionalizarem a gestão de seus ativos móveis e imóveis com tecnologia de ponta.
+                </p>
+<div class="flex gap-4 mt-6">
+<a class="w-10 h-10 rounded-full border border-primary/20 flex items-center justify-center hover:bg-primary/10 transition-colors" href="#">
+<span class="material-icons text-primary text-sm">facebook</span>
+</a>
+<a class="w-10 h-10 rounded-full border border-primary/20 flex items-center justify-center hover:bg-primary/10 transition-colors" href="#">
+<span class="material-icons text-primary text-sm">alternate_email</span>
+</a>
+<a class="w-10 h-10 rounded-full border border-primary/20 flex items-center justify-center hover:bg-primary/10 transition-colors" href="#">
+<span class="material-icons text-primary text-sm">link</span>
+</a>
+</div>
+</div>
+<div>
+<h5 class="text-primary font-bold mb-6">Plataforma</h5>
+<ul class="space-y-4 text-sm text-gray-400">
+<li><a class="hover:text-white transition-colors" href="#">Funcionalidades</a></li>
+<li><a class="hover:text-white transition-colors" href="#">Planos e Preços</a></li>
+<li><a class="hover:text-white transition-colors" href="#">Segurança</a></li>
+<li><a class="hover:text-white transition-colors" href="#">API Docs</a></li>
+</ul>
+</div>
+<div>
+<h5 class="text-primary font-bold mb-6">Empresa</h5>
+<ul class="space-y-4 text-sm text-gray-400">
+<li><a class="hover:text-white transition-colors" href="#">Sobre nós</a></li>
+<li><a class="hover:text-white transition-colors" href="#">Contato</a></li>
+<li><a class="hover:text-white transition-colors" href="#">Privacidade</a></li>
+<li><a class="hover:text-white transition-colors" href="#">Termos de Uso</a></li>
+</ul>
+</div>
+</div>
+<div class="max-w-7xl mx-auto pt-8 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-4 text-xs text-gray-600">
+<p>© 2024 Grapo Tecnologia de Ativos S.A. Todos os direitos reservados.</p>
+<div class="flex gap-4">
+<span>Orgulhosamente brasileiro 🇧🇷</span>
+</div>
+</div>
+</footer>
+</body></html>
