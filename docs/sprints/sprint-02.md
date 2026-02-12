@@ -1,7 +1,7 @@
 # Sprint 02 - MVP Contratos
 
 > **Periodo:** 2025-02-11 a [definir]
-> **Status:** Planejada
+> **Status:** Em Andamento
 > **Milestone:** M1 - MVP Contratos
 > **Objetivo:** Implementar sistema basico de gestao de contratos de locacao
 
@@ -13,20 +13,39 @@
 
 | ID | Feature | Prioridade | Status |
 |----|---------|------------|--------|
-| F01 | Contratos | Alta | Planejada |
+| F01 | Contratos | Alta | Em Andamento |
+| F02 | Frontend Vue.js | Alta | Concluido |
 
 ---
 
 ## Tarefas
 
+### 0. Frontend Vue.js (Estrutura)
+
+| ID | Tarefa | Descricao | Status |
+|----|--------|-----------|--------|
+| T00.1 | Tipos TypeScript | models, api, forms | Concluido |
+| T00.2 | Cliente HTTP | lib/api.ts com fetch | Concluido |
+| T00.3 | Stores Pinia | auth, notification | Concluido |
+| T00.4 | Composables | useAuth, useApi, useForm, useNotification | Concluido |
+| T00.5 | Componentes UI | input, select, dialog, table, toast, etc | Concluido |
+| T00.6 | Componentes Forms | FormField, FormGroup, FormActions | Concluido |
+| T00.7 | Componentes App | Sidebar, Header, UserMenu, StatCard | Concluido |
+| T00.8 | Layouts | AuthLayout, AppLayout | Concluido |
+| T00.9 | Router + Guards | Rotas protegidas, nested routes | Concluido |
+| T00.10 | Views Auth | Login, Register | Concluido |
+| T00.11 | Views App | Dashboard, CRUD stubs | Concluido |
+
+> Documentacao: [docs/FRONTEND.md](../FRONTEND.md)
+
 ### 1. Setup do Backend
 
 | ID | Tarefa | Descricao | Status |
 |----|--------|-----------|--------|
-| T01 | Criar migrations | Todas as tabelas do modelo de dados | Pendente |
-| T02 | Criar models | Eloquent models com relacionamentos | Pendente |
-| T03 | Criar factories | Factories para testes | Pendente |
-| T04 | Criar seeders | Dados iniciais (planos, tenant demo) | Pendente |
+| T01 | Criar migrations | Todas as tabelas do modelo de dados | Concluido |
+| T02 | Criar models | Eloquent models com relacionamentos | Concluido |
+| T03 | Criar factories | Factories para testes | Concluido |
+| T04 | Criar seeders | Dados iniciais (planos, tenant demo) | Concluido |
 
 ### 2. Cadastro de Locatarios
 
@@ -283,23 +302,25 @@ enum StatusContrato: string
 ## Dependencias
 
 - [x] Sprint 01 concluida (Landing Page)
-- [ ] Docker configurado com Laravel
-- [ ] PostgreSQL configurado
+- [x] Docker configurado com Laravel
+- [x] PostgreSQL configurado
 
 ---
 
 ## Checklist de Conclusao
 
-- [ ] Todas as migrations criadas e rodadas
-- [ ] Models com relacionamentos funcionando
-- [ ] Factories e seeders criados
+- [x] Todas as migrations criadas e rodadas
+- [x] Models com relacionamentos funcionando
+- [x] Factories e seeders criados
 - [ ] Todos os testes passando
 - [ ] Actions implementadas
 - [ ] Controllers implementados
-- [ ] Rotas da API configuradas
-- [ ] Documentacao atualizada
-- [ ] Codigo revisado e commitado
+- [x] Rotas da API configuradas
+- [x] Documentacao atualizada
+- [x] Codigo revisado e commitado
 - [ ] Tag `docs-v1.0.0` criada
+- [x] Estrutura do frontend implementada
+- [ ] Frontend integrado com API
 
 ---
 

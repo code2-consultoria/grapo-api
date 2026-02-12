@@ -1,8 +1,8 @@
 # Diretrizes do Projeto para Claude
 
 ## Stack Tecnológico
-- Frontend (PWA): Vuejs + Javascript + InertiaJS + Tailwind
-- Backend: Laravel 12 + Breeze
+- Frontend (PWA): Vue 3 + TypeScript + Tailwind v4 + Pinia + Reka-UI
+- Backend: Laravel 12 + Breeze (API Sanctum)
 - Banco: PostgreSQL
 
 ## Stack Principal
@@ -48,6 +48,7 @@
 
 ## Documentação Detalhada
 - **Sobre a aplicação:** [docs/APP.md](docs/APP.md)
+- **Frontend Vue.js:** [docs/FRONTEND.md](docs/FRONTEND.md)
 - **Action Driven Development:** [docs/ACTIONS.md](docs/ACTIONS.md)
 - **UI/UX:** [docs/UIUX.md](docs/UIUX.md)
 - **BACKLOG:** [docs/BACKLOG.md](docs/BACKLOG.md)
