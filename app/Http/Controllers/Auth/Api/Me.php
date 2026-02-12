@@ -18,13 +18,23 @@ class Me extends Controller
 
         return response()->json([
             'data' => [
-                'id' => $user->id,
-                'name' => $user->name,
-                'email' => $user->email,
-                'papel' => $user->papel,
+                'user' => [
+                    'id' => $user->id,
+                    'name' => $user->name,
+                    'email' => $user->email,
+                    'papel' => $user->papel,
+                    'ativo' => $user->ativo,
+                    'email_verified_at' => $user->email_verified_at,
+                    'created_at' => $user->created_at,
+                    'updated_at' => $user->updated_at,
+                ],
                 'locador' => $locador ? [
                     'id' => $locador->id,
+                    'tipo' => $locador->tipo,
                     'nome' => $locador->nome,
+                    'email' => $locador->email,
+                    'telefone' => $locador->telefone,
+                    'ativo' => $locador->ativo,
                 ] : null,
             ],
         ]);

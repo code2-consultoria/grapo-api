@@ -11,6 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
+        // Criar tabela primeiro
         Schema::create('pessoas', function (Blueprint $table) {
             $table->uuid('id')->primary();
             $table->uuid('locador_id')->nullable();
@@ -22,9 +23,13 @@ return new class extends Migration
             $table->boolean('ativo')->default(true);
             $table->timestamps();
 
-            $table->foreign('locador_id')->references('id')->on('pessoas');
             $table->index('tipo');
             $table->index('locador_id');
+        });
+
+        // Adicionar FK auto-referencial depois
+        Schema::table('pessoas', function (Blueprint $table) {
+            $table->foreign('locador_id')->references('id')->on('pessoas');
         });
     }
 

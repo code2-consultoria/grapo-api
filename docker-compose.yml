@@ -1,0 +1,68 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.dev
+    container_name: grapo-api
+    restart: unless-stopped
+    working_dir: /var/www/app
+    volumes:
+      - .:/var/www/app
+      - ./storage:/var/www/app/storage
+    ports:
+      - "8000:8000"
+    environment:
+      - APP_ENV=local
+      - APP_DEBUG=true
+      - DB_CONNECTION=pgsql
+      - DB_HOST=db
+      - DB_PORT=5432
+      - DB_DATABASE=grapo
+      - DB_USERNAME=grapo
+      - DB_PASSWORD=secret
+      - QUEUE_CONNECTION=database
+      - CACHE_STORE=database
+      - SESSION_DRIVER=database
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - grapo-net
+    # Roda servidor de desenvolvimento, queue e scheduler juntos
+    command: >
+      sh -c "
+        php artisan migrate --force &&
+        php artisan serve --host=0.0.0.0 --port=8000 &
+        php artisan queue:work --sleep=3 --tries=3 &
+        php artisan schedule:work &
+        wait
+      "
+
+  db:
+    image: postgres:16-alpine
+    container_name: grapo-db
+    restart: unless-stopped
+    volumes:
+      - grapo_pgdata:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_USER=grapo
+      - POSTGRES_PASSWORD=secret
+      - POSTGRES_DB=grapo
+      - TZ=America/Fortaleza
+    ports:
+      - "5433:5432"
+    networks:
+      - grapo-net
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U grapo"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  grapo_pgdata:
+    driver: local
+
+networks:
+  grapo-net:
+    driver: bridge
