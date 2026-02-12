@@ -13,11 +13,14 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // User::factory(10)->create();
+        // Criar planos padrao
+        $this->call(PlanoSeeder::class);
 
+        // Criar usuario de teste
         User::factory()->create([
             'name' => 'Test User',
             'email' => 'test@example.com',
+            'papel' => 'admin',
         ]);
     }
 }

@@ -51,6 +51,9 @@
 - **Action Driven Development:** [docs/ACTIONS.md](docs/ACTIONS.md)
 - **UI/UX:** [docs/UIUX.md](docs/UIUX.md)
 - **BACKLOG:** [docs/BACKLOG.md](docs/BACKLOG.md)
+- **MILESTONES:** [docs/MILESTONES.md](docs/MILESTONES.md)
+- **CHANGELOG:** [docs/CHANGELOG.md](docs/CHANGELOG.md)
+- **Modelo de Dados:** [docs/analises/modelo-dados.md](docs/analises/modelo-dados.md)
 - **Relacionamentos:** [docs/RELACIONAMENTOS.md](docs/RELACIONAMENTOS.md)
 - **Testes automatizados:** [docs/TESTES-AUTOMATIZADOS.md](docs/TESTES-AUTOMATIZADOS.md)
 
@@ -58,15 +61,33 @@
 
 ```
 docs/
+├── BACKLOG.md             # Lista de funcionalidades e status
+├── MILESTONES.md          # Marcos do projeto (reativo)
+├── CHANGELOG.md           # Historico de alteracoes de documentacao
 ├── features/              # Documentação de cada feature (usar TEMPLATE.md)
 ├── mockups/               # Mockups para construção de telas (usar TEMPLATE.md)
 ├── bugs/                  # Imagens/textos de bugs (sem template, informar no chat)
 ├── sprints/               # Backlog, decisões e artefatos das sprints (usar TEMPLATE.md)
 └── analises/              # Análises técnicas e de negócio
+    ├── modelo-dados.md    # DER atual do sistema (versionado por milestone)
+    ├── arquivo/           # Versões arquivadas de documentos (modelo-dados.mN.md)
     ├── tecnicas/          # Análises de performance, segurança, arquitetura (usar TEMPLATE.md)
     ├── negocio/           # Análises de regras de negócio (usar TEMPLATE.md)
     └── features/          # Rascunhos em estudo antes de virar feature (usar TEMPLATE.md, aplicar INVEST)
 ```
+
+## Versionamento de Documentação
+
+### Regras
+- Modelo de dados é versionado por milestone
+- Ao concluir um milestone, arquivar versão atual: `arquivo/modelo-dados.mN.md`
+- Criar tag git: `docs-vX.Y.Z`
+- Atualizar CHANGELOG.md com alterações
+
+### Milestones
+- Milestones são reativos: novos podem ser inseridos antes de outros na fila
+- Cada milestone agrupa funcionalidades relacionadas
+- Ver MILESTONES.md para lista completa
 
 ## Artefatos de Design/UX
 
