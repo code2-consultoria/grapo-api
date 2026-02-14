@@ -2,11 +2,14 @@
 
 namespace App\Providers;
 
+use App\Models\StripeSubscription;
+use App\Models\StripeSubscriptionItem;
 use Carbon\CarbonImmutable;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Validation\Rules\Password;
+use Laravel\Cashier\Cashier;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -24,6 +27,16 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         $this->configureDefaults();
+        $this->configureCashier();
+    }
+
+    /**
+     * Configura Laravel Cashier com models personalizados.
+     */
+    protected function configureCashier(): void
+    {
+        Cashier::useSubscriptionModel(StripeSubscription::class);
+        Cashier::useSubscriptionItemModel(StripeSubscriptionItem::class);
     }
 
     /**

@@ -4,6 +4,7 @@ namespace App\Actions\Contrato;
 
 use App\Actions\Contrato\Item\CalcularValorItem;
 use App\Contracts\Command;
+use App\Enums\StatusContrato;
 use App\Models\Contrato;
 use App\Models\Pessoa;
 
@@ -26,7 +27,7 @@ class Atualizar implements Command
     public function handle(): void
     {
         // Apenas contratos em rascunho podem ser atualizados
-        if ($this->contrato->status !== 'rascunho') {
+        if ($this->contrato->status !== StatusContrato::Rascunho) {
             throw new \DomainException('Apenas contratos em rascunho podem ser atualizados.');
         }
 

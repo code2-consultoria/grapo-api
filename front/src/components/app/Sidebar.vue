@@ -23,12 +23,12 @@ const menuItems = [
 
 function isActive(itemName: string): boolean {
   const currentRoute = route.name as string
-  const itemRoute = itemName.toLowerCase().replace(" ", "-")
 
   if (itemName === "Dashboard") {
     return currentRoute === "dashboard"
   }
 
+  const itemRoute = itemName.toLowerCase().replace(" ", "-")
   return currentRoute?.startsWith(itemRoute) || false
 }
 </script>

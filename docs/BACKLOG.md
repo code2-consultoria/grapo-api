@@ -2,7 +2,7 @@
 
 Este documento lista funcionalidades implementadas, em andamento e planejadas para implementação futura.
 
-**Última atualização:** 2025-02-13
+**Última atualização:** 2025-02-14
 **Mantido por:** Equipe de Desenvolvimento
 
 ---
@@ -17,6 +17,7 @@ Este documento lista funcionalidades implementadas, em andamento e planejadas pa
 | 02 | Contratos | Concluída |
 | 03 | Dashboard | Concluída |
 | 04 | Autenticação | Concluída |
+| 05 | Assinaturas e Pagamentos | Concluída |
 
 ---
 
@@ -72,6 +73,21 @@ Este documento lista funcionalidades implementadas, em andamento e planejadas pa
 - [x] Auto-login após registro
 - [x] 23 testes automatizados passando
 
+### Sprint 05 - Assinaturas e Pagamentos
+- **Status**: Concluída
+- **Arquivo**: `docs/sprints/sprint-05.md`
+- **Descrição**: Sistema de assinaturas com Stripe, controle de acesso e funcionalidades financeiras
+
+**Entregáveis:**
+- [x] Integração Stripe Billing (planos e checkout)
+- [x] Stripe Connect Express (locador recebe pagamentos)
+- [x] Pagamento recorrente de contratos
+- [x] Webhooks Stripe (plataforma e Connect)
+- [x] Desconto comercial em pagamentos
+- [x] Controle de acesso por assinatura (trial, data limite)
+- [x] Majoração da diária configurável por locador
+- [x] 64+ testes automatizados passando
+
 ## BACKLOG (Funcionalidades Futuras)
 
 ### Aditivos de Contrato
@@ -95,20 +111,18 @@ Este documento lista funcionalidades implementadas, em andamento e planejadas pa
 ---
 
 ### Majoracao Percentual da Diaria Configuravel
-- **Status**: Backlog
+- **Status**: Concluido (Sprint 05)
 - **Prioridade**: Media
 - **Dependencia**: Sprint 02 (Contratos)
 - **Descrição**: Permitir que o locador configure o percentual de majoracao para calculo do valor da diaria a partir do valor mensal
 
-**Regras atuais:**
-- O valor da diaria e calculado automaticamente: `(valor_mensal * 1.10) / 30`
-- Majoracao fixa de 10% sobre o valor mensal
-
-**Escopo:**
-- Campo `majoracao_diaria` no model Pessoa (locador)
-- Valor padrao: 10% (1.10)
-- Interface para locador configurar o percentual
-- Atualizar accessor `valor_diaria_sugerido` em TipoAtivo para usar majoracao do locador
+**Implementado:**
+- Campo `majoracao_diaria` (decimal 5,2) no model Pessoa (locador)
+- Valor padrao: 10%
+- Seção no perfil do usuário para configuração
+- Accessor `valor_diaria_sugerido` em TipoAtivo usa majoracao do locador
+- Endpoints: GET/PUT /perfil/majoracao
+- 8 testes automatizados
 
 ---
 
@@ -153,7 +167,7 @@ Este documento lista funcionalidades implementadas, em andamento e planejadas pa
 ---
 
 ### Assinaturas e Pagamentos
-- **Status**: Backlog
+- **Status**: Concluido (Sprint 05)
 - **Prioridade**: Media
 - **Descrição**: Gestao de planos e cobrancas
 
@@ -161,6 +175,14 @@ Este documento lista funcionalidades implementadas, em andamento e planejadas pa
 - Trimestral: R$ 75,00
 - Semestral: R$ 140,00
 - Anual: R$ 250,00
+
+**Implementado:**
+- Integração Stripe Billing completa
+- Stripe Connect Express para locadores
+- Controle de acesso por data limite
+- Trial configurável (padrão 7 dias)
+- Desconto comercial em pagamentos
+- Webhooks para eventos Stripe
 
 ---
 
@@ -173,5 +195,5 @@ Este documento lista funcionalidades implementadas, em andamento e planejadas pa
 
 ---
 
-**Ultima revisao:** 2025-02-13 - Sprint 04 concluida
-**Proxima revisao:** Definicao da Sprint 05
+**Ultima revisao:** 2025-02-14 - Sprint 05 concluida
+**Proxima revisao:** Definicao da Sprint 06

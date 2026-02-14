@@ -163,6 +163,14 @@ const router = createRouter({
             },
           ],
         },
+
+        // Perfil
+        {
+          path: "perfil",
+          name: "perfil",
+          component: () => import("@/views/app/perfil/IndexView.vue"),
+          meta: { title: "Meu Perfil" },
+        },
       ],
     },
 

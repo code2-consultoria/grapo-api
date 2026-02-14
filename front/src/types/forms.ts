@@ -1,5 +1,5 @@
 // Tipos para formularios
-import type { TipoPessoa, LoteStatus, ContratoStatus } from './models'
+import type { TipoPessoa, LoteStatus, ContratoStatus, TipoCobranca, OrigemPagamento } from './models'
 
 // Formulario de login
 export interface LoginForm {
@@ -61,6 +61,16 @@ export interface ContratoForm {
   data_termino: string
   observacoes?: string
   status?: ContratoStatus
+  tipo_cobranca?: TipoCobranca
+}
+
+// Formulario de pagamento manual
+export interface PagamentoForm {
+  valor: number | string
+  data_vencimento: string
+  data_pagamento?: string
+  origem: OrigemPagamento
+  observacoes?: string
 }
 
 // Periodo de aluguel

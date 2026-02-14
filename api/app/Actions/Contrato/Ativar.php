@@ -4,6 +4,7 @@ namespace App\Actions\Contrato;
 
 use App\Actions\Alocacao\Alocar;
 use App\Contracts\Command;
+use App\Enums\StatusContrato;
 use App\Exceptions\ContratoNaoPodeSerAtivadoException;
 use App\Exceptions\QuantidadeIndisponivelException;
 use App\Models\Contrato;
@@ -41,8 +42,14 @@ class Ativar implements Command
                 (new Alocar($item))->handle();
             }
 
-            // Atualiza status
-            $this->contrato->status = 'ativo';
+            // Define status baseado no tipo de cobranca
+            // Se exige pagamento antecipado, vai para aguardando_pagamento
+            // Caso contrario, vai direto para ativo
+            $novoStatus = $this->contrato->exigePagamentoAntecipado()
+                ? StatusContrato::AguardandoPagamento
+                : StatusContrato::Ativo;
+
+            $this->contrato->status = $novoStatus;
             $this->contrato->save();
         });
     }

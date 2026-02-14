@@ -53,8 +53,8 @@ class TipoAtivo extends Model
 
     /**
      * Calcula o valor da diaria sugerida a partir do valor mensal.
-     * Formula: (valor_mensal * 1.10) / 30
-     * Majoracao de 10% para diarias.
+     * Formula: (valor_mensal * (1 + majoracao/100)) / 30
+     * Majoracao configuravel por locador (padrao 10%).
      */
     public function getValorDiariaSugeridoAttribute(): float
     {
@@ -62,8 +62,9 @@ class TipoAtivo extends Model
             return 0;
         }
 
-        // TODO: Majoracao configuravel por locador (backlog)
-        $majoracao = 1.10;
+        // Busca a majoracao do locador (padrao 10%)
+        $majoracaoPercent = $this->locador?->majoracao_diaria ?? 10.00;
+        $majoracao = 1 + ($majoracaoPercent / 100);
 
         return round(($this->valor_mensal_sugerido * $majoracao) / 30, 2);
     }

@@ -1,0 +1,2 @@
+-- Script de inicialização do PostgreSQL
+-- Nada extra necessário, o pg_hba.conf será configurado via comando

@@ -10,8 +10,13 @@ export type {
   LoteStatus,
   Lote,
   ContratoStatus,
+  TipoCobranca,
+  StatusPagamento,
+  OrigemPagamento,
   Contrato,
   ContratoItem,
+  Pagamento,
+  PagamentoResumo,
   VinculoTime,
 } from './models'
 
@@ -39,6 +44,7 @@ export type {
   LoteForm,
   ContratoForm,
   ContratoItemForm,
+  PagamentoForm,
   FormErrors,
   FormState,
 } from './forms'

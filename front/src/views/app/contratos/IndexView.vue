@@ -54,10 +54,12 @@ function formatDate(date: string): string {
   return new Date(date).toLocaleDateString("pt-BR")
 }
 
-function getStatusVariant(status: ContratoStatus): "default" | "success" | "secondary" | "destructive" {
+function getStatusVariant(status: ContratoStatus): "default" | "success" | "secondary" | "destructive" | "warning" {
   switch (status) {
     case "rascunho":
       return "secondary"
+    case "aguardando_pagamento":
+      return "warning"
     case "ativo":
       return "success"
     case "finalizado":
@@ -73,6 +75,8 @@ function getStatusLabel(status: ContratoStatus): string {
   switch (status) {
     case "rascunho":
       return "Rascunho"
+    case "aguardando_pagamento":
+      return "Aguard. Pagamento"
     case "ativo":
       return "Ativo"
     case "finalizado":

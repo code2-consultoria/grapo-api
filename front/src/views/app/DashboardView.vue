@@ -18,21 +18,53 @@ import {
   AlertCircle,
   Plus,
   TrendingUp,
+  Crown,
+  XCircle,
 } from "lucide-vue-next"
 import api from "@/lib/api"
 import type { DashboardData, DashboardAlerta } from "@/types/api"
 
+interface AssinaturaStatus {
+  has_subscription: boolean
+  data_limite_acesso: string | null
+}
+
 const { userName } = useAuth()
 
 const dashboard = ref<DashboardData | null>(null)
+const assinaturaStatus = ref<AssinaturaStatus | null>(null)
 const isLoading = ref(true)
 const error = ref<string | null>(null)
+
+// Assinatura
+const acessoExpirado = computed(() => {
+  if (!assinaturaStatus.value?.data_limite_acesso) return true
+  const dataLimite = new Date(assinaturaStatus.value.data_limite_acesso)
+  return dataLimite < new Date()
+})
+
+const diasRestantesAssinatura = computed(() => {
+  if (!assinaturaStatus.value?.data_limite_acesso) return null
+  const dataLimite = new Date(assinaturaStatus.value.data_limite_acesso)
+  const hoje = new Date()
+  return Math.ceil((dataLimite.getTime() - hoje.getTime()) / (1000 * 60 * 60 * 24))
+})
+
+const mostrarAvisoAssinatura = computed(() => {
+  if (acessoExpirado.value) return true
+  if (diasRestantesAssinatura.value !== null && diasRestantesAssinatura.value <= 7) return true
+  return false
+})
 
 // Carregar dados
 onMounted(async () => {
   try {
-    const response = await api.get<{ data: DashboardData }>("/dashboard")
-    dashboard.value = response.data
+    const [dashboardRes, assinaturaRes] = await Promise.all([
+      api.get<{ data: DashboardData }>("/dashboard"),
+      api.get<{ data: AssinaturaStatus }>("/assinaturas/status"),
+    ])
+    dashboard.value = dashboardRes.data
+    assinaturaStatus.value = assinaturaRes.data
   } catch (err) {
     error.value = "Erro ao carregar dashboard"
     console.error(err)
@@ -105,6 +137,48 @@ const ocupacaoPercent = computed(() => {
         </Button>
       </RouterLink>
     </div>
+
+    <!-- Aviso de Assinatura -->
+    <Card
+      v-if="!isLoading && mostrarAvisoAssinatura"
+      class="border-2"
+      :class="acessoExpirado ? 'border-destructive bg-destructive/5' : 'border-amber-500 bg-amber-50'"
+    >
+      <CardContent class="p-4">
+        <div class="flex items-start gap-4">
+          <div
+            class="size-12 rounded-full flex items-center justify-center shrink-0"
+            :class="acessoExpirado ? 'bg-destructive/10' : 'bg-amber-100'"
+          >
+            <component
+              :is="acessoExpirado ? XCircle : Crown"
+              class="size-6"
+              :class="acessoExpirado ? 'text-destructive' : 'text-amber-600'"
+            />
+          </div>
+          <div class="flex-1">
+            <h3 class="font-semibold" :class="acessoExpirado ? 'text-destructive' : 'text-amber-800'">
+              <template v-if="acessoExpirado">Acesso bloqueado</template>
+              <template v-else>Sua assinatura esta acabando</template>
+            </h3>
+            <p class="text-sm mt-1" :class="acessoExpirado ? 'text-destructive/80' : 'text-amber-700'">
+              <template v-if="acessoExpirado">
+                Sua assinatura expirou. Renove para continuar acessando as funcionalidades de contrato.
+              </template>
+              <template v-else>
+                Restam {{ diasRestantesAssinatura }} dia(s) de acesso. Renove para nao perder o acesso.
+              </template>
+            </p>
+          </div>
+          <RouterLink :to="{ name: 'perfil' }">
+            <Button :variant="acessoExpirado ? 'default' : 'outline'" class="shrink-0 gap-2">
+              <Crown class="size-4" />
+              Renovar Assinatura
+            </Button>
+          </RouterLink>
+        </div>
+      </CardContent>
+    </Card>
 
     <!-- Loading -->
     <div v-if="isLoading" class="flex items-center justify-center py-12">

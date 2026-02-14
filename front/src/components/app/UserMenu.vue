@@ -1,11 +1,17 @@
 <script setup lang="ts">
 import { computed } from "vue"
+import { useRouter } from "vue-router"
 import { useAuth } from "@/composables"
 import { Dropdown, DropdownItem, DropdownSeparator } from "@/components/ui/dropdown"
 import { Button } from "@/components/ui/button"
-import { User, LogOut, Settings } from "lucide-vue-next"
+import { User, LogOut } from "lucide-vue-next"
 
+const router = useRouter()
 const { user, logout } = useAuth()
+
+function goToProfile() {
+  router.push({ name: "perfil" })
+}
 
 // Iniciais do nome do usuario
 const initials = computed(() => {
@@ -39,14 +45,9 @@ const initials = computed(() => {
 
     <DropdownSeparator />
 
-    <DropdownItem>
+    <DropdownItem @click="goToProfile">
       <User class="size-4" />
-      Meu perfil
-    </DropdownItem>
-
-    <DropdownItem>
-      <Settings class="size-4" />
-      Configuracoes
+      Meu Perfil
     </DropdownItem>
 
     <DropdownSeparator />

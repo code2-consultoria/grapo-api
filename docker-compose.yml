@@ -1,21 +1,43 @@
+# Docker Compose para desenvolvimento local
+# Sobe frontend, backend e banco de dados
+
 services:
-  app:
+  # Frontend Vue.js
+  front:
     build:
-      context: .
+      context: ./front
+      dockerfile: Dockerfile.dev
+    container_name: grapo-front
+    restart: unless-stopped
+    volumes:
+      - ./front:/app
+      - /app/node_modules
+    ports:
+      - "5180:5173"
+    environment:
+      - VITE_API_URL=http://localhost:8050/api
+      - VITE_APP_NAME=Grapo
+    networks:
+      - grapo-net
+
+  # Backend Laravel
+  api:
+    build:
+      context: ./api
       dockerfile: docker/Dockerfile.dev
     container_name: grapo-api
     restart: unless-stopped
     working_dir: /var/www/app
     volumes:
-      - .:/var/www/app
-      - ./storage:/var/www/app/storage
+      - ./api:/var/www/app
+      - ./api/storage:/var/www/app/storage
     ports:
-      - "8000:8000"
+      - "8050:8000"
     environment:
       - APP_ENV=local
       - APP_DEBUG=true
       - DB_CONNECTION=pgsql
-      - DB_HOST=db
+      - DB_HOST=grapo-db
       - DB_PORT=5432
       - DB_DATABASE=grapo
       - DB_USERNAME=grapo
@@ -28,7 +50,6 @@ services:
         condition: service_healthy
     networks:
       - grapo-net
-    # Roda servidor de desenvolvimento, queue e scheduler juntos
     command: >
       sh -c "
         php artisan migrate --force &&
@@ -38,6 +59,7 @@ services:
         wait
       "
 
+  # Banco de dados PostgreSQL
   db:
     image: postgres:16-alpine
     container_name: grapo-db
@@ -49,8 +71,10 @@ services:
       - POSTGRES_PASSWORD=secret
       - POSTGRES_DB=grapo
       - TZ=America/Fortaleza
-    ports:
-      - "5433:5432"
+      - POSTGRES_HOST_AUTH_METHOD=md5
+      - POSTGRES_INITDB_ARGS=--auth-host=md5
+    # ports:
+    #   - "5433:5432"
     networks:
       - grapo-net
     healthcheck:

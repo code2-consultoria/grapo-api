@@ -21,6 +21,44 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
 ---
 
+## [v1.3.0] - 2025-02-14
+
+**Milestone:** M4 - Monetização (Sprint 05)
+
+### Adicionado
+- Integração Stripe Billing (planos trimestral, semestral, anual)
+- Stripe Connect Express para locadores receberem pagamentos
+- Pagamento recorrente de contratos via Stripe
+- Webhooks para eventos Stripe (plataforma e Connect)
+- Campo `desconto_comercial` em pagamentos de contrato
+- Campo `data_limite_acesso` para controle de acesso por assinatura
+- Middleware `VerificaAssinatura` para bloquear acesso quando expirado
+- Campo `majoracao_diaria` configurável por locador (padrão 10%)
+- Configuração `config/assinatura.php` (trial, dias após pagamento/cancelamento)
+- Seção de majoração no perfil do usuário
+- Seleção de plano no registro
+- Status de assinatura no perfil
+- Alerta de expiração no dashboard
+
+### Alterado
+- Accessor `valor_diaria_sugerido` em TipoAtivo usa majoracao do locador
+- RegisterView.vue com seleção de plano
+- IndexView.vue (perfil) com seções de assinatura, Stripe Connect e majoração
+- DashboardView.vue com alerta de expiração
+
+### Testes
+- 64+ testes passando na Sprint 05
+  - PlanoTest: 6 testes
+  - StripeTest: 11 testes
+  - ConnectTest: 8 testes
+  - ContratoPagamentoTest: 11 testes
+  - WebhookTest: 7 testes
+  - DescontoComercialTest: 8 testes
+  - AssinaturaAcessoTest: 13 testes
+  - MajoracaoDiariaTest: 8 testes
+
+---
+
 ## [v1.1.0] - 2025-02-11
 
 **Milestone:** M1 - MVP Contratos (Refatoracao)

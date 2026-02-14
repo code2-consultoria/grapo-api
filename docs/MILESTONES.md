@@ -11,8 +11,10 @@ Marcos do projeto que agrupam funcionalidades relacionadas.
 | ID | Nome | Status | Sprints | Versao Docs |
 |----|------|--------|---------|-------------|
 | M0 | Landing Page | Concluido | Sprint 01 | v0.1.0 |
-| M1 | MVP Contratos | Planejado | Sprint 02 | v1.0.0 |
+| M1 | MVP Contratos | Concluido | Sprint 02 | v1.1.0 |
 | M2 | Contratos Completo | Backlog | - | - |
+| M3 | Dashboard e Autenticação | Concluido | Sprint 03, 04 | v1.1.0 |
+| M4 | Monetização | Concluido | Sprint 05 | v1.2.0 |
 
 ---
 
@@ -40,9 +42,9 @@ Marcos do projeto que agrupam funcionalidades relacionadas.
 
 ## M1 - MVP Contratos
 
-**Status:** Planejado
-**Versao:** v1.0.0
-**Tag Git:** `docs-v1.0.0` (a criar apos conclusao)
+**Status:** Concluido
+**Versao:** v1.1.0
+**Tag Git:** `docs-v1.1.0`
 
 ### Escopo
 - Sistema basico de gestao de contratos de locacao
@@ -51,14 +53,15 @@ Marcos do projeto que agrupam funcionalidades relacionadas.
 - Alocacao automatica de lotes (FIFO)
 
 ### Funcionalidades
-- [ ] Contratos (`docs/analises/features/contratos.md`)
+- [x] Contratos (`docs/analises/features/contratos.md`)
 
 ### Entidades do Modelo
-- usuarios
-- tenants
+- users
+- vinculo_times
+- pessoas
+- documentos
 - planos
 - assinaturas
-- locatarios
 - tipos_ativos
 - lotes
 - contratos
@@ -67,7 +70,7 @@ Marcos do projeto que agrupam funcionalidades relacionadas.
 
 ### Artefatos
 - Sprint: `docs/sprints/sprint-02.md`
-- Modelo atual: `docs/analises/modelo-dados.md`
+- Modelo: `docs/analises/modelo-dados.md`
 
 ---
 
@@ -93,6 +96,65 @@ Marcos do projeto que agrupam funcionalidades relacionadas.
 
 ---
 
+## M3 - Dashboard e Autenticação
+
+**Status:** Concluido
+**Versao:** v1.1.0
+**Dependencia:** M1
+
+### Escopo
+- Dashboard com metricas financeiras e operacionais
+- Sistema completo de autenticacao (registro, recuperacao de senha)
+
+### Funcionalidades
+- [x] Dashboard (`docs/sprints/sprint-03.md`)
+- [x] Autenticação completa (`docs/sprints/sprint-04.md`)
+
+### Artefatos
+- Sprint 03: `docs/sprints/sprint-03.md`
+- Sprint 04: `docs/sprints/sprint-04.md`
+
+---
+
+## M4 - Monetização
+
+**Status:** Concluido
+**Versao:** v1.2.0
+**Dependencia:** M3
+
+### Escopo
+- Integracao Stripe Billing (assinaturas da plataforma)
+- Stripe Connect Express (locadores recebem pagamentos)
+- Pagamento recorrente de contratos
+- Controle de acesso por assinatura
+- Majoracao da diaria configuravel
+- Desconto comercial em pagamentos
+
+### Funcionalidades
+- [x] Stripe Billing (planos, checkout, cancelamento)
+- [x] Stripe Connect (onboarding, status, dashboard)
+- [x] Pagamento de contratos via Stripe
+- [x] Webhooks Stripe (plataforma e Connect)
+- [x] Controle de acesso (trial, data limite, middleware)
+- [x] Majoracao da diaria configuravel
+- [x] Desconto comercial em pagamentos
+
+### Entidades Adicionais
+- pagamentos
+- stripe_subscriptions
+- stripe_subscription_items
+
+### Campos Adicionais
+- pessoas: data_limite_acesso, majoracao_diaria, stripe_*, stripe_connect_config
+- contratos: tipo_cobranca, dia_vencimento, stripe_subscription_id, stripe_customer_id
+- pagamentos: desconto_comercial
+
+### Artefatos
+- Sprint: `docs/sprints/sprint-05.md`
+- Modelo: `docs/analises/modelo-dados.md` (v1.2.0)
+
+---
+
 ## Regras de Versionamento
 
 ### Documentacao
@@ -111,4 +173,4 @@ Marcos do projeto que agrupam funcionalidades relacionadas.
 
 ---
 
-**Ultima atualizacao:** 2025-02-11
+**Ultima atualizacao:** 2025-02-14

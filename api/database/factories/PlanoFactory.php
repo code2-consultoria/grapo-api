@@ -26,6 +26,17 @@ class PlanoFactory extends Factory
     }
 
     /**
+     * Plano com Stripe configurado.
+     */
+    public function comStripe(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'stripe_product_id' => 'prod_' . fake()->regexify('[A-Za-z0-9]{14}'),
+            'stripe_price_id' => 'price_' . fake()->regexify('[A-Za-z0-9]{14}'),
+        ]);
+    }
+
+    /**
      * Plano trimestral.
      */
     public function trimestral(): static
