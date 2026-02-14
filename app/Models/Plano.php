@@ -17,6 +17,8 @@ class Plano extends Model
         'nome',
         'duracao_meses',
         'valor',
+        'stripe_product_id',
+        'stripe_price_id',
         'ativo',
     ];
 

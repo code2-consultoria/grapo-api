@@ -50,6 +50,9 @@ class Registrar
             ]);
             $locador->save();
 
+            // Define trial de 7 dias
+            $locador->definirTrial();
+
             // Cria o vinculo entre user e locador
             $vinculo = new VinculoTime();
             $vinculo->user()->associate($user);

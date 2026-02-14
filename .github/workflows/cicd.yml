@@ -1,0 +1,531 @@
+name: CI/CD
+
+on:
+  push:
+    branches: [main, staging]
+  pull_request:
+    branches: [main, staging]
+
+env:
+  REGISTRY: ghcr.io
+  DOCKER_IMAGE: ghcr.io/${{ github.repository }}
+  PHP_VERSION: "8.4"
+
+jobs:
+  test:
+    name: Test
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:latest
+        env:
+          POSTGRES_USER: jukebar
+          POSTGRES_PASSWORD: jukebar
+          POSTGRES_DB: jukebar_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+      redis:
+        image: redis:alpine
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ env.PHP_VERSION }}
+          extensions: pdo_pgsql, pgsql, redis, mbstring, xml, ctype, json, bcmath, pcntl, intl, gd
+          coverage: xdebug
+
+      - name: Get Composer cache directory
+        id: composer-cache
+        run: echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
+        working-directory: src
+
+      - name: Cache Composer dependencies
+        uses: actions/cache@v4
+        with:
+          path: ${{ steps.composer-cache.outputs.dir }}
+          key: ${{ runner.os }}-composer-${{ hashFiles('src/composer.lock') }}
+          restore-keys: ${{ runner.os }}-composer-
+
+      - name: Install dependencies
+        run: composer install --prefer-dist --no-progress
+        working-directory: src
+
+      - name: Create .env file
+        run: |
+          cp .env.example .env
+          sed -i 's/DB_HOST=.*/DB_HOST=127.0.0.1/' .env
+          sed -i 's/DB_DATABASE=.*/DB_DATABASE=jukebar_test/' .env
+          sed -i 's/DB_USERNAME=.*/DB_USERNAME=jukebar/' .env
+          sed -i 's/DB_PASSWORD=.*/DB_PASSWORD=jukebar/' .env
+          sed -i 's/REDIS_HOST=.*/REDIS_HOST=127.0.0.1/' .env
+          php artisan key:generate
+          php artisan jwt:secret --force
+        working-directory: src
+
+      - name: Run migrations
+        run: php artisan migrate --force
+        working-directory: src
+
+      - name: Run tests with Pest
+        run: ./vendor/bin/pest --coverage --coverage-clover=coverage.xml
+        working-directory: src
+
+      - name: Upload coverage
+        uses: codecov/codecov-action@v4
+        with:
+          files: src/coverage.xml
+          fail_ci_if_error: false
+        continue-on-error: true
+
+  # Lint e Analyse rodam apenas em Pull Requests
+  lint:
+    name: Lint (Pint)
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ env.PHP_VERSION }}
+
+      - name: Install dependencies
+        run: composer install --prefer-dist --no-progress
+        working-directory: src
+
+      - name: Run Laravel Pint
+        run: ./vendor/bin/pint --test
+        working-directory: src
+
+  analyse:
+    name: Static Analysis (Larastan)
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ env.PHP_VERSION }}
+          extensions: pdo_pgsql, pgsql, redis, mbstring, xml, ctype, json, bcmath, pcntl, intl
+
+      - name: Install dependencies
+        run: composer install --prefer-dist --no-progress
+        working-directory: src
+
+      - name: Create .env file
+        run: cp .env.example .env && php artisan key:generate
+        working-directory: src
+
+      - name: Run Larastan
+        run: ./vendor/bin/phpstan analyse --memory-limit=2G
+        working-directory: src
+
+  # Build sem push para Pull Requests
+  build-pr:
+    name: Build (PR Validation)
+    runs-on: ubuntu-latest
+    needs: [test, lint, analyse]
+    if: github.event_name == 'pull_request'
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build Docker image (no push)
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: Docker/Dockerfile-fpm
+          push: false
+          tags: ${{ env.DOCKER_IMAGE }}:pr-${{ github.event.number }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+  # Build e Push para pushes em main/staging
+  build-and-push:
+    name: Build and Push Docker Images
+    runs-on: ubuntu-latest
+    needs: [test]
+    if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/staging')
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set environment tag
+        id: env-tag
+        run: |
+          if [ "${{ github.ref }}" == "refs/heads/main" ]; then
+            echo "tag=production" >> $GITHUB_OUTPUT
+          else
+            echo "tag=staging" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Build and push API image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: Docker/Dockerfile-fpm
+          push: true
+          tags: |
+            ${{ env.DOCKER_IMAGE }}:${{ steps.env-tag.outputs.tag }}
+            ${{ env.DOCKER_IMAGE }}:build-${{ github.run_number }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Build and push WebSocket image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: Docker/Dockerfile-ws
+          push: true
+          tags: |
+            ${{ env.DOCKER_IMAGE }}-ws:${{ steps.env-tag.outputs.tag }}
+            ${{ env.DOCKER_IMAGE }}-ws:build-${{ github.run_number }}
+          cache-from: type=gha,scope=ws
+          cache-to: type=gha,mode=max,scope=ws
+
+  deploy-staging:
+    name: Deploy to Staging
+    runs-on: ubuntu-latest
+    needs: build-and-push
+    if: github.event_name == 'push' && github.ref == 'refs/heads/staging'
+    environment: staging
+
+    steps:
+      - name: Set short SHA
+        id: vars
+        run: echo "short_sha=${GITHUB_SHA::7}" >> $GITHUB_OUTPUT
+
+      - name: Deploy via SSH
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USERNAME }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          port: ${{ secrets.SSH_PORT }}
+          script: |
+            mkdir -p /var/docker/services/jukebar/api
+            cd /var/docker/services/jukebar/api
+
+            # Cria arquivo .env com as variáveis de ambiente
+            cat > .env << 'ENVEOF'
+            APP_KEY=${{ secrets.APP_KEY }}
+            APP_URL=${{ vars.APP_URL }}
+            APP_CUSTOMER_URL=${{ vars.APP_CUSTOMER_URL }}
+            SPOTIFY_CLIENT_ID=${{ secrets.SPOTIFY_CLIENT_ID }}
+            SPOTIFY_CLIENT_SECRET=${{ secrets.SPOTIFY_CLIENT_SECRET }}
+            WPP_CLIENT_ID=${{ secrets.WPP_CLIENT_ID }}
+            WPP_CLIENT_KEY=${{ secrets.WPP_CLIENT_KEY }}
+            WPP_ENDPOINT=${{ vars.WPP_ENDPOINT }}
+            STRIPE_KEY=${{ secrets.STRIPE_KEY }}
+            STRIPE_SECRET=${{ secrets.STRIPE_SECRET }}
+            STRIPE_WEBHOOK_SECRET=${{ secrets.STRIPE_WEBHOOK_SECRET }}
+            MAILERSEND_API_KEY=${{ secrets.MAILERSEND_API_KEY }}
+            REVERB_APP_ID=${{ secrets.REVERB_APP_ID }}
+            REVERB_APP_KEY=${{ secrets.REVERB_APP_KEY }}
+            REVERB_APP_SECRET=${{ secrets.REVERB_APP_SECRET }}
+            JWT_SECRET=${{ secrets.JWT_SECRET }}
+            DB_PASSWORD=${{ secrets.DB_PASSWORD }}
+            INSPECTOR_INGESTION_KEY=${{ secrets.INSPECTOR_INGESTION_KEY }}
+            INSPECTOR_ENABLE=${{ secrets.INSPECTOR_INGESTION_KEY != '' && 'true' || 'false' }}
+            BUILD_ID=${{ steps.vars.outputs.short_sha }}
+            ENVEOF
+
+            # Baixa arquivos do repositório
+            curl -sSL -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+              -H "Accept: application/vnd.github.v3.raw" \
+              -o docker-compose.github.yml \
+              "https://api.github.com/repos/${{ github.repository }}/contents/docker-compose.github.yml?ref=staging"
+
+            curl -sSL -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+              -H "Accept: application/vnd.github.v3.raw" \
+              -o .env.static \
+              "https://api.github.com/repos/${{ github.repository }}/contents/src/.env.static?ref=staging"
+
+            curl -sSL -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+              -H "Accept: application/vnd.github.v3.raw" \
+              -o deploy.sh \
+              "https://api.github.com/repos/${{ github.repository }}/contents/deploy.sh?ref=staging"
+
+            chmod +x deploy.sh
+
+            # Salva token para docker login
+            echo "${{ secrets.GITHUB_TOKEN }}" > .github_token
+
+            # Executa o deploy
+            ./deploy.sh staging
+
+  deploy-production:
+    name: Deploy to Production
+    runs-on: ubuntu-latest
+    needs: build-and-push
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    environment: producao
+
+    steps:
+      - name: Set short SHA
+        id: vars
+        run: echo "short_sha=${GITHUB_SHA::7}" >> $GITHUB_OUTPUT
+
+      - name: Deploy via SSH
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USERNAME }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          port: ${{ secrets.SSH_PORT }}
+          script: |
+            mkdir -p /var/docker/services/jukebar/api
+            cd /var/docker/services/jukebar/api
+
+            # Cria arquivo .env com as variáveis de ambiente
+            cat > .env << 'ENVEOF'
+            APP_KEY=${{ secrets.APP_KEY }}
+            APP_URL=${{ vars.APP_URL }}
+            APP_CUSTOMER_URL=${{ vars.APP_CUSTOMER_URL }}
+            SPOTIFY_CLIENT_ID=${{ secrets.SPOTIFY_CLIENT_ID }}
+            SPOTIFY_CLIENT_SECRET=${{ secrets.SPOTIFY_CLIENT_SECRET }}
+            WPP_CLIENT_ID=${{ secrets.WPP_CLIENT_ID }}
+            WPP_CLIENT_KEY=${{ secrets.WPP_CLIENT_KEY }}
+            WPP_ENDPOINT=${{ vars.WPP_ENDPOINT }}
+            STRIPE_KEY=${{ secrets.STRIPE_KEY }}
+            STRIPE_SECRET=${{ secrets.STRIPE_SECRET }}
+            STRIPE_WEBHOOK_SECRET=${{ secrets.STRIPE_WEBHOOK_SECRET }}
+            MAILERSEND_API_KEY=${{ secrets.MAILERSEND_API_KEY }}
+            REVERB_APP_ID=${{ secrets.REVERB_APP_ID }}
+            REVERB_APP_KEY=${{ secrets.REVERB_APP_KEY }}
+            REVERB_APP_SECRET=${{ secrets.REVERB_APP_SECRET }}
+            JWT_SECRET=${{ secrets.JWT_SECRET }}
+            DB_PASSWORD=${{ secrets.DB_PASSWORD }}
+            INSPECTOR_INGESTION_KEY=${{ secrets.INSPECTOR_INGESTION_KEY }}
+            INSPECTOR_ENABLE=${{ secrets.INSPECTOR_INGESTION_KEY != '' && 'true' || 'false' }}
+            BUILD_ID=${{ steps.vars.outputs.short_sha }}
+            ENVEOF
+
+            # Baixa arquivos do repositório
+            curl -sSL -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+              -H "Accept: application/vnd.github.v3.raw" \
+              -o docker-compose.github.yml \
+              "https://api.github.com/repos/${{ github.repository }}/contents/docker-compose.github.yml?ref=main"
+
+            curl -sSL -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+              -H "Accept: application/vnd.github.v3.raw" \
+              -o .env.static \
+              "https://api.github.com/repos/${{ github.repository }}/contents/src/.env.static?ref=main"
+
+            curl -sSL -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+              -H "Accept: application/vnd.github.v3.raw" \
+              -o deploy.sh \
+              "https://api.github.com/repos/${{ github.repository }}/contents/deploy.sh?ref=main"
+
+            chmod +x deploy.sh
+
+            # Salva token para docker login
+            echo "${{ secrets.GITHUB_TOKEN }}" > .github_token
+
+            # Executa o deploy
+            ./deploy.sh production
+
+  # Notificação para Push (produção/staging)
+  notify:
+    name: Notify Telegram
+    runs-on: ubuntu-latest
+    if: always() && github.event_name == 'push'
+    needs: [test, build-and-push, deploy-staging, deploy-production]
+    environment: producao
+
+    steps:
+      - name: Get workflow conclusion
+        id: conclusion
+        run: |
+          FAILED_JOB=""
+          FAILED_REASON=""
+
+          if [ "${{ needs.test.result }}" == "failure" ]; then
+            FAILED_JOB="Test (Pest)"
+            FAILED_REASON="Testes automatizados falharam"
+          elif [ "${{ needs.build-and-push.result }}" == "failure" ]; then
+            FAILED_JOB="Build Docker"
+            FAILED_REASON="Falha ao construir imagem Docker"
+          elif [ "${{ needs.deploy-staging.result }}" == "failure" ]; then
+            FAILED_JOB="Deploy Staging"
+            FAILED_REASON="Falha no deploy para staging"
+          elif [ "${{ needs.deploy-production.result }}" == "failure" ]; then
+            FAILED_JOB="Deploy Production"
+            FAILED_REASON="Falha no deploy para produção"
+          fi
+
+          if [ -n "$FAILED_JOB" ]; then
+            echo "status=failure" >> $GITHUB_OUTPUT
+            echo "failed_job=$FAILED_JOB" >> $GITHUB_OUTPUT
+            echo "failed_reason=$FAILED_REASON" >> $GITHUB_OUTPUT
+          else
+            echo "status=success" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Set environment info
+        id: env-info
+        run: |
+          if [ "${{ github.ref }}" == "refs/heads/main" ]; then
+            echo "environment=Produção" >> $GITHUB_OUTPUT
+          else
+            echo "environment=Staging" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Check Telegram secrets
+        id: telegram-check
+        run: |
+          if [ -z "${{ secrets.TELEGRAM_BOT_TOKEN }}" ]; then
+            echo "::warning::TELEGRAM_BOT_TOKEN não configurado em Repository Secrets"
+            echo "configured=false" >> $GITHUB_OUTPUT
+          elif [ -z "${{ secrets.TELEGRAM_CHAT_ID }}" ]; then
+            echo "::warning::TELEGRAM_CHAT_ID não configurado em Repository Secrets"
+            echo "configured=false" >> $GITHUB_OUTPUT
+          else
+            echo "configured=true" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Send Telegram notification (Success)
+        if: steps.conclusion.outputs.status == 'success' && steps.telegram-check.outputs.configured == 'true'
+        uses: appleboy/telegram-action@master
+        with:
+          to: ${{ secrets.TELEGRAM_CHAT_ID }}
+          token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          format: markdown
+          message: |
+            ✅ *Pipeline Jukebar API*
+
+            *Status:* Sucesso
+            *Ambiente:* ${{ steps.env-info.outputs.environment }}
+            *Branch:* `${{ github.ref_name }}`
+            *Commit:* `${{ github.sha }}`
+            *Autor:* ${{ github.actor }}
+
+            [Ver no GitHub](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})
+
+      - name: Send Telegram notification (Failure)
+        if: steps.conclusion.outputs.status == 'failure' && steps.telegram-check.outputs.configured == 'true'
+        uses: appleboy/telegram-action@master
+        with:
+          to: ${{ secrets.TELEGRAM_CHAT_ID }}
+          token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          format: markdown
+          message: |
+            ❌ *Pipeline Jukebar API*
+
+            *Status:* Falhou
+            *Etapa:* ${{ steps.conclusion.outputs.failed_job }}
+            *Motivo:* ${{ steps.conclusion.outputs.failed_reason }}
+            *Branch:* `${{ github.ref_name }}`
+            *Commit:* `${{ github.sha }}`
+            *Autor:* ${{ github.actor }}
+
+            [Ver detalhes](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})
+
+  # Notificação para Pull Requests
+  notify-pr:
+    name: Notify PR Status
+    runs-on: ubuntu-latest
+    if: always() && github.event_name == 'pull_request'
+    needs: [test, lint, analyse, build-pr]
+    environment: producao
+
+    steps:
+      - name: Get workflow conclusion
+        id: conclusion
+        run: |
+          FAILED_JOB=""
+          FAILED_REASON=""
+
+          if [ "${{ needs.test.result }}" == "failure" ]; then
+            FAILED_JOB="Test (Pest)"
+            FAILED_REASON="Testes automatizados falharam"
+          elif [ "${{ needs.lint.result }}" == "failure" ]; then
+            FAILED_JOB="Lint (Pint)"
+            FAILED_REASON="Problemas de estilo de código"
+          elif [ "${{ needs.analyse.result }}" == "failure" ]; then
+            FAILED_JOB="Static Analysis (Larastan)"
+            FAILED_REASON="Erros de análise estática"
+          elif [ "${{ needs.build-pr.result }}" == "failure" ]; then
+            FAILED_JOB="Build Docker"
+            FAILED_REASON="Falha ao construir imagem Docker"
+          fi
+
+          if [ -n "$FAILED_JOB" ]; then
+            echo "status=failure" >> $GITHUB_OUTPUT
+            echo "failed_job=$FAILED_JOB" >> $GITHUB_OUTPUT
+            echo "failed_reason=$FAILED_REASON" >> $GITHUB_OUTPUT
+          else
+            echo "status=success" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Check Telegram secrets
+        id: telegram-check
+        run: |
+          if [ -z "${{ secrets.TELEGRAM_BOT_TOKEN }}" ]; then
+            echo "configured=false" >> $GITHUB_OUTPUT
+          elif [ -z "${{ secrets.TELEGRAM_CHAT_ID }}" ]; then
+            echo "configured=false" >> $GITHUB_OUTPUT
+          else
+            echo "configured=true" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Send Telegram notification (PR)
+        if: steps.telegram-check.outputs.configured == 'true'
+        uses: appleboy/telegram-action@master
+        with:
+          to: ${{ secrets.TELEGRAM_CHAT_ID }}
+          token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          format: markdown
+          message: |
+            ${{ steps.conclusion.outputs.status == 'success' && '✅' || '❌' }} *Pull Request #${{ github.event.number }}*
+
+            *Status:* ${{ steps.conclusion.outputs.status == 'success' && 'Validação OK' || 'Falhou' }}
+            ${{ steps.conclusion.outputs.status == 'failure' && format('*Etapa:* {0}', steps.conclusion.outputs.failed_job) || '' }}
+            ${{ steps.conclusion.outputs.status == 'failure' && format('*Motivo:* {0}', steps.conclusion.outputs.failed_reason) || '' }}
+            *PR:* ${{ github.event.pull_request.title }}
+            *Autor:* ${{ github.actor }}
+
+            [Ver PR](${{ github.event.pull_request.html_url }})

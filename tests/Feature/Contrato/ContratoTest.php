@@ -1,5 +1,6 @@
 <?php
 
+use App\Enums\StatusContrato;
 use App\Models\Contrato;
 use App\Models\ContratoItem;
 use App\Models\Lote;
@@ -182,7 +183,7 @@ test('retorna erro ao ativar contrato sem disponibilidade suficiente', function 
 
     // Contrato permanece em rascunho
     $contrato->refresh();
-    expect($contrato->status)->toBe('rascunho');
+    expect($contrato->status)->toBe(StatusContrato::Rascunho);
 
     // Lote não foi alterado
     $lote->refresh();

@@ -25,6 +25,7 @@ class PessoaFactory extends Factory
             'telefone' => fake()->phoneNumber(),
             'endereco' => fake()->address(),
             'ativo' => true,
+            'majoracao_diaria' => 10.00,
         ];
     }
 
