@@ -1,8 +1,8 @@
 # Modelo de Dados - Grapo
 
-> **Versao:** 1.1.0 (M1 - MVP Contratos)
-> **Ultima atualizacao:** 2025-02-11
-> **Milestone:** M1
+> **Versao:** 1.2.0 (M4 - Monetização)
+> **Ultima atualizacao:** 2025-02-14
+> **Milestone:** M4
 
 ---
 
@@ -18,7 +18,9 @@ erDiagram
     pessoas ||--o{ tipos_ativos : possui
     pessoas ||--o{ lotes : possui
     pessoas ||--o{ assinaturas : possui
+    pessoas ||--o{ stripe_subscriptions : assina
     contratos ||--|{ contrato_itens : contem
+    contratos ||--o{ pagamentos : gera
     contrato_itens ||--|{ alocacoes_lotes : alocado_de
     tipos_ativos ||--o{ lotes : categoriza
     lotes ||--o{ alocacoes_lotes : fornece
@@ -51,6 +53,13 @@ erDiagram
         string telefone
         string endereco
         boolean ativo
+        date data_limite_acesso
+        decimal majoracao_diaria
+        string stripe_id
+        string pm_type
+        string pm_last_four
+        timestamp trial_ends_at
+        json stripe_connect_config
         timestamp created_at
         timestamp updated_at
     }
@@ -120,6 +129,10 @@ erDiagram
         date data_termino
         decimal valor_total
         string status
+        string tipo_cobranca
+        integer dia_vencimento
+        string stripe_subscription_id
+        string stripe_customer_id
         text observacoes
         timestamp created_at
         timestamp updated_at
@@ -141,6 +154,34 @@ erDiagram
         uuid contrato_item_id
         uuid lote_id
         integer quantidade_alocada
+        timestamp created_at
+        timestamp updated_at
+    }
+
+    pagamentos {
+        uuid id
+        uuid contrato_id
+        date data_vencimento
+        date data_pagamento
+        decimal valor
+        decimal desconto_comercial
+        string status
+        string forma_pagamento
+        text observacoes
+        timestamp created_at
+        timestamp updated_at
+    }
+
+    stripe_subscriptions {
+        uuid id
+        uuid pessoa_id
+        string type
+        string stripe_id
+        string stripe_status
+        string stripe_price
+        integer quantity
+        timestamp trial_ends_at
+        timestamp ends_at
         timestamp created_at
         timestamp updated_at
     }
@@ -243,6 +284,12 @@ Entidade unificada para Locador e Locatario. O campo `tipo` define o papel:
 - **PJ**: CNPJ, Inscricao Municipal, Inscricao Estadual
 - **PF**: CPF, RG, CadUnico, Passaporte, CNH
 
+**Campos de assinatura (Sprint 05):**
+- `data_limite_acesso`: Data ate quando o locador pode acessar o sistema
+- `majoracao_diaria`: Percentual de majoracao para calculo da diaria (padrao 10%)
+- Campos Stripe Cashier: `stripe_id`, `pm_type`, `pm_last_four`, `trial_ends_at`
+- `stripe_connect_config`: JSON com configuracao do Stripe Connect
+
 ### documentos
 Documentos de uma pessoa. Cada tipo tem classe propria com validacao e formatacao.
 
@@ -287,6 +334,20 @@ Itens solicitados pelo locatario no contrato.
 Tabela interna de mapeamento automatico usando **FIFO** (lote mais antigo primeiro).
 
 **Esta informacao nao e exibida ao usuario.**
+
+### pagamentos
+Parcelas de pagamento de um contrato.
+
+**Campos importantes:**
+- `valor`: Valor original da parcela
+- `desconto_comercial`: Desconto aplicado (max = valor da parcela)
+- `status`: pendente, pago, cancelado
+- `forma_pagamento`: manual, stripe
+
+**Accessor `valor_final`**: Retorna `valor - desconto_comercial`
+
+### stripe_subscriptions
+Assinaturas Stripe do locador (plataforma). Tabela customizada do Laravel Cashier usando `pessoa_id` ao inves de `user_id`.
 
 ---
 
@@ -341,6 +402,7 @@ Todas as Actions implementam `Query` (leitura) ou `Command` (escrita).
 |--------|-----------|------------|
 | 1.0.0 | M1 | Modelo inicial com tenants/locatarios separados |
 | 1.1.0 | M1 | Unificacao em pessoas, documentos, vinculo_times, CQRS |
+| 1.2.0 | M4 | Stripe Billing/Connect, pagamentos, majoracao, controle de acesso |
 
 ---
 

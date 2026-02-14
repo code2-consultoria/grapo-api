@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use App\Enums\StatusContrato;
+use App\Enums\TipoCobranca;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -22,7 +24,13 @@ class Contrato extends Model
         'data_termino',
         'valor_total',
         'status',
+        'tipo_cobranca',
         'observacoes',
+        // Stripe Connect - pagamento recorrente
+        'stripe_subscription_id',
+        'stripe_customer_id',
+        'stripe_checkout_id',
+        'dia_vencimento',
     ];
 
     protected function casts(): array
@@ -31,6 +39,9 @@ class Contrato extends Model
             'data_inicio' => 'date',
             'data_termino' => 'date',
             'valor_total' => 'decimal:2',
+            'dia_vencimento' => 'integer',
+            'status' => StatusContrato::class,
+            'tipo_cobranca' => TipoCobranca::class,
         ];
     }
 
@@ -49,6 +60,16 @@ class Contrato extends Model
     public function itens(): HasMany
     {
         return $this->hasMany(ContratoItem::class);
+    }
+
+    public function pagamentos(): HasMany
+    {
+        return $this->hasMany(Pagamento::class);
+    }
+
+    public function aditivos(): HasMany
+    {
+        return $this->hasMany(ContratoAditivo::class);
     }
 
     // Scopes
@@ -72,12 +93,17 @@ class Contrato extends Model
 
     public function estaAtivo(): bool
     {
-        return $this->status === 'ativo';
+        return $this->status === StatusContrato::Ativo;
     }
 
     public function estaEmRascunho(): bool
     {
-        return $this->status === 'rascunho';
+        return $this->status === StatusContrato::Rascunho;
+    }
+
+    public function estaAguardandoPagamento(): bool
+    {
+        return $this->status === StatusContrato::AguardandoPagamento;
     }
 
     public function podeSerEditado(): bool
@@ -88,5 +114,25 @@ class Contrato extends Model
     public function calcularDiasLocacao(): int
     {
         return $this->data_inicio->diffInDays($this->data_termino) + 1;
+    }
+
+    public function exigePagamentoAntecipado(): bool
+    {
+        return $this->tipo_cobranca?->isAntecipado() ?? false;
+    }
+
+    public function temCobrancaStripe(): bool
+    {
+        return $this->tipo_cobranca?->isStripe() ?? false;
+    }
+
+    public function temCobrancaManual(): bool
+    {
+        return $this->tipo_cobranca?->isManual() ?? false;
+    }
+
+    public function semCobranca(): bool
+    {
+        return $this->tipo_cobranca === TipoCobranca::SemCobranca;
     }
 }

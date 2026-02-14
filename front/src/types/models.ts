@@ -79,7 +79,16 @@ export interface Lote {
 }
 
 // Status do contrato (enum no backend)
-export type ContratoStatus = 'rascunho' | 'ativo' | 'finalizado' | 'cancelado'
+export type ContratoStatus = 'rascunho' | 'aguardando_pagamento' | 'ativo' | 'finalizado' | 'cancelado'
+
+// Tipo de cobranca (enum no backend)
+export type TipoCobranca = 'antecipado_stripe' | 'antecipado_pix' | 'recorrente_stripe' | 'recorrente_manual' | 'sem_cobranca'
+
+// Status do pagamento (enum no backend)
+export type StatusPagamento = 'pendente' | 'pago' | 'atrasado' | 'cancelado' | 'reembolsado'
+
+// Origem do pagamento (enum no backend)
+export type OrigemPagamento = 'stripe' | 'pix' | 'manual'
 
 export interface Contrato {
   id: string // UUID
@@ -88,15 +97,50 @@ export interface Contrato {
   data_termino: string
   valor_total: number
   status: ContratoStatus
+  tipo_cobranca: TipoCobranca
   observacoes: string | null
   locador_id: string
   locatario_id: string
+  stripe_subscription_id: string | null
+  stripe_customer_id: string | null
+  stripe_checkout_id: string | null
+  dia_vencimento: number | null
   created_at: string
   updated_at: string
   // Relacionamentos opcionais
   locador?: Pessoa
   locatario?: Pessoa
   itens?: ContratoItem[]
+  pagamentos?: Pagamento[]
+}
+
+export interface Pagamento {
+  id: string // UUID
+  valor: string // Decimal formatado
+  desconto_comercial: string // Decimal formatado
+  valor_final: number // Calculado: valor - desconto_comercial
+  data_vencimento: string
+  data_pagamento: string | null
+  status: StatusPagamento
+  status_label: string
+  origem: OrigemPagamento
+  origem_label: string
+  stripe_payment_id: string | null
+  observacoes: string | null
+  contrato_id: string
+  created_at: string
+  updated_at: string
+}
+
+export interface PagamentoResumo {
+  total_contrato: string
+  total_pago: string
+  total_pendente: string
+  total_atrasado: string
+  qtd_pagamentos: number
+  qtd_pagos: number
+  qtd_pendentes: number
+  qtd_atrasados: number
 }
 
 // Periodo de aluguel
@@ -123,4 +167,42 @@ export interface VinculoTime {
   locador_id: string
   created_at: string
   updated_at: string
+}
+
+// Tipo de aditivo (enum no backend)
+export type TipoAditivo = 'prorrogacao' | 'acrescimo' | 'reducao' | 'alteracao_valor'
+
+// Status do aditivo (enum no backend)
+export type StatusAditivo = 'rascunho' | 'ativo' | 'cancelado'
+
+export interface ContratoAditivo {
+  id: string // UUID
+  tipo: TipoAditivo
+  descricao: string | null
+  data_vigencia: string
+  valor_ajuste: number | null
+  nova_data_termino: string | null
+  conceder_reembolso: boolean
+  status: StatusAditivo
+  stripe_price_anterior_id: string | null
+  stripe_invoice_item_id: string | null
+  data_termino_anterior: string | null
+  valor_total_anterior: number | null
+  contrato_id: string
+  created_at: string
+  updated_at: string
+  // Relacionamentos opcionais
+  itens?: ContratoAditivoItem[]
+}
+
+export interface ContratoAditivoItem {
+  id: string // UUID
+  quantidade_alterada: number
+  valor_unitario: number | null
+  contrato_aditivo_id: string
+  tipo_ativo_id: string
+  created_at: string
+  updated_at: string
+  // Relacionamentos opcionais
+  tipo_ativo?: TipoAtivo
 }

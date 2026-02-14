@@ -19,6 +19,8 @@ import {
 } from "@/components/ui/table"
 import { Spinner } from "@/components/ui/spinner"
 import { useForm, useNotification } from "@/composables"
+import { ContratoPagamentoStripe, ContratoPagamentos, ContratoCheckout, ContratoAditivos } from "@/components/app"
+import { Select } from "@/components/ui/select"
 import {
   ArrowLeft,
   Calendar,
@@ -31,9 +33,11 @@ import {
   Play,
   XCircle,
   CheckCircle,
+  CreditCard,
+  Banknote,
 } from "lucide-vue-next"
 import api from "@/lib/api"
-import type { Contrato, ContratoItem, ContratoStatus, TipoAtivo, TipoAtivoForm, ContratoForm, Pessoa, ApiResponse, PaginatedResponse } from "@/types"
+import type { Contrato, ContratoItem, ContratoStatus, TipoCobranca, TipoAtivo, TipoAtivoForm, ContratoForm, Pessoa, ApiResponse, PaginatedResponse } from "@/types"
 
 const router = useRouter()
 const route = useRoute()
@@ -52,8 +56,18 @@ const editForm = ref<ContratoForm>({
   data_inicio: "",
   data_termino: "",
   observacoes: "",
+  tipo_cobranca: "sem_cobranca",
 })
 const isSubmittingEdit = ref(false)
+
+// Opcoes de tipo de cobranca
+const tiposCobranca: { value: TipoCobranca; label: string }[] = [
+  { value: "sem_cobranca", label: "Sem cobranca via sistema" },
+  { value: "antecipado_stripe", label: "Antecipado - Cartao" },
+  { value: "antecipado_pix", label: "Antecipado - PIX" },
+  { value: "recorrente_stripe", label: "Recorrente - Stripe" },
+  { value: "recorrente_manual", label: "Recorrente - Manual" },
+]
 
 // Estado do dialog de item
 const showItemDialog = ref(false)
@@ -71,6 +85,11 @@ const showConfirmDialog = ref(false)
 const confirmAction = ref<"ativar" | "cancelar" | "finalizar" | "remover-item" | null>(null)
 const confirmItemId = ref<string | null>(null)
 const isConfirming = ref(false)
+
+// Estado do dialog de tipo de cobranca
+const showTipoCobrancaDialog = ref(false)
+const tipoCobrancaForm = ref<TipoCobranca>("sem_cobranca")
+const isSubmittingTipoCobranca = ref(false)
 
 // Estado do dialog de ativo
 const showTipoAtivoDialog = ref(false)
@@ -121,6 +140,7 @@ function openTipoAtivoDialog() {
 
 // Computed
 const isRascunho = computed(() => contrato.value?.status === "rascunho")
+const isAguardandoPagamento = computed(() => contrato.value?.status === "aguardando_pagamento")
 const isAtivo = computed(() => contrato.value?.status === "ativo")
 
 const diasLocacao = computed(() => {
@@ -207,6 +227,7 @@ function openEditDialog(): void {
     data_inicio: contrato.value.data_inicio,
     data_termino: contrato.value.data_termino,
     observacoes: contrato.value.observacoes || "",
+    tipo_cobranca: contrato.value.tipo_cobranca || "sem_cobranca",
   }
   showEditDialog.value = true
 }
@@ -228,6 +249,32 @@ async function submitEditContrato(): Promise<void> {
   }
 }
 
+// Handlers de tipo de cobranca
+function openTipoCobrancaDialog(): void {
+  if (!contrato.value) return
+  tipoCobrancaForm.value = contrato.value.tipo_cobranca || "sem_cobranca"
+  showTipoCobrancaDialog.value = true
+}
+
+async function submitTipoCobranca(): Promise<void> {
+  if (!contrato.value) return
+
+  isSubmittingTipoCobranca.value = true
+  try {
+    await api.put(`/contratos/${contrato.value.id}/tipo-cobranca`, {
+      tipo_cobranca: tipoCobrancaForm.value,
+    })
+    success("Sucesso!", "Tipo de cobranca atualizado")
+    showTipoCobrancaDialog.value = false
+    await loadContrato()
+  } catch (err: unknown) {
+    const apiError = err as { message?: string }
+    error("Erro", apiError.message || "Erro ao atualizar tipo de cobranca")
+  } finally {
+    isSubmittingTipoCobranca.value = false
+  }
+}
+
 // Formatadores
 function formatCurrency(value: number): string {
   return new Intl.NumberFormat("pt-BR", {
@@ -240,10 +287,12 @@ function formatDate(date: string): string {
   return new Date(date).toLocaleDateString("pt-BR")
 }
 
-function getStatusVariant(status: ContratoStatus): "default" | "success" | "secondary" | "destructive" {
+function getStatusVariant(status: ContratoStatus): "default" | "success" | "secondary" | "destructive" | "warning" {
   switch (status) {
     case "rascunho":
       return "secondary"
+    case "aguardando_pagamento":
+      return "warning"
     case "ativo":
       return "success"
     case "finalizado":
@@ -259,6 +308,8 @@ function getStatusLabel(status: ContratoStatus): string {
   switch (status) {
     case "rascunho":
       return "Rascunho"
+    case "aguardando_pagamento":
+      return "Aguardando Pagamento"
     case "ativo":
       return "Ativo"
     case "finalizado":
@@ -268,6 +319,12 @@ function getStatusLabel(status: ContratoStatus): string {
     default:
       return status
   }
+}
+
+function getTipoCobrancaLabel(tipo: TipoCobranca | undefined): string {
+  if (!tipo) return "Nao definido"
+  const found = tiposCobranca.find((t) => t.value === tipo)
+  return found?.label || tipo
 }
 
 // Handlers de item
@@ -469,7 +526,7 @@ async function executeConfirmAction(): Promise<void> {
 
     <template v-else-if="contrato">
       <!-- Info cards -->
-      <div class="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+      <div class="grid gap-4 md:grid-cols-2 lg:grid-cols-5">
         <Card>
           <CardContent class="p-4">
             <div class="flex items-center gap-3">
@@ -524,6 +581,21 @@ async function executeConfirmAction(): Promise<void> {
                 <p class="text-sm text-muted-foreground">Valor Total</p>
                 <p class="font-medium text-lg">{{ formatCurrency(contrato.valor_total) }}</p>
               </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card :class="{ 'cursor-pointer hover:bg-muted/50': isRascunho }" @click="isRascunho && openTipoCobrancaDialog()">
+          <CardContent class="p-4">
+            <div class="flex items-center gap-3">
+              <div class="rounded-lg bg-primary/10 p-2">
+                <CreditCard class="size-5 text-primary" />
+              </div>
+              <div class="flex-1 min-w-0">
+                <p class="text-sm text-muted-foreground">Tipo de Cobranca</p>
+                <p class="font-medium text-sm truncate">{{ getTipoCobrancaLabel(contrato.tipo_cobranca) }}</p>
+              </div>
+              <Pencil v-if="isRascunho" class="size-4 text-muted-foreground" />
             </div>
           </CardContent>
         </Card>
@@ -593,6 +665,38 @@ async function executeConfirmAction(): Promise<void> {
           </div>
         </CardContent>
       </Card>
+
+      <!-- Checkout para pagamento antecipado -->
+      <ContratoCheckout
+        :contrato-id="contrato.id"
+        :contrato-status="contrato.status"
+        :tipo-cobranca="contrato.tipo_cobranca"
+        :valor-total="contrato.valor_total"
+        @updated="loadContrato"
+      />
+
+      <!-- Pagamento Stripe Recorrente -->
+      <ContratoPagamentoStripe
+        v-if="contrato.tipo_cobranca === 'recorrente_stripe'"
+        :contrato-id="contrato.id"
+        :contrato-status="contrato.status"
+        @updated="loadContrato"
+      />
+
+      <!-- Gestao de Pagamentos -->
+      <ContratoPagamentos
+        :contrato-id="contrato.id"
+        :contrato-status="contrato.status"
+        :tipo-cobranca="contrato.tipo_cobranca"
+        @updated="loadContrato"
+      />
+
+      <!-- Aditivos do Contrato -->
+      <ContratoAditivos
+        :contrato-id="contrato.id"
+        :contrato-status="contrato.status"
+        @updated="loadContrato"
+      />
 
     </template>
 
@@ -822,6 +926,47 @@ async function executeConfirmAction(): Promise<void> {
           Confirmar
         </Button>
       </DialogFooter>
+    </Dialog>
+
+    <!-- Dialog Tipo de Cobranca -->
+    <Dialog
+      v-model:open="showTipoCobrancaDialog"
+      title="Tipo de Cobranca"
+      description="Defina como sera feita a cobranca deste contrato"
+    >
+      <form @submit.prevent="submitTipoCobranca" class="space-y-4">
+        <FormField label="Tipo de Cobranca" required>
+          <Select
+            v-model="tipoCobrancaForm"
+            :options="tiposCobranca"
+            placeholder="Selecione o tipo..."
+          />
+        </FormField>
+
+        <div class="bg-muted rounded-lg p-4 space-y-2 text-sm">
+          <p class="font-medium">O que significa cada opcao:</p>
+          <ul class="space-y-1 text-muted-foreground">
+            <li><strong>Sem cobranca:</strong> Nao usa o sistema de pagamentos</li>
+            <li><strong>Antecipado:</strong> Pagamento deve ser feito antes de ativar o contrato</li>
+            <li><strong>Recorrente Stripe:</strong> Cobranca automatica mensal via Stripe</li>
+            <li><strong>Recorrente Manual:</strong> Voce registra os pagamentos manualmente</li>
+          </ul>
+        </div>
+
+        <DialogFooter>
+          <Button
+            type="button"
+            variant="outline"
+            @click="showTipoCobrancaDialog = false"
+          >
+            Cancelar
+          </Button>
+          <Button type="submit" :disabled="isSubmittingTipoCobranca">
+            <Spinner v-if="isSubmittingTipoCobranca" size="sm" class="mr-2" />
+            Salvar
+          </Button>
+        </DialogFooter>
+      </form>
     </Dialog>
   </div>
 </template>
