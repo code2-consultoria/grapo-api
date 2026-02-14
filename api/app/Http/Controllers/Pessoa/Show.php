@@ -28,8 +28,18 @@ class Show extends Controller
             }
         }
 
+        // Carrega relacionamentos
+        $pessoa->load('documentos');
+
+        // Se for locatário, carrega também os contratos
+        if ($pessoa->isLocatario()) {
+            $pessoa->load(['contratosComoLocatario' => function ($query) {
+                $query->orderBy('data_inicio', 'desc');
+            }, 'contratosComoLocatario.itens.tipoAtivo']);
+        }
+
         return response()->json([
-            'data' => $pessoa->load('documentos'),
+            'data' => $pessoa,
         ]);
     }
 }

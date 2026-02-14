@@ -36,8 +36,11 @@ class Store extends Controller
                 }),
             ],
             'quantidade_total' => ['required', 'integer', 'min:1'],
-            'valor_unitario_diaria' => ['required', 'numeric', 'min:0'],
-            'custo_aquisicao' => ['nullable', 'numeric', 'min:0'],
+            'fornecedor' => ['nullable', 'string', 'max:255'],
+            'valor_total' => ['nullable', 'numeric', 'min:0'],
+            'valor_frete' => ['nullable', 'numeric', 'min:0'],
+            'forma_pagamento' => ['nullable', 'string', 'max:100'],
+            'nf' => ['nullable', 'string', 'max:100'],
             'data_aquisicao' => ['nullable', 'date'],
         ]);
 
@@ -48,8 +51,11 @@ class Store extends Controller
             tipoAtivo: $tipoAtivo,
             codigo: $validated['codigo'],
             quantidadeTotal: $validated['quantidade_total'],
-            valorUnitarioDiaria: $validated['valor_unitario_diaria'],
-            custoAquisicao: $validated['custo_aquisicao'] ?? null,
+            fornecedor: $validated['fornecedor'] ?? null,
+            valorTotal: $validated['valor_total'] ?? null,
+            valorFrete: $validated['valor_frete'] ?? null,
+            formaPagamento: $validated['forma_pagamento'] ?? null,
+            nf: $validated['nf'] ?? null,
             dataAquisicao: isset($validated['data_aquisicao'])
                 ? new \DateTime($validated['data_aquisicao'])
                 : null

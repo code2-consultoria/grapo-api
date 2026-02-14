@@ -34,17 +34,20 @@ const props = defineProps<Props>()
           <component :is="icon" class="size-5" />
         </div>
       </div>
-      <div v-if="trendValue" class="mt-3 flex items-center gap-1 text-xs">
-        <span
-          :class="[
-            trend === 'up' && 'text-green-600',
-            trend === 'down' && 'text-red-600',
-            trend === 'neutral' && 'text-muted-foreground',
-          ]"
-        >
-          {{ trendValue }}
-        </span>
-        <span class="text-muted-foreground">vs. mes anterior</span>
+      <div class="mt-3 flex items-center justify-between">
+        <div v-if="trendValue" class="flex items-center gap-1 text-xs">
+          <span
+            :class="[
+              trend === 'up' && 'text-green-600',
+              trend === 'down' && 'text-red-600',
+              trend === 'neutral' && 'text-muted-foreground',
+            ]"
+          >
+            {{ trendValue }}
+          </span>
+          <span class="text-muted-foreground">vs. mes anterior</span>
+        </div>
+        <slot name="action" />
       </div>
     </CardContent>
   </Card>

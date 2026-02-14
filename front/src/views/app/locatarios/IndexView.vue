@@ -17,7 +17,7 @@ import { Pagination } from "@/components/ui/pagination"
 import { Spinner } from "@/components/ui/spinner"
 import { Dialog, DialogFooter } from "@/components/ui/dialog"
 import { usePaginatedApi, useNotification } from "@/composables"
-import { Plus, Pencil, Trash2, Search } from "lucide-vue-next"
+import { Plus, Pencil, Trash2, Search, Eye } from "lucide-vue-next"
 import api from "@/lib/api"
 import type { Pessoa } from "@/types"
 
@@ -72,6 +72,20 @@ async function confirmDelete(): Promise<void> {
     isDeleting.value = false
     deleteTarget.value = null
   }
+}
+
+function formatPhone(phone: string | null): string {
+  if (!phone) return "-"
+  // Remove tudo que não é número
+  const digits = phone.replace(/\D/g, "")
+  // Formata (99) 99999-9999 ou (99) 9999-9999
+  if (digits.length === 11) {
+    return `(${digits.slice(0, 2)}) ${digits.slice(2, 7)}-${digits.slice(7)}`
+  }
+  if (digits.length === 10) {
+    return `(${digits.slice(0, 2)}) ${digits.slice(2, 6)}-${digits.slice(6)}`
+  }
+  return phone
 }
 </script>
 
@@ -132,14 +146,19 @@ async function confirmDelete(): Promise<void> {
           <TableRow v-else v-for="item in items" :key="item.id">
             <TableCell>
               <div>
-                <p class="font-medium">{{ item.nome }}</p>
+                <RouterLink
+                  :to="{ name: 'locatarios.show', params: { id: item.id } }"
+                  class="font-medium hover:underline"
+                >
+                  {{ item.nome }}
+                </RouterLink>
                 <p v-if="item.tipo_pessoa" class="text-sm text-muted-foreground">
                   {{ item.tipo_pessoa }}
                 </p>
               </div>
             </TableCell>
             <TableCell>{{ item.email || "-" }}</TableCell>
-            <TableCell>{{ item.telefone || "-" }}</TableCell>
+            <TableCell>{{ formatPhone(item.telefone) }}</TableCell>
             <TableCell>
               <Badge :variant="item.ativo ? 'success' : 'secondary'">
                 {{ item.ativo ? "Ativo" : "Inativo" }}
@@ -147,6 +166,11 @@ async function confirmDelete(): Promise<void> {
             </TableCell>
             <TableCell>
               <div class="flex items-center gap-1">
+                <Button variant="ghost" size="icon-sm" as-child>
+                  <RouterLink :to="{ name: 'locatarios.show', params: { id: item.id } }">
+                    <Eye class="size-4" />
+                  </RouterLink>
+                </Button>
                 <Button variant="ghost" size="icon-sm" as-child>
                   <RouterLink :to="{ name: 'locatarios.edit', params: { id: item.id } }">
                     <Pencil class="size-4" />

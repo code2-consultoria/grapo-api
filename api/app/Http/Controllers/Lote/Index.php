@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Lote;
 
 use App\Http\Controllers\Controller;
-use App\Models\Lote;
+use App\Queries\Lote\Listar;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
@@ -15,29 +15,16 @@ class Index extends Controller
     public function __invoke(Request $request): JsonResponse
     {
         $user = $request->user();
-        $locador = $user->locador();
+        $locador = $user->isCliente() ? $user->locador() : null;
 
-        $query = Lote::with('tipoAtivo');
+        $query = new Listar(
+            locador: $locador,
+            tipoAtivoId: $request->input('tipo_ativo_id'),
+            status: $request->input('status'),
+            search: $request->input('search')
+        );
 
-        if ($user->isCliente() && $locador) {
-            $query->where('locador_id', $locador->id);
-        }
-
-        // Filtros
-        if ($request->has('tipo_ativo_id')) {
-            $query->where('tipo_ativo_id', $request->input('tipo_ativo_id'));
-        }
-
-        if ($request->has('status')) {
-            $query->where('status', $request->input('status'));
-        }
-
-        if ($request->has('search')) {
-            $search = $request->input('search');
-            $query->where('codigo', 'ilike', "%{$search}%");
-        }
-
-        $lotes = $query->orderBy('data_aquisicao', 'desc')->paginate(15);
+        $lotes = $query->handle();
 
         return response()->json([
             'data' => $lotes->items(),

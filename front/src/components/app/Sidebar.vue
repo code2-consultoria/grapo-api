@@ -15,10 +15,10 @@ const route = useRoute()
 
 const menuItems = [
   { name: "Dashboard", icon: LayoutDashboard, to: { name: "dashboard" } },
-  { name: "Locatarios", icon: Users, to: { name: "locatarios.index" } },
-  { name: "Tipos de Ativos", icon: Package, to: { name: "tipos-ativos.index" } },
-  { name: "Lotes", icon: Boxes, to: { name: "lotes.index" } },
   { name: "Contratos", icon: FileText, to: { name: "contratos.index" } },
+  { name: "Locatarios", icon: Users, to: { name: "locatarios.index" } },
+  { name: "Meus Ativos", icon: Package, to: { name: "tipos-ativos.index" } },
+  { name: "Lotes", icon: Boxes, to: { name: "lotes.index" } },
 ]
 
 function isActive(itemName: string): boolean {

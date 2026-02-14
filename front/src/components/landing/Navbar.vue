@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { RouterLink } from 'vue-router'
 import { Button } from '@/components/ui/button'
 import { Wallet } from 'lucide-vue-next'
 </script>
@@ -29,14 +30,16 @@ import { Wallet } from 'lucide-vue-next'
           >
             Planos
           </a>
-          <a
-            href="#"
+          <RouterLink
+            :to="{ name: 'login' }"
             class="text-sm font-medium text-muted-foreground hover:text-primary transition-colors"
           >
             Entrar
-          </a>
-          <Button class="bg-primary hover:bg-primary/90 text-primary-foreground font-semibold shadow-lg shadow-primary/20">
-            Começar
+          </RouterLink>
+          <Button as-child class="bg-primary hover:bg-primary/90 text-primary-foreground font-semibold shadow-lg shadow-primary/20">
+            <RouterLink :to="{ name: 'register' }">
+              Começar
+            </RouterLink>
           </Button>
         </div>
       </div>

@@ -113,6 +113,12 @@ const router = createRouter({
               meta: { title: "Novo Locatario" },
             },
             {
+              path: ":id",
+              name: "locatarios.show",
+              component: () => import("@/views/app/locatarios/ShowView.vue"),
+              meta: { title: "Detalhes do Locatario" },
+            },
+            {
               path: ":id/editar",
               name: "locatarios.edit",
               component: () => import("@/views/app/locatarios/EditView.vue"),

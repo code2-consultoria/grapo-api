@@ -31,14 +31,16 @@ class Update extends Controller
 
         $validated = $request->validate([
             'quantidade' => ['sometimes', 'integer', 'min:1'],
-            'valor_unitario_diaria' => ['sometimes', 'numeric', 'min:0'],
+            'valor_unitario' => ['sometimes', 'numeric', 'min:0'],
+            'periodo_aluguel' => ['sometimes', 'string', 'in:diaria,mensal'],
         ]);
 
         try {
             $atualizar = new Atualizar(
                 item: $item,
                 quantidade: $validated['quantidade'] ?? null,
-                valorUnitarioDiaria: $validated['valor_unitario_diaria'] ?? null
+                valorUnitario: $validated['valor_unitario'] ?? null,
+                periodoAluguel: $validated['periodo_aluguel'] ?? null
             );
             $atualizar->handle();
 

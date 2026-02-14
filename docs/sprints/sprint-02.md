@@ -1,7 +1,7 @@
 # Sprint 02 - MVP Contratos
 
-> **Periodo:** 2025-02-11 a [definir]
-> **Status:** Em Andamento
+> **Periodo:** 2025-02-11 a 2025-02-13
+> **Status:** Concluida
 > **Milestone:** M1 - MVP Contratos
 > **Objetivo:** Implementar sistema basico de gestao de contratos de locacao
 
@@ -13,7 +13,7 @@
 
 | ID | Feature | Prioridade | Status |
 |----|---------|------------|--------|
-| F01 | Contratos | Alta | Em Andamento |
+| F01 | Contratos | Alta | Concluido |
 | F02 | Frontend Vue.js | Alta | Concluido |
 
 ---
@@ -35,6 +35,7 @@
 | T00.9 | Router + Guards | Rotas protegidas, nested routes | Concluido |
 | T00.10 | Views Auth | Login, Register | Concluido |
 | T00.11 | Views App | Dashboard, CRUD stubs | Concluido |
+| T00.12 | Links Landing Page | Conectar Navbar/Hero a Login/Register | Concluido |
 
 > Documentacao: [docs/FRONTEND.md](../FRONTEND.md)
 
@@ -51,67 +52,76 @@
 
 | ID | Tarefa | Descricao | Status |
 |----|--------|-----------|--------|
-| T05 | Testes - Locatarios | Testes de CRUD e validacoes | Pendente |
-| T06 | Action - Criar | `Locatario/Criar` | Pendente |
-| T07 | Action - Atualizar | `Locatario/Atualizar` | Pendente |
-| T08 | Action - Excluir | `Locatario/Excluir` | Pendente |
-| T09 | Controllers | `Locatario/Index`, `Store`, `Show`, `Update`, `Destroy` | Pendente |
+| T05 | Testes - Locatarios | Testes de CRUD e validacoes (18 testes) | Concluido |
+| T06 | Action - Criar | `Locatario/Criar` | Concluido |
+| T07 | Action - Atualizar | `Locatario/Atualizar` | Concluido |
+| T08 | Action - Excluir | `Locatario/Excluir` | Concluido |
+| T09 | Controllers | `Locatario/Index`, `Store`, `Show`, `Update`, `Destroy` | Concluido |
 
 ### 3. Cadastro de Tipos de Ativos
 
 | ID | Tarefa | Descricao | Status |
 |----|--------|-----------|--------|
-| T10 | Testes - Tipos Ativos | Testes de CRUD e validacoes | Pendente |
-| T11 | Action - Criar | `TipoAtivo/Criar` | Pendente |
-| T12 | Action - Atualizar | `TipoAtivo/Atualizar` | Pendente |
-| T13 | Action - Excluir | `TipoAtivo/Excluir` | Pendente |
-| T14 | Controllers | `TipoAtivo/Index`, `Store`, `Show`, `Update`, `Destroy` | Pendente |
+| T10 | Testes - Tipos Ativos | Testes de CRUD e validacoes (7 testes) | Concluido |
+| T11 | Action - Criar | `TipoAtivo/Criar` | Concluido |
+| T12 | Action - Atualizar | `TipoAtivo/Atualizar` | Concluido |
+| T13 | Action - Excluir | `TipoAtivo/Excluir` | Concluido |
+| T14 | Controllers | `TipoAtivo/Index`, `Store`, `Show`, `Update`, `Destroy` | Concluido |
 
 ### 4. Gestao de Lotes
 
 | ID | Tarefa | Descricao | Status |
 |----|--------|-----------|--------|
-| T15 | Testes - Lotes | Testes de CRUD, disponibilidade e validacoes | Pendente |
-| T16 | Action - Criar | `Lote/Criar` | Pendente |
-| T17 | Action - Atualizar | `Lote/Atualizar` | Pendente |
-| T18 | Action - Excluir | `Lote/Excluir` (validar se nao alocado) | Pendente |
-| T19 | Controllers | `Lote/Index`, `Store`, `Show`, `Update`, `Destroy` | Pendente |
+| T15 | Testes - Lotes | Testes de CRUD, disponibilidade e validacoes (10 testes) | Concluido |
+| T16 | Action - Criar | `Lote/Criar` | Concluido |
+| T17 | Action - Atualizar | `Lote/Atualizar` | Concluido |
+| T18 | Action - Excluir | `Lote/Excluir` (validar se nao alocado) | Concluido |
+| T19 | Controllers | `Lote/Index`, `Store`, `Show`, `Update`, `Destroy` | Concluido |
 
 ### 5. Contratos
 
 | ID | Tarefa | Descricao | Status |
 |----|--------|-----------|--------|
-| T20 | Testes - Contratos | Testes de criacao, ativacao, cancelamento | Pendente |
-| T21 | Action - Criar | `Contrato/Criar` (status rascunho) | Pendente |
-| T22 | Action - Ativar | `Contrato/Ativar` (aloca lotes FIFO) | Pendente |
-| T23 | Action - Cancelar | `Contrato/Cancelar` (libera lotes) | Pendente |
-| T24 | Action - Finalizar | `Contrato/Finalizar` (libera lotes) | Pendente |
-| T25 | Controllers | `Contrato/Index`, `Store`, `Show`, `Ativar`, `Cancelar`, `Finalizar` | Pendente |
+| T20 | Testes - Contratos | Testes de criacao, ativacao, cancelamento | Concluido |
+| T21 | Action - Criar | `Contrato/Criar` (status rascunho) | Concluido |
+| T22 | Action - Ativar | `Contrato/Ativar` (aloca lotes FIFO) | Concluido |
+| T23 | Action - Cancelar | `Contrato/Cancelar` (libera lotes) | Concluido |
+| T24 | Action - Finalizar | `Contrato/Finalizar` (libera lotes) | Concluido |
+| T25 | Controllers | `Contrato/Index`, `Store`, `Show`, `Ativar`, `Cancelar`, `Finalizar` | Concluido |
+| T25.1 | Frontend - Index | Lista de contratos com busca/paginacao | Concluido |
+| T25.2 | Frontend - Create | Formulario de criacao de contrato | Concluido |
+| T25.3 | Frontend - Show | Detalhes, itens e acoes de status | Concluido |
 
 ### 6. Itens do Contrato
 
 | ID | Tarefa | Descricao | Status |
 |----|--------|-----------|--------|
-| T26 | Testes - Itens | Testes de adicao/remocao de itens | Pendente |
-| T27 | Action - Adicionar | `Contrato/Item/Adicionar` | Pendente |
-| T28 | Action - Remover | `Contrato/Item/Remover` | Pendente |
-| T29 | Controllers | `Contrato/Item/Store`, `Destroy` | Pendente |
+| T26 | Testes - Itens | Testes de adicao/remocao de itens | Concluido |
+| T27 | Action - Adicionar | `Contrato/Item/Adicionar` | Concluido |
+| T28 | Action - Remover | `Contrato/Item/Remover` | Concluido |
+| T29 | Controllers | `Contrato/Item/Store`, `Update`, `Destroy` | Concluido |
 
 ### 7. Alocacao Automatica (FIFO)
 
 | ID | Tarefa | Descricao | Status |
 |----|--------|-----------|--------|
-| T30 | Testes - Alocacao | Testes de FIFO, multiplos lotes, disponibilidade | Pendente |
-| T31 | Action - Alocar | `Alocacao/Alocar` (FIFO) | Pendente |
-| T32 | Action - Liberar | `Alocacao/Liberar` (ao cancelar/finalizar) | Pendente |
+| T30 | Testes - Alocacao | Testes de FIFO, multiplos lotes, disponibilidade | Concluido |
+| T31 | Action - Alocar | `Alocacao/Alocar` (FIFO) | Concluido |
+| T32 | Action - Liberar | `Alocacao/Liberar` (ao cancelar/finalizar) | Concluido |
 
 ### 8. Validacoes e Regras de Negocio
 
 | ID | Tarefa | Descricao | Status |
 |----|--------|-----------|--------|
-| T33 | Testes - Validacoes | Disponibilidade insuficiente, contrato ativo imutavel | Pendente |
-| T34 | Exception - Indisponivel | `QuantidadeIndisponivelException` | Pendente |
-| T35 | Exception - ContratoAtivo | `ContratoAtivoImutavelException` | Pendente |
+| T33 | Testes - Validacoes | Disponibilidade insuficiente, contrato ativo imutavel | Concluido |
+| T34 | Exception - Indisponivel | `QuantidadeIndisponivelException` | Concluido |
+| T35 | Exception - ContratoAtivo | `ContratoAtivoImutavelException` | Concluido |
+
+### 9. Multi-tenant
+
+| ID | Tarefa | Descricao | Status |
+|----|--------|-----------|--------|
+| T36 | Testes - Isolamento | Usuario ve apenas dados do seu locador | Concluido |
 
 ---
 
@@ -312,15 +322,15 @@ enum StatusContrato: string
 - [x] Todas as migrations criadas e rodadas
 - [x] Models com relacionamentos funcionando
 - [x] Factories e seeders criados
-- [ ] Todos os testes passando
-- [ ] Actions implementadas
-- [ ] Controllers implementados
+- [x] Todos os testes passando (73 testes, 190 assertions)
+- [x] Actions implementadas
+- [x] Controllers implementados
 - [x] Rotas da API configuradas
 - [x] Documentacao atualizada
 - [x] Codigo revisado e commitado
-- [ ] Tag `docs-v1.0.0` criada
+- [x] Tag `docs-v1.0.0` criada
 - [x] Estrutura do frontend implementada
-- [ ] Frontend integrado com API
+- [x] Frontend de Contratos integrado com API
 
 ---
 

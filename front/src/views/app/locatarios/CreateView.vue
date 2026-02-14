@@ -17,6 +17,7 @@ const form = useForm<PessoaForm>({
   initialValues: {
     tipo: "locatario",
     nome: "",
+    documento: "",
     email: "",
     telefone: "",
     endereco: "",
@@ -26,6 +27,10 @@ const form = useForm<PessoaForm>({
 
     if (!values.nome) {
       errors.nome = "Nome e obrigatorio"
+    }
+
+    if (!values.documento) {
+      errors.documento = "CPF ou CNPJ e obrigatorio"
     }
 
     if (values.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(values.email)) {
@@ -65,6 +70,14 @@ const form = useForm<PessoaForm>({
               v-model="form.values.nome"
               placeholder="Nome completo ou razao social"
               :error="form.hasError('nome')"
+            />
+          </FormField>
+
+          <FormField label="CPF ou CNPJ" :error="form.getError('documento')" required>
+            <Input
+              v-model="form.values.documento"
+              placeholder="Digite apenas numeros"
+              :error="form.hasError('documento')"
             />
           </FormField>
 

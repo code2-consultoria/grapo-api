@@ -42,6 +42,45 @@ test('cria contrato em rascunho', function () {
     ]);
 });
 
+// Cenário: Criar contrato com data de início retroativa
+test('permite criar contrato com data de inicio retroativa', function () {
+    $response = $this->actingAs($this->user)->postJson('/api/contratos', [
+        'locatario_id' => $this->locatario->id,
+        'data_inicio' => now()->subMonth()->format('Y-m-d'),
+        'data_termino' => now()->addMonth()->format('Y-m-d'),
+        'observacoes' => 'Contrato retroativo importado',
+    ]);
+
+    $response->assertStatus(201);
+    $response->assertJsonPath('data.status', 'rascunho');
+});
+
+// Cenário: Rejeitar data de término igual à data de início
+test('rejeita data de termino igual a data de inicio', function () {
+    $dataIgual = now()->addDay()->format('Y-m-d');
+
+    $response = $this->actingAs($this->user)->postJson('/api/contratos', [
+        'locatario_id' => $this->locatario->id,
+        'data_inicio' => $dataIgual,
+        'data_termino' => $dataIgual,
+    ]);
+
+    $response->assertStatus(422);
+    $response->assertJsonValidationErrors(['data_termino']);
+});
+
+// Cenário: Rejeitar data de término anterior à data de início
+test('rejeita data de termino anterior a data de inicio', function () {
+    $response = $this->actingAs($this->user)->postJson('/api/contratos', [
+        'locatario_id' => $this->locatario->id,
+        'data_inicio' => now()->addMonth()->format('Y-m-d'),
+        'data_termino' => now()->addDay()->format('Y-m-d'),
+    ]);
+
+    $response->assertStatus(422);
+    $response->assertJsonValidationErrors(['data_termino']);
+});
+
 // Cenário: Contrato criado não aloca lotes
 test('contrato em rascunho não aloca lotes', function () {
     $lote = Lote::factory()->comQuantidade(20)->create([
@@ -58,7 +97,7 @@ test('contrato em rascunho não aloca lotes', function () {
     $this->actingAs($this->user)->postJson("/api/contratos/{$contrato->id}/itens", [
         'tipo_ativo_id' => $this->tipoAtivo->id,
         'quantidade' => 10,
-        'valor_unitario_diaria' => 5.00,
+        'valor_unitario' => 5.00,
     ]);
 
     // Verifica que lote não foi alterado
@@ -99,7 +138,7 @@ test('ativa contrato e aloca lotes usando FIFO', function () {
         'contrato_id' => $contrato->id,
         'tipo_ativo_id' => $this->tipoAtivo->id,
         'quantidade' => 15,
-        'valor_unitario_diaria' => 5.00,
+        'valor_unitario' => 5.00,
         'valor_total_item' => 15 * 5.00 * 30,
     ]);
 
@@ -201,11 +240,95 @@ test('retorna erro ao tentar editar contrato ativo', function () {
         ->postJson("/api/contratos/{$contrato->id}/itens", [
             'tipo_ativo_id' => $this->tipoAtivo->id,
             'quantidade' => 5,
-            'valor_unitario_diaria' => 5.00,
+            'valor_unitario' => 5.00,
+            'periodo_aluguel' => 'diaria',
         ]);
 
     $response->assertStatus(422);
     $response->assertJsonPath('message', fn ($m) => str_contains($m, 'não pode ser alterado'));
+});
+
+// Cenário: Atualizar contrato em rascunho
+test('atualiza contrato em rascunho', function () {
+    $contrato = Contrato::factory()->rascunho()->create([
+        'locador_id' => $this->locador->id,
+        'locatario_id' => $this->locatario->id,
+    ]);
+
+    $novoLocatario = Pessoa::factory()->locatario()->create([
+        'locador_id' => $this->locador->id,
+    ]);
+
+    $novaDataInicio = now()->addWeek()->format('Y-m-d');
+    $novaDataTermino = now()->addMonths(2)->format('Y-m-d');
+
+    $response = $this->actingAs($this->user)->putJson("/api/contratos/{$contrato->id}", [
+        'locatario_id' => $novoLocatario->id,
+        'data_inicio' => $novaDataInicio,
+        'data_termino' => $novaDataTermino,
+        'observacoes' => 'Contrato atualizado',
+    ]);
+
+    $response->assertStatus(200);
+    $response->assertJsonPath('data.locatario_id', $novoLocatario->id);
+    $response->assertJsonPath('data.observacoes', 'Contrato atualizado');
+
+    $contrato->refresh();
+    expect($contrato->locatario_id)->toBe($novoLocatario->id);
+    expect($contrato->observacoes)->toBe('Contrato atualizado');
+});
+
+// Cenário: Erro ao atualizar contrato ativo
+test('retorna erro ao tentar atualizar contrato ativo', function () {
+    $contrato = Contrato::factory()->ativo()->create([
+        'locador_id' => $this->locador->id,
+        'locatario_id' => $this->locatario->id,
+    ]);
+
+    $response = $this->actingAs($this->user)->putJson("/api/contratos/{$contrato->id}", [
+        'locatario_id' => $this->locatario->id,
+        'data_inicio' => now()->addWeek()->format('Y-m-d'),
+        'data_termino' => now()->addMonths(2)->format('Y-m-d'),
+    ]);
+
+    $response->assertStatus(422);
+    $response->assertJsonPath('message', 'Apenas contratos em rascunho podem ser atualizados.');
+});
+
+// Cenário: Atualizar contrato recalcula valor total
+test('atualiza contrato e recalcula valor total baseado no novo periodo', function () {
+    $contrato = Contrato::factory()->rascunho()->create([
+        'locador_id' => $this->locador->id,
+        'locatario_id' => $this->locatario->id,
+        'data_inicio' => now()->addDay()->format('Y-m-d'),
+        'data_termino' => now()->addDays(10)->format('Y-m-d'), // 10 dias
+        'valor_total' => 0,
+    ]);
+
+    // Adiciona item de R$ 10/dia x 5 unidades
+    ContratoItem::factory()->create([
+        'contrato_id' => $contrato->id,
+        'tipo_ativo_id' => $this->tipoAtivo->id,
+        'quantidade' => 5,
+        'valor_unitario' => 10.00,
+        'periodo_aluguel' => 'diaria',
+        'valor_total_item' => 5 * 10 * 10, // 500 (10 dias)
+    ]);
+
+    $contrato->refresh();
+
+    // Atualiza para 20 dias
+    $response = $this->actingAs($this->user)->putJson("/api/contratos/{$contrato->id}", [
+        'locatario_id' => $this->locatario->id,
+        'data_inicio' => now()->addDay()->format('Y-m-d'),
+        'data_termino' => now()->addDays(20)->format('Y-m-d'),
+    ]);
+
+    $response->assertStatus(200);
+
+    $contrato->refresh();
+    // Novo valor: 5 x 10 x 20 = 1000
+    expect((float) $contrato->valor_total)->toBe(1000.0);
 });
 
 // Cenário: Finalizar contrato

@@ -19,8 +19,11 @@ class Criar implements Command
         private TipoAtivo $tipoAtivo,
         private string $codigo,
         private int $quantidadeTotal,
-        private float $valorUnitarioDiaria,
-        private ?float $custoAquisicao = null,
+        private ?string $fornecedor = null,
+        private ?float $valorTotal = null,
+        private ?float $valorFrete = null,
+        private ?string $formaPagamento = null,
+        private ?string $nf = null,
         private ?\DateTime $dataAquisicao = null
     ) {}
 
@@ -29,12 +32,22 @@ class Criar implements Command
      */
     public function handle(): void
     {
+        // Calcula custo de aquisição: (valor_total + valor_frete)
+        $custoAquisicao = null;
+        if ($this->valorTotal !== null || $this->valorFrete !== null) {
+            $custoAquisicao = ($this->valorTotal ?? 0) + ($this->valorFrete ?? 0);
+        }
+
         $this->lote = new Lote([
             'codigo' => $this->codigo,
             'quantidade_total' => $this->quantidadeTotal,
             'quantidade_disponivel' => $this->quantidadeTotal,
-            'valor_unitario_diaria' => $this->valorUnitarioDiaria,
-            'custo_aquisicao' => $this->custoAquisicao,
+            'fornecedor' => $this->fornecedor,
+            'valor_total' => $this->valorTotal,
+            'valor_frete' => $this->valorFrete,
+            'forma_pagamento' => $this->formaPagamento,
+            'nf' => $this->nf,
+            'custo_aquisicao' => $custoAquisicao,
             'data_aquisicao' => $this->dataAquisicao ?? now(),
             'status' => 'disponivel',
         ]);

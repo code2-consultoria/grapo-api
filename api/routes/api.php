@@ -67,6 +67,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::get('/', \App\Http\Controllers\Contrato\Index::class);
         Route::post('/', \App\Http\Controllers\Contrato\Store::class);
         Route::get('/{id}', \App\Http\Controllers\Contrato\Show::class);
+        Route::put('/{id}', \App\Http\Controllers\Contrato\Update::class);
 
         // Ações de status
         Route::post('/{id}/ativar', \App\Http\Controllers\Contrato\Ativar::class);

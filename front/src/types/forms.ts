@@ -19,6 +19,7 @@ export interface RegisterForm {
 export interface PessoaForm {
   tipo: TipoPessoa
   nome: string
+  documento: string
   email: string
   telefone: string
   endereco: string
@@ -36,7 +37,7 @@ export interface TipoAtivoForm {
   nome: string
   descricao: string
   unidade_medida: string
-  valor_diaria_sugerido: number | string
+  valor_mensal_sugerido: number | string
 }
 
 // Formulario de lote
@@ -44,8 +45,11 @@ export interface LoteForm {
   codigo: string
   tipo_ativo_id: string
   quantidade_total: number | string
-  valor_unitario_diaria: number | string
-  custo_aquisicao?: number | string
+  fornecedor?: string
+  valor_total?: number | string
+  valor_frete?: number | string
+  forma_pagamento?: string
+  nf?: string
   data_aquisicao?: string
   status?: LoteStatus
 }
@@ -59,11 +63,15 @@ export interface ContratoForm {
   status?: ContratoStatus
 }
 
+// Periodo de aluguel
+export type PeriodoAluguel = 'diaria' | 'mensal'
+
 // Formulario de item de contrato
 export interface ContratoItemForm {
   tipo_ativo_id: string
   quantidade: number | string
-  valor_unitario_diaria: number | string
+  valor_unitario: number | string
+  periodo_aluguel: PeriodoAluguel
 }
 
 // Tipo generico para erros de validacao

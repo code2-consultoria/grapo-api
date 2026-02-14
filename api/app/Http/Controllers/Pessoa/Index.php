@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Pessoa;
 
 use App\Enums\TipoPessoa;
 use App\Http\Controllers\Controller;
-use App\Models\Pessoa;
+use App\Queries\Pessoa\Listar;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
@@ -16,43 +16,20 @@ class Index extends Controller
     public function __invoke(Request $request): JsonResponse
     {
         $user = $request->user();
-        $locador = $user->locador();
-
-        $query = Pessoa::query();
+        $locador = $user->isCliente() ? $user->locador() : null;
 
         // Tipo pode vir da rota (defaults) ou query string
         $tipoParam = $request->route('tipo') ?? $request->input('tipo');
+        $tipo = $tipoParam ? TipoPessoa::tryFrom($tipoParam) : null;
 
-        if ($tipoParam) {
-            $tipo = TipoPessoa::tryFrom($tipoParam);
-            if ($tipo) {
-                $query->porTipo($tipo);
-            }
-        }
+        $query = new Listar(
+            locador: $locador,
+            tipo: $tipo,
+            search: $request->input('search'),
+            ativo: $request->has('ativo') ? $request->boolean('ativo') : null
+        );
 
-        // Busca por nome
-        if ($request->has('search')) {
-            $search = $request->input('search');
-            $query->where('nome', 'ilike', "%{$search}%");
-        }
-
-        // Filtro por ativo
-        if ($request->has('ativo')) {
-            $query->where('ativo', $request->boolean('ativo'));
-        }
-
-        // Se for cliente, filtra pelo locador
-        if ($user->isCliente() && $locador) {
-            // Se está buscando locadores, mostra apenas o próprio locador
-            if ($tipoParam === 'locador') {
-                $query->where('id', $locador->id);
-            } else {
-                // Para outros tipos, filtra pelo locador_id
-                $query->where('locador_id', $locador->id);
-            }
-        }
-
-        $pessoas = $query->with('documentos')->orderBy('nome')->paginate(15);
+        $pessoas = $query->handle();
 
         return response()->json([
             'data' => $pessoas->items(),

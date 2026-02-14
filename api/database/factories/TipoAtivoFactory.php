@@ -25,7 +25,7 @@ class TipoAtivoFactory extends Factory
             'nome' => fake()->unique()->words(3, true),
             'descricao' => fake()->sentence(),
             'unidade_medida' => fake()->randomElement($unidades),
-            'valor_diaria_sugerido' => fake()->randomFloat(2, 2, 100),
+            'valor_mensal_sugerido' => fake()->randomFloat(2, 2, 100),
         ];
     }
 
@@ -38,7 +38,7 @@ class TipoAtivoFactory extends Factory
             'nome' => 'Placa de EVA',
             'descricao' => 'Placa de EVA para protecao de piso',
             'unidade_medida' => 'unidade',
-            'valor_diaria_sugerido' => 5.00,
+            'valor_mensal_sugerido' => 5.00,
         ]);
     }
 
@@ -51,7 +51,7 @@ class TipoAtivoFactory extends Factory
             'nome' => 'Betoneira 400L',
             'descricao' => 'Betoneira com capacidade de 400 litros',
             'unidade_medida' => 'unidade',
-            'valor_diaria_sugerido' => 80.00,
+            'valor_mensal_sugerido' => 80.00,
         ]);
     }
 }

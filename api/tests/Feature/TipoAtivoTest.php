@@ -31,11 +31,14 @@ test('cria tipo de ativo', function () {
         'nome' => 'Placa de EVA',
         'descricao' => 'Placa de EVA para proteção de piso',
         'unidade_medida' => 'unidade',
-        'valor_diaria_sugerido' => 5.00,
+        'valor_mensal_sugerido' => 150.00,
     ]);
 
     $response->assertStatus(201);
     $response->assertJsonPath('data.nome', 'Placa de EVA');
+    $response->assertJsonPath('data.valor_mensal_sugerido', '150.00');
+    // Accessor: (150 * 1.10) / 30 = 5.50
+    $response->assertJsonPath('data.valor_diaria_sugerido', 5.5);
 
     $this->assertDatabaseHas('tipos_ativos', [
         'locador_id' => $this->locador->id,
@@ -46,16 +49,18 @@ test('cria tipo de ativo', function () {
 test('atualiza tipo de ativo', function () {
     $tipoAtivo = TipoAtivo::factory()->create([
         'locador_id' => $this->locador->id,
-        'valor_diaria_sugerido' => 5.00,
+        'valor_mensal_sugerido' => 150.00,
     ]);
 
     $response = $this->actingAs($this->user)
         ->putJson("/api/tipos-ativos/{$tipoAtivo->id}", [
-            'valor_diaria_sugerido' => 7.50,
+            'valor_mensal_sugerido' => 225.00,
         ]);
 
     $response->assertStatus(200);
-    $response->assertJsonPath('data.valor_diaria_sugerido', '7.50');
+    $response->assertJsonPath('data.valor_mensal_sugerido', '225.00');
+    // Accessor: (225 * 1.10) / 30 = 8.25
+    $response->assertJsonPath('data.valor_diaria_sugerido', 8.25);
 });
 
 test('exclui tipo de ativo sem lotes', function () {

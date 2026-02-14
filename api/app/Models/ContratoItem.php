@@ -16,7 +16,8 @@ class ContratoItem extends Model
 
     protected $fillable = [
         'quantidade',
-        'valor_unitario_diaria',
+        'valor_unitario',
+        'periodo_aluguel',
         'valor_total_item',
     ];
 
@@ -24,7 +25,7 @@ class ContratoItem extends Model
     {
         return [
             'quantidade' => 'integer',
-            'valor_unitario_diaria' => 'decimal:2',
+            'valor_unitario' => 'decimal:2',
             'valor_total_item' => 'decimal:2',
         ];
     }

@@ -23,7 +23,7 @@ const form = useForm<TipoAtivoForm>({
     nome: "",
     descricao: "",
     unidade_medida: "",
-    valor_diaria_sugerido: "",
+    valor_mensal_sugerido: "",
   },
   validate(values) {
     const errors: Partial<Record<keyof TipoAtivoForm, string>> = {}
@@ -36,10 +36,10 @@ const form = useForm<TipoAtivoForm>({
       errors.unidade_medida = "Unidade de medida e obrigatoria"
     }
 
-    if (!values.valor_diaria_sugerido) {
-      errors.valor_diaria_sugerido = "Valor da diaria e obrigatorio"
-    } else if (Number(values.valor_diaria_sugerido) <= 0) {
-      errors.valor_diaria_sugerido = "Valor deve ser maior que zero"
+    if (!values.valor_mensal_sugerido) {
+      errors.valor_mensal_sugerido = "Valor mensal e obrigatorio"
+    } else if (Number(values.valor_mensal_sugerido) <= 0) {
+      errors.valor_mensal_sugerido = "Valor deve ser maior que zero"
     }
 
     return errors
@@ -47,7 +47,7 @@ const form = useForm<TipoAtivoForm>({
   async onSubmit(values) {
     await api.put(`/tipos-ativos/${route.params.id}`, {
       ...values,
-      valor_diaria_sugerido: Number(values.valor_diaria_sugerido),
+      valor_mensal_sugerido: Number(values.valor_mensal_sugerido),
     })
     success("Sucesso!", "Tipo de ativo atualizado com sucesso")
     router.push({ name: "tipos-ativos.index" })
@@ -67,7 +67,7 @@ onMounted(async () => {
       nome: response.data.nome,
       descricao: response.data.descricao || "",
       unidade_medida: response.data.unidade_medida,
-      valor_diaria_sugerido: String(response.data.valor_diaria_sugerido),
+      valor_mensal_sugerido: String(response.data.valor_mensal_sugerido),
     })
   } catch (err) {
     error("Erro", "Tipo de ativo nao encontrado")
@@ -134,17 +134,17 @@ onMounted(async () => {
             </FormField>
 
             <FormField
-              label="Valor Diaria Sugerido (R$)"
-              :error="form.getError('valor_diaria_sugerido')"
+              label="Valor Mensal Sugerido (R$)"
+              :error="form.getError('valor_mensal_sugerido')"
               required
             >
               <Input
                 type="number"
                 step="0.01"
                 min="0"
-                v-model="form.values.valor_diaria_sugerido"
+                v-model="form.values.valor_mensal_sugerido"
                 placeholder="0,00"
-                :error="form.hasError('valor_diaria_sugerido')"
+                :error="form.hasError('valor_mensal_sugerido')"
               />
             </FormField>
           </FormGroup>

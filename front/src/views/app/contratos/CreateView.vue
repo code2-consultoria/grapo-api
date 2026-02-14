@@ -3,26 +3,28 @@ import { ref, onMounted } from "vue"
 import { useRouter } from "vue-router"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { Select } from "@/components/ui/select"
+import { Combobox } from "@/components/ui/combobox"
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card"
+import { Dialog, DialogFooter } from "@/components/ui/dialog"
 import { FormField, FormGroup, FormActions } from "@/components/forms"
 import { Spinner } from "@/components/ui/spinner"
 import { useForm, useNotification } from "@/composables"
 import { ArrowLeft } from "lucide-vue-next"
 import api from "@/lib/api"
-import type { ContratoForm, Pessoa, PaginatedResponse } from "@/types"
+import type { ContratoForm, PessoaForm, Pessoa, PaginatedResponse } from "@/types"
 
 const router = useRouter()
 const { success } = useNotification()
 
 const locatarios = ref<{ value: string; label: string }[]>([])
 const loadingLocatarios = ref(true)
+const showLocatarioDialog = ref(false)
 
-onMounted(async () => {
+async function loadLocatarios() {
+  loadingLocatarios.value = true
   try {
     const response = await api.get<PaginatedResponse<Pessoa>>("/pessoas", {
       per_page: 100,
-      // tipo: 'locatario',
     })
     locatarios.value = response.data.map((p) => ({
       value: p.id,
@@ -31,7 +33,9 @@ onMounted(async () => {
   } finally {
     loadingLocatarios.value = false
   }
-})
+}
+
+onMounted(loadLocatarios)
 
 const form = useForm<ContratoForm>({
   initialValues: {
@@ -53,7 +57,7 @@ const form = useForm<ContratoForm>({
 
     if (!values.data_termino) {
       errors.data_termino = "Data de termino e obrigatoria"
-    } else if (values.data_inicio && values.data_termino < values.data_inicio) {
+    } else if (values.data_inicio && values.data_termino <= values.data_inicio) {
       errors.data_termino = "Data de termino deve ser posterior a data de inicio"
     }
 
@@ -65,6 +69,52 @@ const form = useForm<ContratoForm>({
     router.push({ name: "contratos.show", params: { id: response.data.id } })
   },
 })
+
+// Form para criar locatario inline
+const locatarioForm = useForm<PessoaForm>({
+  initialValues: {
+    tipo: "locatario",
+    nome: "",
+    documento: "",
+    email: "",
+    telefone: "",
+    endereco: "",
+  },
+  validate(values) {
+    const errors: Partial<Record<keyof PessoaForm, string>> = {}
+    if (!values.nome) {
+      errors.nome = "Nome e obrigatorio"
+    }
+    if (!values.documento) {
+      errors.documento = "CPF ou CNPJ e obrigatorio"
+    }
+    if (values.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(values.email)) {
+      errors.email = "E-mail invalido"
+    }
+    return errors
+  },
+  async onSubmit(values) {
+    const response = await api.post<{ data: Pessoa }>("/pessoas", values)
+    success("Sucesso!", "Locatario criado com sucesso")
+
+    // Adiciona o novo locatario a lista e seleciona
+    const newLocatario = response.data
+    locatarios.value.push({
+      value: newLocatario.id,
+      label: newLocatario.nome,
+    })
+    form.setFieldValue("locatario_id", newLocatario.id)
+
+    // Fecha o dialog e reseta o form
+    showLocatarioDialog.value = false
+    locatarioForm.reset()
+  },
+})
+
+function openLocatarioDialog() {
+  locatarioForm.reset()
+  showLocatarioDialog.value = true
+}
 </script>
 
 <template>
@@ -90,12 +140,18 @@ const form = useForm<ContratoForm>({
             :error="form.getError('locatario_id')"
             required
           >
-            <Select
+            <Combobox
               v-model="form.values.locatario_id"
               :options="locatarios"
               :disabled="loadingLocatarios"
-              placeholder="Selecione o locatario"
+              :loading="loadingLocatarios"
+              placeholder="Buscar locatario..."
+              search-placeholder="Digite para buscar..."
+              empty-text="Nenhum locatario encontrado"
               :error="form.hasError('locatario_id')"
+              allow-create
+              create-text="Criar novo locatario"
+              @create="openLocatarioDialog"
             />
           </FormField>
 
@@ -148,5 +204,69 @@ const form = useForm<ContratoForm>({
         </form>
       </CardContent>
     </Card>
+
+    <!-- Modal criar locatario -->
+    <Dialog
+      v-model:open="showLocatarioDialog"
+      title="Novo Locatario"
+      description="Cadastre um novo locatario rapidamente"
+    >
+      <form @submit="locatarioForm.handleSubmit" class="space-y-4">
+        <FormField label="Nome" :error="locatarioForm.getError('nome')" required>
+          <Input
+            v-model="locatarioForm.values.nome"
+            placeholder="Nome completo ou razao social"
+            :error="locatarioForm.hasError('nome')"
+          />
+        </FormField>
+
+        <FormField label="CPF ou CNPJ" :error="locatarioForm.getError('documento')" required>
+          <Input
+            v-model="locatarioForm.values.documento"
+            placeholder="Digite apenas numeros"
+            :error="locatarioForm.hasError('documento')"
+          />
+        </FormField>
+
+        <FormGroup>
+          <FormField label="E-mail" :error="locatarioForm.getError('email')">
+            <Input
+              type="email"
+              v-model="locatarioForm.values.email"
+              placeholder="email@exemplo.com"
+              :error="locatarioForm.hasError('email')"
+            />
+          </FormField>
+
+          <FormField label="Telefone" :error="locatarioForm.getError('telefone')">
+            <Input
+              v-model="locatarioForm.values.telefone"
+              placeholder="(00) 00000-0000"
+            />
+          </FormField>
+        </FormGroup>
+
+        <FormField label="Endereco" :error="locatarioForm.getError('endereco')">
+          <Input
+            v-model="locatarioForm.values.endereco"
+            placeholder="Endereco completo"
+          />
+        </FormField>
+
+        <DialogFooter>
+          <Button
+            type="button"
+            variant="outline"
+            @click="showLocatarioDialog = false"
+          >
+            Cancelar
+          </Button>
+          <Button type="submit" :disabled="locatarioForm.isSubmitting.value">
+            <Spinner v-if="locatarioForm.isSubmitting.value" size="sm" class="mr-2" />
+            Salvar Locatario
+          </Button>
+        </DialogFooter>
+      </form>
+    </Dialog>
   </div>
 </template>

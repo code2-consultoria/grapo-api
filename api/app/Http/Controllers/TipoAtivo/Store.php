@@ -29,7 +29,7 @@ class Store extends Controller
             ],
             'descricao' => ['nullable', 'string', 'max:1000'],
             'unidade_medida' => ['nullable', 'string', 'max:50'],
-            'valor_diaria_sugerido' => ['nullable', 'numeric', 'min:0'],
+            'valor_mensal_sugerido' => ['nullable', 'numeric', 'min:0'],
         ]);
 
         $criar = new Criar(
@@ -37,7 +37,7 @@ class Store extends Controller
             nome: $validated['nome'],
             descricao: $validated['descricao'] ?? null,
             unidadeMedida: $validated['unidade_medida'] ?? 'unidade',
-            valorDiariaSugerido: $validated['valor_diaria_sugerido'] ?? null
+            valorMensalSugerido: $validated['valor_mensal_sugerido'] ?? null
         );
         $criar->handle();
 

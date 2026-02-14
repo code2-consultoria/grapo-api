@@ -18,7 +18,7 @@ class Criar implements Command
         private string $nome,
         private ?string $descricao = null,
         private string $unidadeMedida = 'unidade',
-        private ?float $valorDiariaSugerido = null
+        private ?float $valorMensalSugerido = null
     ) {}
 
     /**
@@ -30,7 +30,7 @@ class Criar implements Command
             'nome' => $this->nome,
             'descricao' => $this->descricao,
             'unidade_medida' => $this->unidadeMedida,
-            'valor_diaria_sugerido' => $this->valorDiariaSugerido,
+            'valor_mensal_sugerido' => $this->valorMensalSugerido,
         ]);
 
         $this->tipoAtivo->locador()->associate($this->locador);

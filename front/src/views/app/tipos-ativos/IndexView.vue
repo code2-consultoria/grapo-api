@@ -3,6 +3,7 @@ import { ref, onMounted } from "vue"
 import { RouterLink } from "vue-router"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
+import { Badge } from "@/components/ui/badge"
 import {
   Table,
   TableHeader,
@@ -20,7 +21,11 @@ import { Plus, Pencil, Trash2, Search } from "lucide-vue-next"
 import api from "@/lib/api"
 import type { TipoAtivo } from "@/types"
 
-const { items, meta, isLoading, fetch } = usePaginatedApi<TipoAtivo>("/tipos-ativos")
+interface TipoAtivoComEstoque extends TipoAtivo {
+  quantidade_disponivel?: number
+}
+
+const { items, meta, isLoading, fetch } = usePaginatedApi<TipoAtivoComEstoque>("/tipos-ativos")
 const { success, error } = useNotification()
 
 const search = ref("")
@@ -28,7 +33,7 @@ const currentPage = ref(1)
 
 // Dialog de confirmacao de exclusao
 const deleteDialog = ref(false)
-const deleteTarget = ref<TipoAtivo | null>(null)
+const deleteTarget = ref<TipoAtivoComEstoque | null>(null)
 const isDeleting = ref(false)
 
 // Carregar dados
@@ -53,7 +58,7 @@ function handlePageChange(page: number): void {
   loadData()
 }
 
-function openDeleteDialog(item: TipoAtivo): void {
+function openDeleteDialog(item: TipoAtivoComEstoque): void {
   deleteTarget.value = item
   deleteDialog.value = true
 }
@@ -64,11 +69,11 @@ async function confirmDelete(): Promise<void> {
   isDeleting.value = true
   try {
     await api.delete(`/tipos-ativos/${deleteTarget.value.id}`)
-    success("Excluido!", "Tipo de ativo removido com sucesso")
+    success("Excluido!", "Ativo removido com sucesso")
     deleteDialog.value = false
     loadData()
   } catch (err) {
-    error("Erro", "Nao foi possivel excluir o tipo de ativo")
+    error("Erro", "Nao foi possivel excluir o ativo")
   } finally {
     isDeleting.value = false
     deleteTarget.value = null
@@ -82,6 +87,12 @@ function formatCurrency(value: number): string {
     currency: "BRL",
   }).format(value)
 }
+
+function getEstoqueVariant(quantidade: number | undefined): "success" | "warning" | "destructive" {
+  if (quantidade === undefined || quantidade === 0) return "destructive"
+  if (quantidade < 5) return "warning"
+  return "success"
+}
 </script>
 
 <template>
@@ -89,15 +100,15 @@ function formatCurrency(value: number): string {
     <!-- Cabecalho -->
     <div class="flex items-center justify-between">
       <div>
-        <h1 class="text-2xl font-bold">Tipos de Ativos</h1>
+        <h1 class="text-2xl font-bold">Meus Ativos</h1>
         <p class="text-muted-foreground">
-          Gerencie as categorias de ativos disponiveis para locacao
+          Gerencie seus ativos e acompanhe o estoque disponivel
         </p>
       </div>
       <Button as-child>
         <RouterLink :to="{ name: 'tipos-ativos.create' }">
           <Plus class="size-4 mr-2" />
-          Novo Tipo
+          Novo Ativo
         </RouterLink>
       </Button>
     </div>
@@ -123,6 +134,8 @@ function formatCurrency(value: number): string {
           <TableRow>
             <TableHead>Nome</TableHead>
             <TableHead>Unidade</TableHead>
+            <TableHead>Estoque</TableHead>
+            <TableHead>Valor Mensal</TableHead>
             <TableHead>Valor Diaria</TableHead>
             <TableHead class="w-[100px]">Acoes</TableHead>
           </TableRow>
@@ -130,7 +143,7 @@ function formatCurrency(value: number): string {
         <TableBody>
           <!-- Loading -->
           <TableRow v-if="isLoading">
-            <TableCell :colspan="4" class="text-center py-8">
+            <TableCell :colspan="6" class="text-center py-8">
               <Spinner />
             </TableCell>
           </TableRow>
@@ -138,8 +151,8 @@ function formatCurrency(value: number): string {
           <!-- Empty -->
           <TableEmpty
             v-else-if="items.length === 0"
-            :colspan="4"
-            message="Nenhum tipo de ativo encontrado"
+            :colspan="6"
+            message="Nenhum ativo encontrado"
           />
 
           <!-- Items -->
@@ -153,6 +166,12 @@ function formatCurrency(value: number): string {
               </div>
             </TableCell>
             <TableCell>{{ item.unidade_medida }}</TableCell>
+            <TableCell>
+              <Badge :variant="getEstoqueVariant(item.quantidade_disponivel)">
+                {{ item.quantidade_disponivel ?? 0 }} {{ item.unidade_medida }}
+              </Badge>
+            </TableCell>
+            <TableCell>{{ formatCurrency(item.valor_mensal_sugerido) }}</TableCell>
             <TableCell>{{ formatCurrency(item.valor_diaria_sugerido) }}</TableCell>
             <TableCell>
               <div class="flex items-center gap-1">
@@ -189,7 +208,7 @@ function formatCurrency(value: number): string {
     <!-- Dialog de exclusao -->
     <Dialog v-model:open="deleteDialog" title="Confirmar exclusao">
       <p class="text-muted-foreground">
-        Tem certeza que deseja excluir o tipo de ativo
+        Tem certeza que deseja excluir o ativo
         <strong>{{ deleteTarget?.nome }}</strong>?
         Esta acao nao pode ser desfeita.
       </p>

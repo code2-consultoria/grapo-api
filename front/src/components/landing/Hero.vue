@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { RouterLink } from 'vue-router'
 import { Button } from '@/components/ui/button'
 import { Play } from 'lucide-vue-next'
 </script>
@@ -31,10 +32,13 @@ import { Play } from 'lucide-vue-next'
       <!-- CTAs -->
       <div class="flex flex-col sm:flex-row gap-4 justify-center">
         <Button
+          as-child
           size="lg"
           class="bg-primary text-primary-foreground px-8 py-6 text-lg font-bold shadow-xl shadow-primary/30 hover:bg-primary/90"
         >
-          Criar minha conta grátis
+          <RouterLink :to="{ name: 'register' }">
+            Criar minha conta grátis
+          </RouterLink>
         </Button>
         <Button
           variant="ghost"

@@ -1,10 +1,12 @@
 <script setup lang="ts">
 import { ref, onMounted } from "vue"
+import { RouterLink } from "vue-router"
 import { useAuth } from "@/composables"
 import { StatCard } from "@/components/app"
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card"
+import { Button } from "@/components/ui/button"
 import { Spinner } from "@/components/ui/spinner"
-import { Users, Package, Boxes, FileText } from "lucide-vue-next"
+import { Users, Package, Boxes, FileText, Plus } from "lucide-vue-next"
 import api from "@/lib/api"
 
 const { userName, locador } = useAuth()
@@ -55,6 +57,23 @@ onMounted(async () => {
       <!-- Cards de estatisticas -->
       <div class="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         <StatCard
+          title="Contratos"
+          :value="stats.contratos"
+          description="Ativos"
+          :icon="FileText"
+          trend="up"
+          trend-value="+12%"
+        >
+          <template #action>
+            <RouterLink :to="{ name: 'contratos.create' }">
+              <Button size="sm" variant="outline" class="gap-1">
+                <Plus class="size-4" />
+                Novo
+              </Button>
+            </RouterLink>
+          </template>
+        </StatCard>
+        <StatCard
           title="Locatarios"
           :value="stats.locatarios"
           description="Total cadastrados"
@@ -71,14 +90,6 @@ onMounted(async () => {
           :value="stats.lotes"
           description="Em estoque"
           :icon="Boxes"
-        />
-        <StatCard
-          title="Contratos"
-          :value="stats.contratos"
-          description="Ativos"
-          :icon="FileText"
-          trend="up"
-          trend-value="+12%"
         />
       </div>
 

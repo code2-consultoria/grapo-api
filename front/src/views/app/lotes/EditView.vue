@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted } from "vue"
+import { ref, onMounted, computed } from "vue"
 import { useRouter, useRoute } from "vue-router"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -19,13 +19,25 @@ const { success, error } = useNotification()
 const isLoading = ref(true)
 const tiposAtivos = ref<{ value: string; label: string }[]>([])
 
+const formasPagamento = [
+  { value: "pix", label: "PIX" },
+  { value: "boleto", label: "Boleto" },
+  { value: "cartao", label: "Cartao" },
+  { value: "transferencia", label: "Transferencia" },
+  { value: "dinheiro", label: "Dinheiro" },
+  { value: "outro", label: "Outro" },
+]
+
 const form = useForm<LoteForm>({
   initialValues: {
     codigo: "",
     tipo_ativo_id: "",
     quantidade_total: "",
-    valor_unitario_diaria: "",
-    custo_aquisicao: "",
+    fornecedor: "",
+    valor_total: "",
+    valor_frete: "",
+    forma_pagamento: "",
+    nf: "",
     data_aquisicao: "",
   },
   validate(values) {
@@ -38,26 +50,42 @@ const form = useForm<LoteForm>({
     } else if (Number(values.quantidade_total) <= 0) {
       errors.quantidade_total = "Quantidade deve ser maior que zero"
     }
-    if (!values.valor_unitario_diaria) {
-      errors.valor_unitario_diaria = "Valor da diaria e obrigatorio"
-    } else if (Number(values.valor_unitario_diaria) <= 0) {
-      errors.valor_unitario_diaria = "Valor deve ser maior que zero"
-    }
 
     return errors
   },
   async onSubmit(values) {
     await api.put(`/lotes/${route.params.id}`, {
-      ...values,
-      quantidade_total: Number(values.quantidade_total),
-      valor_unitario_diaria: Number(values.valor_unitario_diaria),
-      custo_aquisicao: values.custo_aquisicao ? Number(values.custo_aquisicao) : null,
-      data_aquisicao: values.data_aquisicao || null,
+      fornecedor: values.fornecedor || null,
+      valor_total: values.valor_total ? Number(values.valor_total) : null,
+      valor_frete: values.valor_frete ? Number(values.valor_frete) : null,
+      forma_pagamento: values.forma_pagamento || null,
+      nf: values.nf || null,
     })
     success("Sucesso!", "Lote atualizado com sucesso")
     router.push({ name: "lotes.index" })
   },
 })
+
+// Computed para custo de aquisição (reativo)
+const custoAquisicao = computed(() => {
+  const valorTotal = Number(form.values.valor_total) || 0
+  const valorFrete = Number(form.values.valor_frete) || 0
+  return valorTotal + valorFrete
+})
+
+// Computed para custo unitário (reativo)
+const custoUnitario = computed(() => {
+  const quantidade = Number(form.values.quantidade_total) || 0
+  if (quantidade <= 0) return 0
+  return custoAquisicao.value / quantidade
+})
+
+function formatCurrency(value: number): string {
+  return new Intl.NumberFormat("pt-BR", {
+    style: "currency",
+    currency: "BRL",
+  }).format(value)
+}
 
 onMounted(async () => {
   try {
@@ -76,8 +104,11 @@ onMounted(async () => {
       codigo: lote.codigo,
       tipo_ativo_id: lote.tipo_ativo_id,
       quantidade_total: String(lote.quantidade_total),
-      valor_unitario_diaria: String(lote.valor_unitario_diaria),
-      custo_aquisicao: lote.custo_aquisicao ? String(lote.custo_aquisicao) : "",
+      fornecedor: lote.fornecedor || "",
+      valor_total: lote.valor_total ? String(lote.valor_total) : "",
+      valor_frete: lote.valor_frete ? String(lote.valor_frete) : "",
+      forma_pagamento: lote.forma_pagamento || "",
+      nf: lote.nf || "",
       data_aquisicao: lote.data_aquisicao || "",
     })
   } catch (err) {
@@ -112,80 +143,93 @@ onMounted(async () => {
       <CardContent>
         <form @submit="form.handleSubmit" class="space-y-4">
           <FormGroup>
-            <FormField label="Codigo" :error="form.getError('codigo')" required>
+            <FormField label="Codigo" required>
               <Input
                 v-model="form.values.codigo"
-                placeholder="Ex: LOT-001"
-                :error="form.hasError('codigo')"
+                disabled
               />
             </FormField>
 
-            <FormField
-              label="Tipo de Ativo"
-              :error="form.getError('tipo_ativo_id')"
-              required
-            >
+            <FormField label="Tipo de Ativo" required>
               <Select
                 v-model="form.values.tipo_ativo_id"
                 :options="tiposAtivos"
-                placeholder="Selecione o tipo"
-                :error="form.hasError('tipo_ativo_id')"
+                disabled
               />
             </FormField>
           </FormGroup>
 
           <FormGroup>
-            <FormField
-              label="Quantidade Total"
-              :error="form.getError('quantidade_total')"
-              required
-            >
+            <FormField label="Quantidade Total" required>
               <Input
                 type="number"
-                min="1"
                 v-model="form.values.quantidade_total"
-                placeholder="0"
-                :error="form.hasError('quantidade_total')"
+                disabled
               />
             </FormField>
 
-            <FormField
-              label="Valor Diaria (R$)"
-              :error="form.getError('valor_unitario_diaria')"
-              required
-            >
+            <FormField label="Fornecedor" :error="form.getError('fornecedor')">
               <Input
-                type="number"
-                step="0.01"
-                min="0"
-                v-model="form.values.valor_unitario_diaria"
-                placeholder="0,00"
-                :error="form.hasError('valor_unitario_diaria')"
+                v-model="form.values.fornecedor"
+                placeholder="Nome do fornecedor"
               />
             </FormField>
           </FormGroup>
 
           <FormGroup>
-            <FormField
-              label="Custo de Aquisicao (R$)"
-              :error="form.getError('custo_aquisicao')"
-            >
+            <FormField label="Valor Total (R$)" :error="form.getError('valor_total')">
               <Input
                 type="number"
                 step="0.01"
                 min="0"
-                v-model="form.values.custo_aquisicao"
+                v-model="form.values.valor_total"
                 placeholder="0,00"
               />
             </FormField>
 
-            <FormField
-              label="Data de Aquisicao"
-              :error="form.getError('data_aquisicao')"
-            >
-              <Input type="date" v-model="form.values.data_aquisicao" />
+            <FormField label="Valor Frete (R$)" :error="form.getError('valor_frete')">
+              <Input
+                type="number"
+                step="0.01"
+                min="0"
+                v-model="form.values.valor_frete"
+                placeholder="0,00"
+              />
             </FormField>
           </FormGroup>
+
+          <FormGroup>
+            <FormField label="Forma de Pagamento" :error="form.getError('forma_pagamento')">
+              <Select
+                v-model="form.values.forma_pagamento"
+                :options="formasPagamento"
+                placeholder="Selecione"
+              />
+            </FormField>
+
+            <FormField label="Nota Fiscal" :error="form.getError('nf')">
+              <Input
+                v-model="form.values.nf"
+                placeholder="Numero da NF"
+              />
+            </FormField>
+          </FormGroup>
+
+          <FormField label="Data de Aquisicao">
+            <Input type="date" v-model="form.values.data_aquisicao" disabled />
+          </FormField>
+
+          <!-- Custo de aquisição calculado -->
+          <div v-if="custoAquisicao > 0" class="rounded-lg bg-muted p-4 space-y-2">
+            <div class="flex justify-between items-center text-sm">
+              <span class="text-muted-foreground">Custo de Aquisicao</span>
+              <span class="font-medium">{{ formatCurrency(custoAquisicao) }}</span>
+            </div>
+            <div v-if="Number(form.values.quantidade_total) > 0" class="flex justify-between items-center pt-2 border-t">
+              <span class="text-sm text-muted-foreground">Custo Unitario</span>
+              <span class="text-lg font-semibold">{{ formatCurrency(custoUnitario) }}</span>
+            </div>
+          </div>
 
           <FormActions>
             <Button

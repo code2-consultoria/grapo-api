@@ -29,6 +29,7 @@ export interface Pessoa {
   // Relacionamentos opcionais
   locador?: Pessoa
   documentos?: Documento[]
+  contratos_como_locatario?: Contrato[]
 }
 
 export interface Documento {
@@ -45,7 +46,8 @@ export interface TipoAtivo {
   nome: string
   descricao: string | null
   unidade_medida: string
-  valor_diaria_sugerido: number
+  valor_mensal_sugerido: number
+  valor_diaria_sugerido: number // Accessor calculado: (valor_mensal * 1.10) / 30
   locador_id: string
   created_at: string
   updated_at: string
@@ -59,10 +61,15 @@ export interface Lote {
   codigo: string
   quantidade_total: number
   quantidade_disponivel: number
-  valor_unitario_diaria: number
   custo_aquisicao: number | null
+  custo_unitario: number | null // Accessor: (valor_total + valor_frete) / quantidade_total
   data_aquisicao: string | null
   status: LoteStatus
+  fornecedor: string | null
+  valor_total: number | null
+  valor_frete: number | null
+  forma_pagamento: string | null
+  nf: string | null
   tipo_ativo_id: string
   locador_id: string
   created_at: string
@@ -92,10 +99,14 @@ export interface Contrato {
   itens?: ContratoItem[]
 }
 
+// Periodo de aluguel
+export type PeriodoAluguel = 'diaria' | 'mensal'
+
 export interface ContratoItem {
   id: string // UUID
   quantidade: number
-  valor_unitario_diaria: number
+  valor_unitario: number
+  periodo_aluguel: PeriodoAluguel
   valor_total_item: number
   contrato_id: string
   tipo_ativo_id: string

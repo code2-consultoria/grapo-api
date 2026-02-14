@@ -2,7 +2,7 @@
 
 Este documento lista funcionalidades implementadas, em andamento e planejadas para implementação futura.
 
-**Última atualização:** 2025-02-11
+**Última atualização:** 2025-02-13
 **Mantido por:** Equipe de Desenvolvimento
 
 ---
@@ -14,7 +14,7 @@ Este documento lista funcionalidades implementadas, em andamento e planejadas pa
 | Sprint | Funcionalidade | Status |
 |--------|----------------|--------|
 | 01 | Landing Page | Concluída |
-| 02 | Contratos | Planejada |
+| 02 | Contratos | Concluída |
 
 ---
 
@@ -31,30 +31,19 @@ Este documento lista funcionalidades implementadas, em andamento e planejadas pa
 - [x] Responsividade mobile/tablet/desktop
 - [x] Lighthouse scores > 90
 
----
-
-## PLANEJADO
-
 ### Sprint 02 - Contratos
-- **Status**: Planejada
-- **Prioridade**: Alta
+- **Status**: Concluída
+- **Arquivo**: `docs/sprints/sprint-02.md`
 - **Descrição**: Sistema de gestao de contratos de locacao de ativos
 
-**Escopo:**
-- Cadastro de pessoas (locador, locatario)
-- Cadastro de documentos (CPF, CNPJ, RG, etc) com validacao e formatacao
-- Vinculo de users com locadores
-- Cadastro de tipos de ativos
-- Gestao de lotes
-- Criacao e ativacao de contratos
-- Alocacao automatica de lotes (FIFO)
-- Interfaces CQRS (Query e Command)
-
-**Documentacao:**
-- Funcionalidade: `docs/analises/features/contratos.md`
-- Modelo de Dados: `docs/analises/modelo-dados.md`
-
----
+**Entregáveis:**
+- [x] Cadastro de pessoas (locador, locatario) com documentos
+- [x] Cadastro de tipos de ativos com gestao de estoque
+- [x] Gestao de lotes com custo unitario calculado
+- [x] Criacao, edicao e ativacao de contratos
+- [x] Alocacao automatica de lotes (FIFO)
+- [x] Frontend completo (Index, Create, Edit, Show para todas entidades)
+- [x] 73 testes automatizados passando
 
 ## BACKLOG (Funcionalidades Futuras)
 
@@ -75,6 +64,24 @@ Este documento lista funcionalidades implementadas, em andamento e planejadas pa
 
 **Decisoes pendentes:**
 - Criterio para liberacao de itens na reducao (LIFO, proporcional ou manual)
+
+---
+
+### Majoracao Percentual da Diaria Configuravel
+- **Status**: Backlog
+- **Prioridade**: Media
+- **Dependencia**: Sprint 02 (Contratos)
+- **Descrição**: Permitir que o locador configure o percentual de majoracao para calculo do valor da diaria a partir do valor mensal
+
+**Regras atuais:**
+- O valor da diaria e calculado automaticamente: `(valor_mensal * 1.10) / 30`
+- Majoracao fixa de 10% sobre o valor mensal
+
+**Escopo:**
+- Campo `majoracao_diaria` no model Pessoa (locador)
+- Valor padrao: 10% (1.10)
+- Interface para locador configurar o percentual
+- Atualizar accessor `valor_diaria_sugerido` em TipoAtivo para usar majoracao do locador
 
 ---
 
@@ -137,5 +144,5 @@ Este documento lista funcionalidades implementadas, em andamento e planejadas pa
 
 ---
 
-**Ultima revisao:** 2025-02-11 - Sprint 01 concluida, Sprint 02 planejada
-**Proxima revisao:** Definicao detalhada da Sprint 02 (Contratos)
+**Ultima revisao:** 2025-02-13 - Sprint 02 concluida
+**Proxima revisao:** Definicao da Sprint 03 (Dashboard)

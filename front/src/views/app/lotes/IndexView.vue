@@ -141,9 +141,9 @@ function getStatusLabel(status: LoteStatus): string {
         <TableHeader>
           <TableRow>
             <TableHead>Codigo</TableHead>
-            <TableHead>Tipo de Ativo</TableHead>
+            <TableHead>Ativo</TableHead>
             <TableHead>Quantidade</TableHead>
-            <TableHead>Valor Diaria</TableHead>
+            <TableHead>Custo Unit.</TableHead>
             <TableHead>Status</TableHead>
             <TableHead class="w-[100px]">Acoes</TableHead>
           </TableRow>
@@ -167,7 +167,7 @@ function getStatusLabel(status: LoteStatus): string {
             <TableCell>
               {{ item.quantidade_disponivel }} / {{ item.quantidade_total }}
             </TableCell>
-            <TableCell>{{ formatCurrency(item.valor_unitario_diaria) }}</TableCell>
+            <TableCell>{{ item.custo_unitario ? formatCurrency(item.custo_unitario) : "-" }}</TableCell>
             <TableCell>
               <Badge :variant="getStatusVariant(item.status)">
                 {{ getStatusLabel(item.status) }}

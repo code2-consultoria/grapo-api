@@ -102,8 +102,8 @@ test('usuário autenticado pode obter seus dados', function () {
         ->getJson('/api/auth/me');
 
     $response->assertStatus(200);
-    $response->assertJsonPath('data.name', 'João Silva');
-    $response->assertJsonPath('data.email', 'joao@teste.com');
+    $response->assertJsonPath('data.user.name', 'João Silva');
+    $response->assertJsonPath('data.user.email', 'joao@teste.com');
 });
 
 test('me sem autenticação retorna 401', function () {

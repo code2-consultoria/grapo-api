@@ -19,10 +19,18 @@ class Lote extends Model
         'codigo',
         'quantidade_total',
         'quantidade_disponivel',
-        'valor_unitario_diaria',
         'custo_aquisicao',
         'data_aquisicao',
         'status',
+        'fornecedor',
+        'valor_total',
+        'valor_frete',
+        'forma_pagamento',
+        'nf',
+    ];
+
+    protected $appends = [
+        'custo_unitario',
     ];
 
     protected function casts(): array
@@ -30,8 +38,9 @@ class Lote extends Model
         return [
             'quantidade_total' => 'integer',
             'quantidade_disponivel' => 'integer',
-            'valor_unitario_diaria' => 'decimal:2',
             'custo_aquisicao' => 'decimal:2',
+            'valor_total' => 'decimal:2',
+            'valor_frete' => 'decimal:2',
             'data_aquisicao' => 'date',
         ];
     }
@@ -51,6 +60,27 @@ class Lote extends Model
     public function alocacoes(): HasMany
     {
         return $this->hasMany(AlocacaoLote::class);
+    }
+
+    // Accessors
+
+    /**
+     * Calcula o custo unitario: (valor_total + valor_frete) / quantidade_total
+     */
+    public function getCustoUnitarioAttribute(): ?float
+    {
+        if (!$this->quantidade_total || $this->quantidade_total <= 0) {
+            return null;
+        }
+
+        $valorTotal = (float) ($this->valor_total ?? 0);
+        $valorFrete = (float) ($this->valor_frete ?? 0);
+
+        if ($valorTotal <= 0 && $valorFrete <= 0) {
+            return null;
+        }
+
+        return round(($valorTotal + $valorFrete) / $this->quantidade_total, 2);
     }
 
     // Scopes
