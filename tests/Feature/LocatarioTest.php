@@ -147,3 +147,131 @@ test('retorna tipo_pessoa PJ para locatário com CNPJ', function () {
     $locatario->refresh();
     expect($locatario->tipo_pessoa)->toBe('PJ');
 });
+
+// Testes para campo documento (string única com detecção automática)
+
+test('cria locatário com campo documento detectando CPF automaticamente', function () {
+    $response = $this->actingAs($this->user)->postJson('/api/locatarios', [
+        'nome' => 'Maria Santos',
+        'documento' => '52998224725', // CPF válido - 11 dígitos
+    ]);
+
+    $response->assertStatus(201);
+    $response->assertJsonPath('data.nome', 'Maria Santos');
+
+    $this->assertDatabaseHas('documentos', [
+        'tipo' => 'cpf',
+        'numero' => '52998224725',
+    ]);
+});
+
+test('cria locatário com campo documento detectando CNPJ automaticamente', function () {
+    $response = $this->actingAs($this->user)->postJson('/api/locatarios', [
+        'nome' => 'Empresa ABC',
+        'documento' => '11222333000181', // CNPJ válido - 14 dígitos
+    ]);
+
+    $response->assertStatus(201);
+    $response->assertJsonPath('data.nome', 'Empresa ABC');
+
+    $this->assertDatabaseHas('documentos', [
+        'tipo' => 'cnpj',
+        'numero' => '11222333000181',
+    ]);
+});
+
+test('cria locatário com campo documento formatado (com pontuação)', function () {
+    $response = $this->actingAs($this->user)->postJson('/api/locatarios', [
+        'nome' => 'Pedro Oliveira',
+        'documento' => '529.982.247-25', // CPF com formatação
+    ]);
+
+    $response->assertStatus(201);
+
+    $this->assertDatabaseHas('documentos', [
+        'tipo' => 'cpf',
+        'numero' => '52998224725', // Deve ser salvo sem formatação
+    ]);
+});
+
+test('rejeita documento com tamanho inválido', function () {
+    $response = $this->actingAs($this->user)->postJson('/api/locatarios', [
+        'nome' => 'Teste Invalido',
+        'documento' => '123456789', // Nem CPF (11) nem CNPJ (14)
+    ]);
+
+    $response->assertStatus(422);
+    $response->assertJsonValidationErrors(['documento']);
+});
+
+test('rejeita CPF inválido (dígito verificador errado)', function () {
+    $response = $this->actingAs($this->user)->postJson('/api/locatarios', [
+        'nome' => 'CPF Invalido',
+        'documento' => '12345678901', // CPF com dígitos verificadores errados
+    ]);
+
+    $response->assertStatus(422);
+    $response->assertJsonValidationErrors(['documento']);
+});
+
+test('rejeita CNPJ inválido (dígito verificador errado)', function () {
+    $response = $this->actingAs($this->user)->postJson('/api/locatarios', [
+        'nome' => 'CNPJ Invalido',
+        'documento' => '12345678000199', // CNPJ com dígitos verificadores errados
+    ]);
+
+    $response->assertStatus(422);
+    $response->assertJsonValidationErrors(['documento']);
+});
+
+// Testes de unicidade de documento
+
+test('rejeita locatário com documento duplicado no mesmo locador', function () {
+    // Cria primeiro locatário com CPF
+    $this->actingAs($this->user)->postJson('/api/locatarios', [
+        'nome' => 'Primeiro Locatário',
+        'documento' => '52998224725',
+    ]);
+
+    // Tenta criar segundo locatário com mesmo CPF
+    $response = $this->actingAs($this->user)->postJson('/api/locatarios', [
+        'nome' => 'Segundo Locatário',
+        'documento' => '52998224725',
+    ]);
+
+    $response->assertStatus(422);
+    $response->assertJsonValidationErrors(['documento']);
+});
+
+test('permite mesmo documento para locatários de locadores diferentes', function () {
+    // Cria locatário do primeiro locador
+    $this->actingAs($this->user)->postJson('/api/locatarios', [
+        'nome' => 'Locatário do Locador 1',
+        'documento' => '52998224725',
+    ]);
+
+    // Cria outro locador e usuário
+    $outroLocador = Pessoa::factory()->locador()->create();
+    $outroUser = User::factory()->create(['papel' => 'cliente']);
+    VinculoTime::factory()->create([
+        'user_id' => $outroUser->id,
+        'locador_id' => $outroLocador->id,
+    ]);
+
+    // Cria locatário do segundo locador com mesmo documento
+    $response = $this->actingAs($outroUser)->postJson('/api/locatarios', [
+        'nome' => 'Locatário do Locador 2',
+        'documento' => '52998224725',
+    ]);
+
+    $response->assertStatus(201);
+});
+
+test('campo documento é obrigatório para locatário', function () {
+    $response = $this->actingAs($this->user)->postJson('/api/locatarios', [
+        'nome' => 'Sem Documento',
+    ]);
+
+    $response->assertStatus(422);
+    $response->assertJsonValidationErrors(['documento']);
+});

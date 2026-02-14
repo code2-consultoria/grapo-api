@@ -54,7 +54,7 @@ test('aloca itens usando FIFO (lote mais antigo primeiro)', function () {
         'contrato_id' => $contrato->id,
         'tipo_ativo_id' => $this->tipoAtivo->id,
         'quantidade' => 15,
-        'valor_unitario_diaria' => 5.00,
+        'valor_unitario' => 5.00,
         'valor_total_item' => 15 * 5.00 * 30,
     ]);
 
@@ -100,7 +100,7 @@ test('aloca itens de um único lote quando há disponibilidade suficiente', func
         'contrato_id' => $contrato->id,
         'tipo_ativo_id' => $this->tipoAtivo->id,
         'quantidade' => 10,
-        'valor_unitario_diaria' => 5.00,
+        'valor_unitario' => 5.00,
         'valor_total_item' => 10 * 5.00 * 30,
     ]);
 
@@ -134,7 +134,7 @@ test('lança exceção quando quantidade indisponível', function () {
         'contrato_id' => $contrato->id,
         'tipo_ativo_id' => $this->tipoAtivo->id,
         'quantidade' => 30,
-        'valor_unitario_diaria' => 5.00,
+        'valor_unitario' => 5.00,
         'valor_total_item' => 30 * 5.00 * 30,
     ]);
 

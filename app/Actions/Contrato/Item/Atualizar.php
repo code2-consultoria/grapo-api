@@ -17,7 +17,8 @@ class Atualizar implements Command
     public function __construct(
         ContratoItem $item,
         private ?int $quantidade = null,
-        private ?float $valorUnitarioDiaria = null
+        private ?float $valorUnitario = null,
+        private ?string $periodoAluguel = null
     ) {
         $this->item = $item;
     }
@@ -41,13 +42,20 @@ class Atualizar implements Command
             $this->item->quantidade = $this->quantidade;
         }
 
-        if ($this->valorUnitarioDiaria !== null) {
-            $this->item->valor_unitario_diaria = $this->valorUnitarioDiaria;
+        if ($this->valorUnitario !== null) {
+            $this->item->valor_unitario = $this->valorUnitario;
         }
 
-        // Recalcula valor total do item
+        if ($this->periodoAluguel !== null) {
+            $this->item->periodo_aluguel = $this->periodoAluguel;
+        }
+
+        // Recalcula valor total do item baseado no periodo
         $diasLocacao = $contrato->calcularDiasLocacao();
-        $this->item->valor_total_item = $this->item->quantidade * $this->item->valor_unitario_diaria * $diasLocacao;
+        $multiplicador = $this->item->periodo_aluguel === 'mensal'
+            ? (int) ceil($diasLocacao / 30)
+            : $diasLocacao;
+        $this->item->valor_total_item = $this->item->quantidade * $this->item->valor_unitario * $multiplicador;
 
         $this->item->save();
 

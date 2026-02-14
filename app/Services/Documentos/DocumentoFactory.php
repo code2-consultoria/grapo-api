@@ -29,6 +29,57 @@ class DocumentoFactory
     }
 
     /**
+     * Detecta o tipo de documento (CPF ou CNPJ) pelo tamanho
+     *
+     * @throws InvalidArgumentException
+     */
+    public static function detectarTipo(string $numero): TipoDocumento
+    {
+        // Remove caracteres não numéricos
+        $numeroLimpo = preg_replace('/\D/', '', $numero);
+
+        return match (strlen($numeroLimpo)) {
+            11 => TipoDocumento::Cpf,
+            14 => TipoDocumento::Cnpj,
+            default => throw new InvalidArgumentException(
+                'Documento deve ter 11 (CPF) ou 14 (CNPJ) dígitos.'
+            ),
+        };
+    }
+
+    /**
+     * Valida um documento detectando automaticamente o tipo
+     */
+    public static function validarAuto(string $numero): bool
+    {
+        try {
+            $tipo = self::detectarTipo($numero);
+
+            return self::validar($tipo, $numero);
+        } catch (InvalidArgumentException) {
+            return false;
+        }
+    }
+
+    /**
+     * Limpa a formatação e detecta o tipo automaticamente
+     *
+     * @return array{tipo: TipoDocumento, numero: string}
+     *
+     * @throws InvalidArgumentException
+     */
+    public static function processarAuto(string $numero): array
+    {
+        $tipo = self::detectarTipo($numero);
+        $numeroLimpo = self::limpar($tipo, $numero);
+
+        return [
+            'tipo' => $tipo,
+            'numero' => $numeroLimpo,
+        ];
+    }
+
+    /**
      * Valida um documento de acordo com seu tipo
      */
     public static function validar(TipoDocumento $tipo, string $numero): bool

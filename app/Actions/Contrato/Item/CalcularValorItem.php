@@ -17,10 +17,19 @@ class CalcularValorItem implements Command
 
     /**
      * Executa o cálculo do valor total do item.
+     * - Diaria: quantidade * valor_unitario * dias
+     * - Mensal: quantidade * valor_unitario * meses (arredonda para cima)
      */
     public function handle(): void
     {
-        $this->item->valor_total_item = $this->item->quantidade * $this->item->valor_unitario_diaria * $this->diasLocacao;
+        $multiplicador = $this->diasLocacao;
+
+        if ($this->item->periodo_aluguel === 'mensal') {
+            // Arredonda para cima o numero de meses
+            $multiplicador = (int) ceil($this->diasLocacao / 30);
+        }
+
+        $this->item->valor_total_item = $this->item->quantidade * $this->item->valor_unitario * $multiplicador;
         $this->item->save();
     }
 }

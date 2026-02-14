@@ -38,8 +38,11 @@ test('cria lote', function () {
         'tipo_ativo_id' => $this->tipoAtivo->id,
         'codigo' => 'LOT-001',
         'quantidade_total' => 20,
-        'valor_unitario_diaria' => 5.00,
-        'custo_aquisicao' => 1000.00,
+        'fornecedor' => 'Fornecedor Teste',
+        'valor_total' => 1000.00,
+        'valor_frete' => 100.00,
+        'forma_pagamento' => 'pix',
+        'nf' => 'NF-123456',
         'data_aquisicao' => now()->format('Y-m-d'),
     ]);
 
@@ -47,12 +50,15 @@ test('cria lote', function () {
     $response->assertJsonPath('data.codigo', 'LOT-001');
     $response->assertJsonPath('data.quantidade_total', 20);
     $response->assertJsonPath('data.quantidade_disponivel', 20);
+    $response->assertJsonPath('data.fornecedor', 'Fornecedor Teste');
+    $response->assertJsonPath('data.custo_aquisicao', '1100.00'); // valor_total + valor_frete
 
     $this->assertDatabaseHas('lotes', [
         'locador_id' => $this->locador->id,
         'codigo' => 'LOT-001',
         'quantidade_total' => 20,
         'quantidade_disponivel' => 20,
+        'fornecedor' => 'Fornecedor Teste',
     ]);
 });
 
@@ -60,16 +66,21 @@ test('atualiza lote', function () {
     $lote = Lote::factory()->create([
         'locador_id' => $this->locador->id,
         'tipo_ativo_id' => $this->tipoAtivo->id,
-        'valor_unitario_diaria' => 5.00,
+        'valor_total' => 500.00,
+        'valor_frete' => 50.00,
     ]);
 
     $response = $this->actingAs($this->user)
         ->putJson("/api/lotes/{$lote->id}", [
-            'valor_unitario_diaria' => 7.00,
+            'fornecedor' => 'Novo Fornecedor',
+            'valor_total' => 800.00,
         ]);
 
     $response->assertStatus(200);
-    $response->assertJsonPath('data.valor_unitario_diaria', '7.00');
+    $response->assertJsonPath('data.fornecedor', 'Novo Fornecedor');
+    $response->assertJsonPath('data.valor_total', '800.00');
+    // custo_aquisicao recalculado: 800 + 50 = 850
+    $response->assertJsonPath('data.custo_aquisicao', '850.00');
 });
 
 test('exclui lote sem alocações', function () {
@@ -130,7 +141,6 @@ test('não permite código duplicado no mesmo locador', function () {
         'tipo_ativo_id' => $this->tipoAtivo->id,
         'codigo' => 'LOT-001',
         'quantidade_total' => 10,
-        'valor_unitario_diaria' => 5.00,
     ]);
 
     $response->assertStatus(422);
@@ -145,7 +155,6 @@ test('valida campos obrigatórios', function () {
         'tipo_ativo_id',
         'codigo',
         'quantidade_total',
-        'valor_unitario_diaria',
     ]);
 });
 
@@ -189,4 +198,18 @@ test('lista apenas lotes disponíveis', function () {
 
     $response->assertStatus(200);
     expect($response->json('data'))->toHaveCount(3);
+});
+
+test('calcula custo unitario corretamente', function () {
+    $response = $this->actingAs($this->user)->postJson('/api/lotes', [
+        'tipo_ativo_id' => $this->tipoAtivo->id,
+        'codigo' => 'LOT-CUSTO',
+        'quantidade_total' => 10,
+        'valor_total' => 900.00,
+        'valor_frete' => 100.00,
+    ]);
+
+    $response->assertStatus(201);
+    // custo_unitario = (900 + 100) / 10 = 100
+    expect((float) $response->json('data.custo_unitario'))->toBe(100.0);
 });

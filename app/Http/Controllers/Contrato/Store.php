@@ -31,7 +31,7 @@ class Store extends Controller
                     }
                 }),
             ],
-            'data_inicio' => ['required', 'date', 'after_or_equal:today'],
+            'data_inicio' => ['required', 'date'],
             'data_termino' => ['required', 'date', 'after:data_inicio'],
             'observacoes' => ['nullable', 'string', 'max:2000'],
         ]);

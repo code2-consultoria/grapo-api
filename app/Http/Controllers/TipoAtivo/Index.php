@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\TipoAtivo;
 
 use App\Http\Controllers\Controller;
-use App\Models\TipoAtivo;
+use App\Queries\TipoAtivo\Listar;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
@@ -15,23 +15,23 @@ class Index extends Controller
     public function __invoke(Request $request): JsonResponse
     {
         $user = $request->user();
-        $locador = $user->locador();
+        $locador = $user->isCliente() ? $user->locador() : null;
 
-        $query = TipoAtivo::query();
+        $query = new Listar(
+            locador: $locador,
+            search: $request->input('search')
+        );
 
-        if ($user->isCliente() && $locador) {
-            $query->where('locador_id', $locador->id);
-        }
+        $tiposAtivos = $query->handle();
 
-        if ($request->has('search')) {
-            $search = $request->input('search');
-            $query->where('nome', 'ilike', "%{$search}%");
-        }
-
-        $tiposAtivos = $query->orderBy('nome')->paginate(15);
+        // Adiciona quantidade disponível em cada item
+        $items = collect($tiposAtivos->items())->map(function ($tipoAtivo) {
+            $tipoAtivo->quantidade_disponivel = $tipoAtivo->quantidadeDisponivel();
+            return $tipoAtivo;
+        });
 
         return response()->json([
-            'data' => $tiposAtivos->items(),
+            'data' => $items,
             'meta' => [
                 'current_page' => $tiposAtivos->currentPage(),
                 'last_page' => $tiposAtivos->lastPage(),

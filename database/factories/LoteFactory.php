@@ -20,6 +20,8 @@ class LoteFactory extends Factory
     public function definition(): array
     {
         $quantidade = fake()->numberBetween(5, 50);
+        $valorTotal = fake()->randomFloat(2, 100, 5000);
+        $valorFrete = fake()->randomFloat(2, 0, 500);
 
         return [
             'locador_id' => Pessoa::factory()->locador(),
@@ -27,8 +29,12 @@ class LoteFactory extends Factory
             'codigo' => 'LOT-' . fake()->unique()->numerify('####'),
             'quantidade_total' => $quantidade,
             'quantidade_disponivel' => $quantidade,
-            'valor_unitario_diaria' => fake()->randomFloat(2, 2, 100),
-            'custo_aquisicao' => fake()->randomFloat(2, 100, 5000),
+            'fornecedor' => fake()->company(),
+            'valor_total' => $valorTotal,
+            'valor_frete' => $valorFrete,
+            'forma_pagamento' => fake()->randomElement(['pix', 'boleto', 'cartao', 'transferencia']),
+            'nf' => fake()->numerify('NF-######'),
+            'custo_aquisicao' => $valorTotal + $valorFrete,
             'data_aquisicao' => fake()->dateTimeBetween('-2 years', 'now'),
             'status' => 'disponivel',
         ];

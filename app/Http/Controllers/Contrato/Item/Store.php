@@ -38,7 +38,8 @@ class Store extends Controller
                 }),
             ],
             'quantidade' => ['required', 'integer', 'min:1'],
-            'valor_unitario_diaria' => ['required', 'numeric', 'min:0'],
+            'valor_unitario' => ['required', 'numeric', 'min:0'],
+            'periodo_aluguel' => ['required', 'string', 'in:diaria,mensal'],
         ]);
 
         $tipoAtivo = TipoAtivo::findOrFail($validated['tipo_ativo_id']);
@@ -48,7 +49,8 @@ class Store extends Controller
                 contrato: $contrato,
                 tipoAtivo: $tipoAtivo,
                 quantidade: $validated['quantidade'],
-                valorUnitarioDiaria: $validated['valor_unitario_diaria']
+                valorUnitario: $validated['valor_unitario'],
+                periodoAluguel: $validated['periodo_aluguel']
             );
             $adicionar->handle();
 

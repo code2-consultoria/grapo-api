@@ -37,7 +37,8 @@ test('adiciona item ao contrato em rascunho', function () {
         ->postJson("/api/contratos/{$this->contrato->id}/itens", [
             'tipo_ativo_id' => $this->tipoAtivo->id,
             'quantidade' => 15,
-            'valor_unitario_diaria' => 5.00,
+            'valor_unitario' => 5.00,
+            'periodo_aluguel' => 'diaria',
         ]);
 
     $response->assertStatus(201);
@@ -46,6 +47,7 @@ test('adiciona item ao contrato em rascunho', function () {
         'contrato_id' => $this->contrato->id,
         'tipo_ativo_id' => $this->tipoAtivo->id,
         'quantidade' => 15,
+        'periodo_aluguel' => 'diaria',
     ]);
 });
 
@@ -71,13 +73,13 @@ test('atualiza quantidade do item em contrato rascunho', function () {
         'contrato_id' => $this->contrato->id,
         'tipo_ativo_id' => $this->tipoAtivo->id,
         'quantidade' => 10,
-        'valor_unitario_diaria' => 5.00,
+        'valor_unitario' => 5.00,
     ]);
 
     $response = $this->actingAs($this->user)
         ->putJson("/api/contratos/{$this->contrato->id}/itens/{$item->id}", [
             'quantidade' => 20,
-            'valor_unitario_diaria' => 6.00,
+            'valor_unitario' => 6.00,
         ]);
 
     $response->assertStatus(200);
@@ -85,7 +87,7 @@ test('atualiza quantidade do item em contrato rascunho', function () {
     $this->assertDatabaseHas('contrato_itens', [
         'id' => $item->id,
         'quantidade' => 20,
-        'valor_unitario_diaria' => 6.00,
+        'valor_unitario' => 6.00,
     ]);
 });
 
@@ -100,7 +102,8 @@ test('valida disponibilidade ao adicionar item', function () {
         ->postJson("/api/contratos/{$this->contrato->id}/itens", [
             'tipo_ativo_id' => $this->tipoAtivo->id,
             'quantidade' => 30, // Mais do que disponível
-            'valor_unitario_diaria' => 5.00,
+            'valor_unitario' => 5.00,
+            'periodo_aluguel' => 'diaria',
         ]);
 
     // Deve adicionar mesmo assim (validação ocorre na ativação)
@@ -124,7 +127,8 @@ test('calcula valor total do item corretamente', function () {
         ->postJson("/api/contratos/{$this->contrato->id}/itens", [
             'tipo_ativo_id' => $this->tipoAtivo->id,
             'quantidade' => 10,
-            'valor_unitario_diaria' => 5.00,
+            'valor_unitario' => 5.00,
+            'periodo_aluguel' => 'diaria',
         ]);
 
     $response->assertStatus(201);
@@ -149,7 +153,8 @@ test('atualiza valor total do contrato ao adicionar item', function () {
         ->postJson("/api/contratos/{$this->contrato->id}/itens", [
             'tipo_ativo_id' => $this->tipoAtivo->id,
             'quantidade' => 10,
-            'valor_unitario_diaria' => 5.00,
+            'valor_unitario' => 5.00,
+            'periodo_aluguel' => 'diaria',
         ]);
 
     $this->contrato->refresh();

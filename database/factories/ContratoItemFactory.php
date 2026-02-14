@@ -27,7 +27,8 @@ class ContratoItemFactory extends Factory
             'contrato_id' => Contrato::factory(),
             'tipo_ativo_id' => TipoAtivo::factory(),
             'quantidade' => $quantidade,
-            'valor_unitario_diaria' => $valorUnitario,
+            'valor_unitario' => $valorUnitario,
+            'periodo_aluguel' => 'diaria',
             'valor_total_item' => $quantidade * $valorUnitario * $diasLocacao,
         ];
     }
@@ -39,7 +40,7 @@ class ContratoItemFactory extends Factory
     {
         return $this->state(fn (array $attributes) => [
             'quantidade' => $quantidade,
-            'valor_total_item' => $quantidade * $attributes['valor_unitario_diaria'] * 30,
+            'valor_total_item' => $quantidade * $attributes['valor_unitario'] * 30,
         ]);
     }
 
@@ -49,8 +50,19 @@ class ContratoItemFactory extends Factory
     public function comValorUnitario(float $valor): static
     {
         return $this->state(fn (array $attributes) => [
-            'valor_unitario_diaria' => $valor,
+            'valor_unitario' => $valor,
             'valor_total_item' => $attributes['quantidade'] * $valor * 30,
+        ]);
+    }
+
+    /**
+     * Item com periodo mensal.
+     */
+    public function mensal(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'periodo_aluguel' => 'mensal',
+            'valor_total_item' => $attributes['quantidade'] * $attributes['valor_unitario'] * 1, // 1 mes
         ]);
     }
 }

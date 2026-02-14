@@ -27,10 +27,20 @@ class Update extends Controller
         $lote = $query->findOrFail($id);
 
         $validated = $request->validate([
-            'valor_unitario_diaria' => ['sometimes', 'numeric', 'min:0'],
-            'custo_aquisicao' => ['sometimes', 'nullable', 'numeric', 'min:0'],
+            'fornecedor' => ['sometimes', 'nullable', 'string', 'max:255'],
+            'valor_total' => ['sometimes', 'nullable', 'numeric', 'min:0'],
+            'valor_frete' => ['sometimes', 'nullable', 'numeric', 'min:0'],
+            'forma_pagamento' => ['sometimes', 'nullable', 'string', 'max:100'],
+            'nf' => ['sometimes', 'nullable', 'string', 'max:100'],
             'status' => ['sometimes', 'string', 'in:disponivel,indisponivel,baixado'],
         ]);
+
+        // Recalcula custo de aquisição se valor_total ou valor_frete foram alterados
+        if (isset($validated['valor_total']) || isset($validated['valor_frete'])) {
+            $valorTotal = $validated['valor_total'] ?? $lote->valor_total ?? 0;
+            $valorFrete = $validated['valor_frete'] ?? $lote->valor_frete ?? 0;
+            $validated['custo_aquisicao'] = (float) $valorTotal + (float) $valorFrete;
+        }
 
         $atualizar = new Atualizar($lote, $validated);
         $atualizar->handle();

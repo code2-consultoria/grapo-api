@@ -30,7 +30,7 @@ class Update extends Controller
             'nome' => ['sometimes', 'string', 'max:255'],
             'descricao' => ['sometimes', 'nullable', 'string', 'max:1000'],
             'unidade_medida' => ['sometimes', 'string', 'max:50'],
-            'valor_diaria_sugerido' => ['sometimes', 'nullable', 'numeric', 'min:0'],
+            'valor_mensal_sugerido' => ['sometimes', 'nullable', 'numeric', 'min:0'],
         ]);
 
         $atualizar = new Atualizar($tipoAtivo, $validated);

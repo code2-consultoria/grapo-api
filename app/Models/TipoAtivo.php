@@ -18,13 +18,17 @@ class TipoAtivo extends Model
         'nome',
         'descricao',
         'unidade_medida',
+        'valor_mensal_sugerido',
+    ];
+
+    protected $appends = [
         'valor_diaria_sugerido',
     ];
 
     protected function casts(): array
     {
         return [
-            'valor_diaria_sugerido' => 'decimal:2',
+            'valor_mensal_sugerido' => 'decimal:2',
         ];
     }
 
@@ -43,6 +47,25 @@ class TipoAtivo extends Model
     public function contratoItens(): HasMany
     {
         return $this->hasMany(ContratoItem::class);
+    }
+
+    // Accessors
+
+    /**
+     * Calcula o valor da diaria sugerida a partir do valor mensal.
+     * Formula: (valor_mensal * 1.10) / 30
+     * Majoracao de 10% para diarias.
+     */
+    public function getValorDiariaSugeridoAttribute(): float
+    {
+        if (! $this->valor_mensal_sugerido) {
+            return 0;
+        }
+
+        // TODO: Majoracao configuravel por locador (backlog)
+        $majoracao = 1.10;
+
+        return round(($this->valor_mensal_sugerido * $majoracao) / 30, 2);
     }
 
     // Helpers

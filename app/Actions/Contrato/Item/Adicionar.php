@@ -20,7 +20,8 @@ class Adicionar implements Command
         private Contrato $contrato,
         private TipoAtivo $tipoAtivo,
         private int $quantidade,
-        private float $valorUnitarioDiaria
+        private float $valorUnitario,
+        private string $periodoAluguel = 'diaria'
     ) {}
 
     /**
@@ -35,14 +36,18 @@ class Adicionar implements Command
             throw new ContratoAtivoImutavelException($this->contrato->codigo);
         }
 
-        // Calcula valor total do item
+        // Calcula valor total do item baseado no periodo
         $diasLocacao = $this->contrato->calcularDiasLocacao();
-        $valorTotalItem = $this->quantidade * $this->valorUnitarioDiaria * $diasLocacao;
+        $multiplicador = $this->periodoAluguel === 'mensal'
+            ? (int) ceil($diasLocacao / 30)
+            : $diasLocacao;
+        $valorTotalItem = $this->quantidade * $this->valorUnitario * $multiplicador;
 
         // Cria o item
         $this->item = new ContratoItem([
             'quantidade' => $this->quantidade,
-            'valor_unitario_diaria' => $this->valorUnitarioDiaria,
+            'valor_unitario' => $this->valorUnitario,
+            'periodo_aluguel' => $this->periodoAluguel,
             'valor_total_item' => $valorTotalItem,
         ]);
 
