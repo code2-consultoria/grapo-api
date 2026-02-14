@@ -11,6 +11,9 @@ use Illuminate\Support\Facades\Route;
 // Autenticação (rotas públicas)
 Route::prefix('auth')->group(function () {
     Route::post('/login', \App\Http\Controllers\Auth\Api\Login::class);
+    Route::post('/register', \App\Http\Controllers\Auth\Api\Register::class);
+    Route::post('/forgot-password', \App\Http\Controllers\Auth\Api\ForgotPassword::class);
+    Route::post('/reset-password', \App\Http\Controllers\Auth\Api\ResetPassword::class);
 });
 
 // Autenticação (rotas protegidas)

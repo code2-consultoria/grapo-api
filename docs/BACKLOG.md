@@ -16,6 +16,7 @@ Este documento lista funcionalidades implementadas, em andamento e planejadas pa
 | 01 | Landing Page | Concluída |
 | 02 | Contratos | Concluída |
 | 03 | Dashboard | Concluída |
+| 04 | Autenticação | Concluída |
 
 ---
 
@@ -58,6 +59,18 @@ Este documento lista funcionalidades implementadas, em andamento e planejadas pa
 - [x] Sistema de alertas (vencimento, estoque baixo, esgotados)
 - [x] Frontend responsivo com cards e graficos
 - [x] 11 testes automatizados passando
+
+### Sprint 04 - Autenticação Completa
+- **Status**: Concluída
+- **Arquivo**: `docs/sprints/sprint-04.md`
+- **Descrição**: Sistema completo de autenticação com registro e recuperação de senha
+
+**Entregáveis:**
+- [x] Registro de usuários via API (cria user + locador + vínculo)
+- [x] Recuperação de senha (forgot + reset)
+- [x] Frontend para recuperação de senha
+- [x] Auto-login após registro
+- [x] 23 testes automatizados passando
 
 ## BACKLOG (Funcionalidades Futuras)
 
@@ -112,16 +125,16 @@ Este documento lista funcionalidades implementadas, em andamento e planejadas pa
 ---
 
 ### Autenticacao e Usuarios
-- **Status**: Backlog
+- **Status**: Concluido (Sprint 04)
 - **Prioridade**: Alta
 - **Descrição**: Sistema de login, registro e gestao de usuarios
 
-**Escopo planejado:**
-- Login/Logout
-- Registro de novos locadores
+**Implementado:**
+- Login/Logout via API Sanctum
+- Registro de novos locadores (cria user + locador + vinculo)
 - Vinculo de users com locadores (vinculo_times)
-- Papeis: admin (Grapo), operador (locador)
-- Recuperacao de senha
+- Papeis: admin (Grapo), cliente (locador)
+- Recuperacao de senha (forgot + reset)
 
 ---
 
@@ -160,5 +173,5 @@ Este documento lista funcionalidades implementadas, em andamento e planejadas pa
 
 ---
 
-**Ultima revisao:** 2025-02-13 - Sprint 03 concluida
-**Proxima revisao:** Definicao da Sprint 04
+**Ultima revisao:** 2025-02-13 - Sprint 04 concluida
+**Proxima revisao:** Definicao da Sprint 05

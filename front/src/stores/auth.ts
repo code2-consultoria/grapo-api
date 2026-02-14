@@ -63,6 +63,14 @@ export const useAuthStore = defineStore('auth', () => {
     removeToken()
   }
 
+  function setAuthData(authToken: string, authUser: User, authLocador: Pessoa | null): void {
+    token.value = authToken
+    user.value = authUser
+    locador.value = authLocador
+    setToken(authToken)
+    isInitialized.value = true
+  }
+
   // Inicializar estado se houver token
   async function initialize(): Promise<void> {
     if (isInitialized.value) return
@@ -93,5 +101,6 @@ export const useAuthStore = defineStore('auth', () => {
     fetchMe,
     clearAuth,
     initialize,
+    setAuthData,
   }
 })

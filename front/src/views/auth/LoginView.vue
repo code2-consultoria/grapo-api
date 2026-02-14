@@ -63,6 +63,15 @@ const form = useForm<LoginForm>({
         />
       </FormField>
 
+      <div class="text-right">
+        <RouterLink
+          :to="{ name: 'forgot-password' }"
+          class="text-sm text-primary hover:underline"
+        >
+          Esqueci minha senha
+        </RouterLink>
+      </div>
+
       <FormActions class="pt-2">
         <Button type="submit" class="w-full" :disabled="form.isSubmitting.value">
           <Spinner v-if="form.isSubmitting.value" size="sm" />

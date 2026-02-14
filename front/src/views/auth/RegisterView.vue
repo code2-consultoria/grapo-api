@@ -5,11 +5,13 @@ import { Input } from "@/components/ui/input"
 import { FormField, FormActions } from "@/components/forms"
 import { Spinner } from "@/components/ui/spinner"
 import { useForm, useNotification } from "@/composables"
+import { useAuthStore } from "@/stores/auth"
 import api from "@/lib/api"
 import type { RegisterForm } from "@/types"
 
 const router = useRouter()
-const { success } = useNotification()
+const authStore = useAuthStore()
+const { showSuccess } = useNotification()
 
 const form = useForm<RegisterForm>({
   initialValues: {
@@ -48,9 +50,17 @@ const form = useForm<RegisterForm>({
     return errors
   },
   async onSubmit(values) {
-    await api.post("/auth/register", values)
-    success("Conta criada!", "Faca login para continuar")
-    router.push({ name: "login" })
+    const response = await api.post<{ data: { token: string; user: { id: number; name: string; email: string }; locador: { id: string; nome: string; email: string } } }>("/auth/register", values)
+
+    // Salva token e dados do usuario
+    authStore.setAuthData(
+      response.data.token,
+      response.data.user,
+      response.data.locador
+    )
+
+    showSuccess("Conta criada com sucesso!")
+    router.push({ name: "dashboard" })
   },
 })
 </script>
