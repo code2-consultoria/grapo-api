@@ -20,6 +20,9 @@ Route::prefix('auth')->middleware(['auth:sanctum'])->group(function () {
 });
 
 Route::middleware(['auth:sanctum'])->group(function () {
+    // Dashboard
+    Route::get('/dashboard', \App\Http\Controllers\Dashboard\Index::class);
+
     // Pessoas (entidade base)
     Route::prefix('pessoas')->group(function () {
         Route::get('/', \App\Http\Controllers\Pessoa\Index::class);

@@ -71,3 +71,57 @@ export interface SuccessResponse {
 export interface DeleteResponse {
   message: string
 }
+
+// Dashboard
+export interface DashboardResponse {
+  data: DashboardData
+}
+
+export interface DashboardData {
+  financeiro: DashboardFinanceiro
+  operacional: DashboardOperacional
+  alertas: DashboardAlerta[]
+}
+
+export interface DashboardFinanceiro {
+  receita_total: number
+  contratos_ativos: number
+  receita_media_mensal: number
+  contratos_a_vencer: ContratoAVencer[]
+}
+
+export interface ContratoAVencer {
+  id: string
+  codigo: string
+  data_termino: string
+  dias_restantes: number
+  valor_total: number
+  locatario: string | null
+}
+
+export interface DashboardOperacional {
+  estoque_total: number
+  estoque_disponivel: number
+  estoque_alocado: number
+  taxa_ocupacao: number
+  lotes_por_status: {
+    disponivel: number
+    indisponivel: number
+    esgotado: number
+  }
+  top_ativos: TopAtivo[]
+}
+
+export interface TopAtivo {
+  id: string
+  nome: string
+  quantidade: number
+}
+
+export interface DashboardAlerta {
+  tipo: 'warning' | 'info' | 'destructive'
+  titulo: string
+  mensagem: string
+  icone: string
+  detalhes?: unknown
+}

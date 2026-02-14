@@ -15,6 +15,7 @@ Este documento lista funcionalidades implementadas, em andamento e planejadas pa
 |--------|----------------|--------|
 | 01 | Landing Page | Concluída |
 | 02 | Contratos | Concluída |
+| 03 | Dashboard | Concluída |
 
 ---
 
@@ -44,6 +45,19 @@ Este documento lista funcionalidades implementadas, em andamento e planejadas pa
 - [x] Alocacao automatica de lotes (FIFO)
 - [x] Frontend completo (Index, Create, Edit, Show para todas entidades)
 - [x] 73 testes automatizados passando
+
+### Sprint 03 - Dashboard
+- **Status**: Concluída
+- **Arquivo**: `docs/sprints/sprint-03.md`
+- **Descrição**: Dashboard com metricas financeiras e operacionais
+
+**Entregáveis:**
+- [x] Endpoint GET /api/dashboard
+- [x] Metricas financeiras (receita total, contratos ativos)
+- [x] Metricas operacionais (estoque, taxa ocupacao, top ativos)
+- [x] Sistema de alertas (vencimento, estoque baixo, esgotados)
+- [x] Frontend responsivo com cards e graficos
+- [x] 11 testes automatizados passando
 
 ## BACKLOG (Funcionalidades Futuras)
 
@@ -112,14 +126,16 @@ Este documento lista funcionalidades implementadas, em andamento e planejadas pa
 ---
 
 ### Dashboard
-- **Status**: Backlog
+- **Status**: Concluido (Sprint 03)
 - **Prioridade**: Alta
 - **Descrição**: Painel de controle para locadores
 
-**Escopo planejado:**
+**Implementado:**
 - Visao geral de contratos ativos
-- Alertas de vencimento
-- Metricas de ativos/lotes
+- Alertas de vencimento e estoque
+- Metricas financeiras e operacionais
+- Top 5 ativos mais alugados
+- Taxa de ocupacao do estoque
 
 ---
 
@@ -144,5 +160,5 @@ Este documento lista funcionalidades implementadas, em andamento e planejadas pa
 
 ---
 
-**Ultima revisao:** 2025-02-13 - Sprint 02 concluida
-**Proxima revisao:** Definicao da Sprint 03 (Dashboard)
+**Ultima revisao:** 2025-02-13 - Sprint 03 concluida
+**Proxima revisao:** Definicao da Sprint 04
