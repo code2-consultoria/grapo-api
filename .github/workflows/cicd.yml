@@ -1,0 +1,312 @@
+name: CI/CD
+
+on:
+  push:
+    branches: [main, staging]
+  pull_request:
+    branches: [main, staging]
+
+env:
+  REGISTRY: ghcr.io
+  DOCKER_IMAGE: ghcr.io/${{ github.repository }}
+  PHP_VERSION: "8.4"
+
+jobs:
+  test:
+    name: Test
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:latest
+        env:
+          POSTGRES_USER: grapo
+          POSTGRES_PASSWORD: grapo
+          POSTGRES_DB: grapo_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+      redis:
+        image: redis:alpine
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ env.PHP_VERSION }}
+          extensions: pdo_pgsql, pgsql, redis, mbstring, xml, ctype, json, bcmath, pcntl, intl, gd
+          coverage: xdebug
+
+      - name: Get Composer cache directory
+        id: composer-cache
+        run: echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
+
+      - name: Cache Composer dependencies
+        uses: actions/cache@v4
+        with:
+          path: ${{ steps.composer-cache.outputs.dir }}
+          key: ${{ runner.os }}-composer-${{ hashFiles('composer.lock') }}
+          restore-keys: ${{ runner.os }}-composer-
+
+      - name: Install dependencies
+        run: composer install --prefer-dist --no-progress
+
+      - name: Create .env file
+        run: |
+          cp .env.example .env
+          sed -i 's/DB_CONNECTION=.*/DB_CONNECTION=pgsql/' .env
+          sed -i 's/DB_HOST=.*/DB_HOST=127.0.0.1/' .env
+          sed -i 's/DB_DATABASE=.*/DB_DATABASE=grapo_test/' .env
+          sed -i 's/DB_USERNAME=.*/DB_USERNAME=grapo/' .env
+          sed -i 's/DB_PASSWORD=.*/DB_PASSWORD=grapo/' .env
+          sed -i 's/REDIS_HOST=.*/REDIS_HOST=127.0.0.1/' .env
+          php artisan key:generate
+
+      - name: Run migrations
+        run: php artisan migrate --force
+
+      - name: Run tests with Pest
+        run: ./vendor/bin/pest --coverage --coverage-clover=coverage.xml
+
+      - name: Upload coverage
+        uses: codecov/codecov-action@v4
+        with:
+          files: coverage.xml
+          fail_ci_if_error: false
+        continue-on-error: true
+
+  lint:
+    name: Lint (Pint)
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ env.PHP_VERSION }}
+
+      - name: Install dependencies
+        run: composer install --prefer-dist --no-progress
+
+      - name: Run Laravel Pint
+        run: ./vendor/bin/pint --test
+
+  analyse:
+    name: Static Analysis (Larastan)
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ env.PHP_VERSION }}
+          extensions: pdo_pgsql, pgsql, redis, mbstring, xml, ctype, json, bcmath, pcntl, intl
+
+      - name: Install dependencies
+        run: composer install --prefer-dist --no-progress
+
+      - name: Create .env file
+        run: cp .env.example .env && php artisan key:generate
+
+      - name: Run Larastan
+        run: ./vendor/bin/phpstan analyse --memory-limit=2G
+
+  build-pr:
+    name: Build (PR Validation)
+    runs-on: ubuntu-latest
+    needs: [test, lint, analyse]
+    if: github.event_name == 'pull_request'
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build Docker image (no push)
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: docker/Dockerfile-fpm
+          push: false
+          tags: ${{ env.DOCKER_IMAGE }}:pr-${{ github.event.number }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+  build-and-push:
+    name: Build and Push Docker Images
+    runs-on: ubuntu-latest
+    needs: [test]
+    if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/staging')
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set environment tag
+        id: env-tag
+        run: |
+          if [ "${{ github.ref }}" == "refs/heads/main" ]; then
+            echo "tag=production" >> $GITHUB_OUTPUT
+          else
+            echo "tag=staging" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Build and push API image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: docker/Dockerfile-fpm
+          push: true
+          tags: |
+            ${{ env.DOCKER_IMAGE }}:${{ steps.env-tag.outputs.tag }}
+            ${{ env.DOCKER_IMAGE }}:build-${{ github.run_number }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+  deploy-staging:
+    name: Deploy to Staging
+    runs-on: ubuntu-latest
+    needs: build-and-push
+    if: github.event_name == 'push' && github.ref == 'refs/heads/staging'
+    environment: staging
+
+    steps:
+      - name: Set short SHA
+        id: vars
+        run: echo "short_sha=${GITHUB_SHA::7}" >> $GITHUB_OUTPUT
+
+      - name: Deploy via SSH
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USERNAME }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          port: ${{ secrets.SSH_PORT }}
+          script: |
+            mkdir -p /var/docker/services/grapo/api
+            cd /var/docker/services/grapo/api
+
+            cat > .env << 'ENVEOF'
+            APP_KEY=${{ secrets.APP_KEY }}
+            APP_URL=${{ vars.APP_URL }}
+            FRONTEND_URL=${{ vars.FRONTEND_URL }}
+            STRIPE_KEY=${{ secrets.STRIPE_KEY }}
+            STRIPE_SECRET=${{ secrets.STRIPE_SECRET }}
+            STRIPE_WEBHOOK_SECRET=${{ secrets.STRIPE_WEBHOOK_SECRET }}
+            MAILERSEND_API_KEY=${{ secrets.MAILERSEND_API_KEY }}
+            DB_PASSWORD=${{ secrets.DB_PASSWORD }}
+            BUILD_ID=${{ steps.vars.outputs.short_sha }}
+            DOCKER_IMAGE=ghcr.io/${{ github.repository }}
+            ENVEOF
+
+            curl -sSL -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+              -H "Accept: application/vnd.github.v3.raw" \
+              -o docker-compose.github.yml \
+              "https://api.github.com/repos/${{ github.repository }}/contents/docker-compose.github.yml?ref=staging"
+
+            curl -sSL -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+              -H "Accept: application/vnd.github.v3.raw" \
+              -o .env.static \
+              "https://api.github.com/repos/${{ github.repository }}/contents/.env.static?ref=staging"
+
+            curl -sSL -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+              -H "Accept: application/vnd.github.v3.raw" \
+              -o deploy.sh \
+              "https://api.github.com/repos/${{ github.repository }}/contents/deploy.sh?ref=staging"
+
+            chmod +x deploy.sh
+            echo "${{ secrets.GITHUB_TOKEN }}" > .github_token
+            ./deploy.sh staging
+
+  deploy-production:
+    name: Deploy to Production
+    runs-on: ubuntu-latest
+    needs: build-and-push
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    environment: producao
+
+    steps:
+      - name: Set short SHA
+        id: vars
+        run: echo "short_sha=${GITHUB_SHA::7}" >> $GITHUB_OUTPUT
+
+      - name: Deploy via SSH
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USERNAME }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          port: ${{ secrets.SSH_PORT }}
+          script: |
+            mkdir -p /var/docker/services/grapo/api
+            cd /var/docker/services/grapo/api
+
+            cat > .env << 'ENVEOF'
+            APP_KEY=${{ secrets.APP_KEY }}
+            APP_URL=${{ vars.APP_URL }}
+            FRONTEND_URL=${{ vars.FRONTEND_URL }}
+            STRIPE_KEY=${{ secrets.STRIPE_KEY }}
+            STRIPE_SECRET=${{ secrets.STRIPE_SECRET }}
+            STRIPE_WEBHOOK_SECRET=${{ secrets.STRIPE_WEBHOOK_SECRET }}
+            MAILERSEND_API_KEY=${{ secrets.MAILERSEND_API_KEY }}
+            DB_PASSWORD=${{ secrets.DB_PASSWORD }}
+            BUILD_ID=${{ steps.vars.outputs.short_sha }}
+            DOCKER_IMAGE=ghcr.io/${{ github.repository }}
+            ENVEOF
+
+            curl -sSL -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+              -H "Accept: application/vnd.github.v3.raw" \
+              -o docker-compose.github.yml \
+              "https://api.github.com/repos/${{ github.repository }}/contents/docker-compose.github.yml?ref=main"
+
+            curl -sSL -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+              -H "Accept: application/vnd.github.v3.raw" \
+              -o .env.static \
+              "https://api.github.com/repos/${{ github.repository }}/contents/.env.static?ref=main"
+
+            curl -sSL -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+              -H "Accept: application/vnd.github.v3.raw" \
+              -o deploy.sh \
+              "https://api.github.com/repos/${{ github.repository }}/contents/deploy.sh?ref=main"
+
+            chmod +x deploy.sh
+            echo "${{ secrets.GITHUB_TOKEN }}" > .github_token
+            ./deploy.sh production
