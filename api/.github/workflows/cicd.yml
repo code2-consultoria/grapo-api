@@ -69,12 +69,15 @@ jobs:
       - name: Create .env file
         run: |
           cp .env.example .env
-          sed -i 's/DB_CONNECTION=.*/DB_CONNECTION=pgsql/' .env
-          sed -i 's/DB_HOST=.*/DB_HOST=127.0.0.1/' .env
-          sed -i 's/DB_DATABASE=.*/DB_DATABASE=grapo_test/' .env
-          sed -i 's/DB_USERNAME=.*/DB_USERNAME=grapo/' .env
-          sed -i 's/DB_PASSWORD=.*/DB_PASSWORD=grapo/' .env
-          sed -i 's/REDIS_HOST=.*/REDIS_HOST=127.0.0.1/' .env
+          cat >> .env << 'EOF'
+          DB_CONNECTION=pgsql
+          DB_HOST=127.0.0.1
+          DB_PORT=5432
+          DB_DATABASE=grapo_test
+          DB_USERNAME=grapo
+          DB_PASSWORD=grapo
+          REDIS_HOST=127.0.0.1
+          EOF
           php artisan key:generate
 
       - name: Run migrations
@@ -129,7 +132,17 @@ jobs:
         run: composer install --prefer-dist --no-progress
 
       - name: Create .env file
-        run: cp .env.example .env && php artisan key:generate
+        run: |
+          cp .env.example .env
+          cat >> .env << 'EOF'
+          DB_CONNECTION=pgsql
+          DB_HOST=127.0.0.1
+          DB_PORT=5432
+          DB_DATABASE=grapo_test
+          DB_USERNAME=grapo
+          DB_PASSWORD=grapo
+          EOF
+          php artisan key:generate
 
       - name: Run Larastan
         run: ./vendor/bin/phpstan analyse --memory-limit=2G
