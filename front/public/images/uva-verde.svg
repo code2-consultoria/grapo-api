@@ -1,0 +1,47 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 120" width="100" height="120">
+  <defs>
+    <!-- Gradiente do corpo principal (verde amarelado) -->
+    <linearGradient id="bodyGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#C4D472"/>
+      <stop offset="40%" style="stop-color:#A8BC58"/>
+      <stop offset="100%" style="stop-color:#8BA648"/>
+    </linearGradient>
+
+    <!-- Gradiente para sombra -->
+    <linearGradient id="shadowGradient" x1="100%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#A8BC58;stop-opacity:0"/>
+      <stop offset="100%" style="stop-color:#5D7035;stop-opacity:0.5"/>
+    </linearGradient>
+
+    <!-- Gradiente do talo -->
+    <linearGradient id="stemGradient" x1="0%" y1="100%" x2="0%" y2="0%">
+      <stop offset="0%" style="stop-color:#7AA038"/>
+      <stop offset="100%" style="stop-color:#8CB848"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Talo (stem) -->
+  <ellipse cx="52" cy="10" rx="3.5" ry="10" fill="url(#stemGradient)" transform="rotate(10, 52, 10)"/>
+  <ellipse cx="50" cy="5" rx="2.5" ry="6" fill="#8CB848" transform="rotate(-5, 50, 5)"/>
+
+  <!-- Contorno externo -->
+  <ellipse cx="50" cy="65" rx="36" ry="47" fill="none" stroke="#5D7035" stroke-width="2.5"/>
+
+  <!-- Corpo principal da uva -->
+  <ellipse cx="50" cy="65" rx="34" ry="45" fill="url(#bodyGradient)"/>
+
+  <!-- Sombra interna (lado direito/inferior) -->
+  <ellipse cx="58" cy="72" rx="28" ry="38" fill="url(#shadowGradient)"/>
+
+  <!-- Linha de divisao sutil -->
+  <ellipse cx="50" cy="68" rx="30" ry="40" fill="none" stroke="#8BA648" stroke-width="0.8" opacity="0.4"/>
+
+  <!-- Reflexo principal (highlight grande) -->
+  <ellipse cx="36" cy="48" rx="10" ry="14" fill="white" opacity="0.7" transform="rotate(-15, 36, 48)"/>
+
+  <!-- Reflexo secundario (highlight pequeno) -->
+  <ellipse cx="32" cy="68" rx="5" ry="7" fill="white" opacity="0.5" transform="rotate(-10, 32, 68)"/>
+
+  <!-- Ponto pequeno (detalhe) -->
+  <ellipse cx="62" cy="85" rx="2" ry="2.5" fill="#7A9A40" opacity="0.6"/>
+</svg>

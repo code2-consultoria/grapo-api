@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted, computed } from "vue"
+import { ref, onMounted, computed, watch } from "vue"
 import { Card, CardHeader, CardTitle, CardContent, CardDescription } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
@@ -50,7 +50,7 @@ const resumo = ref<PagamentoResumo | null>(null)
 const isLoading = ref(true)
 const error = ref<string | null>(null)
 
-// Dialog adicionar pagamento
+// Dialog adicionar fatura
 const showAddDialog = ref(false)
 const addForm = ref({
   valor: 0,
@@ -59,8 +59,18 @@ const addForm = ref({
   data_pagamento: "",
   origem: "manual" as OrigemPagamento,
   observacoes: "",
+  ja_paga: false,
 })
 const isAdding = ref(false)
+
+// Quando ja_paga muda, limpa ou preenche data_pagamento
+watch(() => addForm.value.ja_paga, (jaPaga) => {
+  if (jaPaga && !addForm.value.data_pagamento) {
+    addForm.value.data_pagamento = new Date().toISOString().split("T")[0]
+  } else if (!jaPaga) {
+    addForm.value.data_pagamento = ""
+  }
+})
 
 // Dialog marcar como pago
 const showPayDialog = ref(false)
@@ -103,13 +113,13 @@ async function loadData() {
     resumo.value = resumoRes.data
   } catch (err: unknown) {
     const apiError = err as { message?: string }
-    error.value = apiError.message || "Erro ao carregar pagamentos"
+    error.value = apiError.message || "Erro ao carregar faturas"
   } finally {
     isLoading.value = false
   }
 }
 
-// Adiciona pagamento
+// Adiciona fatura
 function openAddDialog() {
   addForm.value = {
     valor: 0,
@@ -118,6 +128,7 @@ function openAddDialog() {
     data_pagamento: "",
     origem: "manual",
     observacoes: "",
+    ja_paga: false,
   }
   showAddDialog.value = true
 }
@@ -137,13 +148,13 @@ async function submitAdd() {
 
     await api.post(`/contratos/${props.contratoId}/pagamentos`, payload)
 
-    success("Sucesso!", "Pagamento registrado")
+    success("Sucesso!", "Fatura registrada")
     showAddDialog.value = false
     emit("updated")
     await loadData()
   } catch (err: unknown) {
     const apiError = err as { message?: string }
-    showError("Erro", apiError.message || "Erro ao registrar pagamento")
+    showError("Erro", apiError.message || "Erro ao registrar fatura")
   } finally {
     isAdding.value = false
   }
@@ -170,13 +181,13 @@ async function submitPay() {
       payForm.value,
     )
 
-    success("Sucesso!", "Pagamento confirmado")
+    success("Sucesso!", "Pagamento da fatura confirmado")
     showPayDialog.value = false
     emit("updated")
     await loadData()
   } catch (err: unknown) {
     const apiError = err as { message?: string }
-    showError("Erro", apiError.message || "Erro ao confirmar pagamento")
+    showError("Erro", apiError.message || "Erro ao confirmar pagamento da fatura")
   } finally {
     isPaying.value = false
   }
@@ -198,13 +209,13 @@ async function submitCancel() {
       `/contratos/${props.contratoId}/pagamentos/${cancelingPagamento.value.id}`,
     )
 
-    success("Sucesso!", "Pagamento cancelado")
+    success("Sucesso!", "Fatura cancelada")
     showCancelDialog.value = false
     emit("updated")
     await loadData()
   } catch (err: unknown) {
     const apiError = err as { message?: string }
-    showError("Erro", apiError.message || "Erro ao cancelar pagamento")
+    showError("Erro", apiError.message || "Erro ao cancelar fatura")
   } finally {
     isCanceling.value = false
   }
@@ -266,12 +277,12 @@ defineExpose({ loadData })
     <CardHeader class="flex flex-row items-center justify-between">
       <div class="flex items-center gap-3">
         <div class="size-10 rounded-full flex items-center justify-center bg-primary/10">
-          <Banknote class="size-5 text-primary" />
+          <Receipt class="size-5 text-primary" />
         </div>
         <div>
-          <CardTitle class="text-base">Pagamentos</CardTitle>
+          <CardTitle class="text-base">Faturas</CardTitle>
           <CardDescription>
-            Historico e gestao de pagamentos do contrato
+            Historico e gestao de faturas do contrato
           </CardDescription>
         </div>
       </div>
@@ -281,7 +292,7 @@ defineExpose({ loadData })
         @click="openAddDialog"
       >
         <Plus class="size-4 mr-2" />
-        Registrar Pagamento
+        Registrar Fatura
       </Button>
     </CardHeader>
     <CardContent>
@@ -349,7 +360,7 @@ defineExpose({ loadData })
               <TableEmpty
                 v-if="pagamentos.length === 0"
                 :colspan="podeGerenciarPagamentos ? 8 : 7"
-                message="Nenhum pagamento registrado"
+                message="Nenhuma fatura registrada"
               />
               <TableRow v-else v-for="pagamento in pagamentos" :key="pagamento.id">
                 <TableCell>{{ formatDate(pagamento.data_vencimento) }}</TableCell>
@@ -403,11 +414,11 @@ defineExpose({ loadData })
     </CardContent>
   </Card>
 
-  <!-- Dialog Adicionar Pagamento -->
+  <!-- Dialog Adicionar Fatura -->
   <Dialog
     v-model:open="showAddDialog"
-    title="Registrar Pagamento"
-    description="Registre um pagamento recebido ou pendente"
+    title="Registrar Fatura"
+    description="Registre uma fatura do contrato"
   >
     <form @submit.prevent="submitAdd" class="space-y-4">
       <FormGroup>
@@ -436,6 +447,13 @@ defineExpose({ loadData })
         </FormField>
       </FormGroup>
 
+      <FormField label="Data de Vencimento" required>
+        <Input
+          type="date"
+          v-model="addForm.data_vencimento"
+        />
+      </FormField>
+
       <FormGroup>
         <FormField label="Origem" required>
           <div class="flex gap-2">
@@ -457,31 +475,41 @@ defineExpose({ loadData })
             </Button>
           </div>
         </FormField>
+
+        <FormField label="Fatura ja paga?">
+          <div class="flex gap-2">
+            <Button
+              type="button"
+              size="sm"
+              :variant="!addForm.ja_paga ? 'default' : 'outline'"
+              @click="addForm.ja_paga = false"
+            >
+              Nao
+            </Button>
+            <Button
+              type="button"
+              size="sm"
+              :variant="addForm.ja_paga ? 'default' : 'outline'"
+              @click="addForm.ja_paga = true"
+            >
+              Sim
+            </Button>
+          </div>
+        </FormField>
       </FormGroup>
 
-      <FormGroup>
-        <FormField label="Data de Vencimento" required>
-          <Input
-            type="date"
-            v-model="addForm.data_vencimento"
-          />
-        </FormField>
-
-        <FormField label="Data de Pagamento">
-          <Input
-            type="date"
-            v-model="addForm.data_pagamento"
-          />
-          <p class="text-xs text-muted-foreground mt-1">
-            Deixe em branco para registrar como pendente
-          </p>
-        </FormField>
-      </FormGroup>
+      <!-- Data de Pagamento (aparece quando ja_paga = true) -->
+      <FormField v-if="addForm.ja_paga" label="Data de Pagamento" required>
+        <Input
+          type="date"
+          v-model="addForm.data_pagamento"
+        />
+      </FormField>
 
       <FormField label="Observacoes">
         <Textarea
           v-model="addForm.observacoes"
-          placeholder="Informacoes adicionais sobre o pagamento..."
+          placeholder="Informacoes adicionais sobre a fatura..."
           rows="2"
         />
       </FormField>
@@ -505,7 +533,7 @@ defineExpose({ loadData })
   <!-- Dialog Marcar como Pago -->
   <Dialog
     v-model:open="showPayDialog"
-    title="Confirmar Pagamento"
+    title="Confirmar Pagamento da Fatura"
     :description="`Confirmar recebimento de ${payingPagamento ? formatCurrency(payingPagamento.valor) : ''}`"
   >
     <form @submit.prevent="submitPay" class="space-y-4">
@@ -543,8 +571,8 @@ defineExpose({ loadData })
   <!-- Dialog Cancelar -->
   <Dialog
     v-model:open="showCancelDialog"
-    title="Cancelar Pagamento"
-    :description="`Deseja cancelar o pagamento de ${cancelingPagamento ? formatCurrency(cancelingPagamento.valor) : ''}?`"
+    title="Cancelar Fatura"
+    :description="`Deseja cancelar a fatura de ${cancelingPagamento ? formatCurrency(cancelingPagamento.valor) : ''}?`"
   >
     <div class="space-y-4">
       <div class="bg-amber-50 border border-amber-200 rounded-lg p-4">
@@ -553,7 +581,7 @@ defineExpose({ loadData })
           <div class="text-sm">
             <p class="font-medium text-amber-800">Atencao</p>
             <p class="text-amber-700">
-              Esta acao nao pode ser desfeita. O pagamento sera marcado como cancelado.
+              Esta acao nao pode ser desfeita. A fatura sera marcada como cancelada.
             </p>
           </div>
         </div>
@@ -572,7 +600,7 @@ defineExpose({ loadData })
           @click="submitCancel"
         >
           <Spinner v-if="isCanceling" size="sm" class="mr-2" />
-          Cancelar Pagamento
+          Cancelar Fatura
         </Button>
       </DialogFooter>
     </div>

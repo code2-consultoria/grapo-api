@@ -17,7 +17,7 @@ import { Pagination } from "@/components/ui/pagination"
 import { Spinner } from "@/components/ui/spinner"
 import { Dialog, DialogFooter } from "@/components/ui/dialog"
 import { usePaginatedApi, useNotification } from "@/composables"
-import { Plus, Pencil, Trash2, Search } from "lucide-vue-next"
+import { Plus, Pencil, Trash2, Search, TrendingUp } from "lucide-vue-next"
 import api from "@/lib/api"
 import type { Lote, LoteStatus } from "@/types"
 
@@ -145,7 +145,7 @@ function getStatusLabel(status: LoteStatus): string {
             <TableHead>Quantidade</TableHead>
             <TableHead>Custo Unit.</TableHead>
             <TableHead>Status</TableHead>
-            <TableHead class="w-[100px]">Acoes</TableHead>
+            <TableHead class="w-[120px]">Acoes</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -175,7 +175,12 @@ function getStatusLabel(status: LoteStatus): string {
             </TableCell>
             <TableCell>
               <div class="flex items-center gap-1">
-                <Button variant="ghost" size="icon-sm" as-child>
+                <Button variant="ghost" size="icon-sm" as-child title="Rentabilidade">
+                  <RouterLink :to="{ name: 'lotes.rentabilidade', params: { id: item.id } }">
+                    <TrendingUp class="size-4" />
+                  </RouterLink>
+                </Button>
+                <Button variant="ghost" size="icon-sm" as-child title="Editar">
                   <RouterLink :to="{ name: 'lotes.edit', params: { id: item.id } }">
                     <Pencil class="size-4" />
                   </RouterLink>
@@ -184,6 +189,7 @@ function getStatusLabel(status: LoteStatus): string {
                   variant="ghost"
                   size="icon-sm"
                   class="text-destructive hover:text-destructive"
+                  title="Excluir"
                   @click="openDeleteDialog(item)"
                 >
                   <Trash2 class="size-4" />

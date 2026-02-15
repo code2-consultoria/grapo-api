@@ -20,6 +20,9 @@ import {
   Check,
   Percent,
   Save,
+  Moon,
+  Sun,
+  Palette,
 } from "lucide-vue-next"
 import api from "@/lib/api"
 
@@ -85,6 +88,31 @@ const majoracaoOriginal = ref("")
 const isLoadingMajoracao = ref(true)
 const isSavingMajoracao = ref(false)
 const majoracaoError = ref<string | null>(null)
+
+// Dark Mode
+const isDarkMode = ref(true)
+
+function initDarkMode() {
+  const saved = localStorage.getItem("grapo-theme")
+  if (saved === "light") {
+    isDarkMode.value = false
+    document.documentElement.classList.add("light")
+  } else {
+    isDarkMode.value = true
+    document.documentElement.classList.remove("light")
+  }
+}
+
+function toggleDarkMode() {
+  isDarkMode.value = !isDarkMode.value
+  if (isDarkMode.value) {
+    document.documentElement.classList.remove("light")
+    localStorage.setItem("grapo-theme", "dark")
+  } else {
+    document.documentElement.classList.add("light")
+    localStorage.setItem("grapo-theme", "light")
+  }
+}
 
 // Status geral da conta
 const accountStatus = computed(() => {
@@ -373,6 +401,9 @@ function resetMajoracao() {
 }
 
 onMounted(async () => {
+  // Inicializa dark mode
+  initDarkMode()
+
   const urlParams = new URLSearchParams(window.location.search)
   if (urlParams.has("refresh")) {
     window.history.replaceState({}, "", window.location.pathname)
@@ -415,6 +446,48 @@ onMounted(async () => {
               {{ user?.email }}
             </div>
           </div>
+        </div>
+      </CardContent>
+    </Card>
+
+    <!-- Aparencia -->
+    <Card>
+      <CardHeader>
+        <CardTitle class="flex items-center gap-2">
+          <Palette class="size-5" />
+          Aparencia
+        </CardTitle>
+        <CardDescription>
+          Personalize a aparencia do sistema
+        </CardDescription>
+      </CardHeader>
+      <CardContent>
+        <div class="flex items-center justify-between">
+          <div class="flex items-center gap-3">
+            <div class="size-10 rounded-full bg-primary/10 flex items-center justify-center">
+              <Moon v-if="isDarkMode" class="size-5 text-primary" />
+              <Sun v-else class="size-5 text-primary" />
+            </div>
+            <div>
+              <p class="font-medium">Modo Escuro</p>
+              <p class="text-sm text-muted-foreground">
+                {{ isDarkMode ? "Ativado" : "Desativado" }}
+              </p>
+            </div>
+          </div>
+          <button
+            type="button"
+            role="switch"
+            :aria-checked="isDarkMode"
+            class="relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 focus:ring-offset-background"
+            :class="isDarkMode ? 'bg-primary' : 'bg-input'"
+            @click="toggleDarkMode"
+          >
+            <span
+              class="pointer-events-none inline-block size-5 transform rounded-full bg-background shadow ring-0 transition duration-200 ease-in-out"
+              :class="isDarkMode ? 'translate-x-5' : 'translate-x-0'"
+            />
+          </button>
         </div>
       </CardContent>
     </Card>

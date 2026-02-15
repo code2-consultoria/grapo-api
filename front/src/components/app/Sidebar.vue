@@ -8,7 +8,7 @@ import {
   Package,
   Boxes,
   FileText,
-  Wallet,
+  BarChart3,
 } from "lucide-vue-next"
 
 const route = useRoute()
@@ -19,6 +19,7 @@ const menuItems = [
   { name: "Locatarios", icon: Users, to: { name: "locatarios.index" } },
   { name: "Meus Ativos", icon: Package, to: { name: "tipos-ativos.index" } },
   { name: "Lotes", icon: Boxes, to: { name: "lotes.index" } },
+  { name: "Relatorios", icon: BarChart3, to: { name: "relatorios.financeiro" } },
 ]
 
 function isActive(itemName: string): boolean {
@@ -40,9 +41,11 @@ function isActive(itemName: string): boolean {
   >
     <!-- Logo -->
     <div class="flex h-16 items-center gap-2 border-b px-6">
-      <div class="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
-        <Wallet class="w-5 h-5 text-primary-foreground" />
-      </div>
+      <img
+        src="/icons/icon-96x96.png"
+        alt="Grapo"
+        class="w-8 h-10"
+      />
       <span class="text-xl font-bold uppercase">Grapo</span>
     </div>
 

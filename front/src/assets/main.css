@@ -23,73 +23,82 @@
   --color-accent: var(--accent);
   --color-accent-foreground: var(--accent-foreground);
   --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
   --color-border: var(--border);
   --color-input: var(--input);
   --color-ring: var(--ring);
 }
 
 /* Paleta Grapo - Modo Escuro (padrão) */
+/* Baseado em paleta-tema-verde-dark-mode-tailwind-4.png */
+/* Primary: Dark Forest Green | Accent: Army/Olive Green */
 :root {
   --radius: 0.5rem;
 
-  /* Cores principais do Grapo */
-  --background: #12110D;
-  --foreground: #F8F7F6;
+  /* Cores principais do Grapo - Tema Verde Dark Mode */
+  --background: #121212;
+  --foreground: #E8EDE0;
 
-  --card: #1E1B12;
-  --card-foreground: #F8F7F6;
+  --card: #1C2D0F;
+  --card-foreground: #E8EDE0;
 
-  --popover: #1E1B12;
-  --popover-foreground: #F8F7F6;
+  --popover: #1C2D0F;
+  --popover-foreground: #E8EDE0;
 
-  /* Dourado como cor primária */
-  --primary: #D4AF37;
-  --primary-foreground: #12110D;
+  /* Dark Forest Green como cor primária */
+  --primary: #606F40;
+  --primary-foreground: #E8EDE0;
 
-  --secondary: #2A2620;
-  --secondary-foreground: #F8F7F6;
+  --secondary: #1C2D0F;
+  --secondary-foreground: #E8EDE0;
 
-  --muted: #2A2620;
-  --muted-foreground: #9CA3AF;
+  --muted: #3A4530;
+  --muted-foreground: #8A9A70;
 
-  --accent: #D4AF37;
-  --accent-foreground: #12110D;
+  /* Army/Olive como cor de destaque */
+  --accent: #7A8844;
+  --accent-foreground: #121212;
 
   --destructive: #EF4444;
+  --destructive-foreground: #FFFFFF;
 
-  --border: rgba(212, 175, 55, 0.1);
-  --input: rgba(212, 175, 55, 0.15);
-  --ring: #D4AF37;
+  --border: rgba(96, 111, 64, 0.3);
+  --input: rgba(96, 111, 64, 0.35);
+  --ring: #606F40;
 }
 
 /* Paleta Grapo - Modo Claro */
+/* Baseado em paleta-tema-verde-tailwind-4.png */
 .light {
-  --background: #F8F7F6;
-  --foreground: #12110D;
+  --background: #F5F6F0;
+  --foreground: #12150D;
 
   --card: #FFFFFF;
-  --card-foreground: #12110D;
+  --card-foreground: #12150D;
 
   --popover: #FFFFFF;
-  --popover-foreground: #12110D;
+  --popover-foreground: #12150D;
 
-  --primary: #D4AF37;
-  --primary-foreground: #12110D;
+  /* Olive/Sage como cor primária */
+  --primary: #7A8844;
+  --primary-foreground: #F5F6F0;
 
-  --secondary: #F3F4F6;
-  --secondary-foreground: #12110D;
+  --secondary: #E8EDD8;
+  --secondary-foreground: #12150D;
 
-  --muted: #F3F4F6;
-  --muted-foreground: #6B7280;
+  --muted: #E8EDD8;
+  --muted-foreground: #4A5020;
 
-  --accent: #D4AF37;
-  --accent-foreground: #12110D;
+  /* Lime como cor de destaque */
+  --accent: #A0E640;
+  --accent-foreground: #12150D;
 
   --destructive: #EF4444;
+  --destructive-foreground: #FFFFFF;
 
-  --border: rgba(18, 17, 13, 0.1);
-  --input: rgba(18, 17, 13, 0.1);
-  --ring: #D4AF37;
+  --border: rgba(74, 80, 32, 0.15);
+  --input: rgba(74, 80, 32, 0.1);
+  --ring: #7A8844;
 }
 
 @layer base {

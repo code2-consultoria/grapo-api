@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { RouterLink } from 'vue-router'
 import { Button } from '@/components/ui/button'
-import { Wallet } from 'lucide-vue-next'
 </script>
 
 <template>
@@ -10,9 +9,11 @@ import { Wallet } from 'lucide-vue-next'
       <div class="flex justify-between items-center h-16">
         <!-- Logo -->
         <div class="flex items-center gap-2">
-          <div class="w-8 h-8 bg-primary rounded flex items-center justify-center">
-            <Wallet class="w-5 h-5 text-background" />
-          </div>
+          <img
+            src="/icons/icon-96x96.png"
+            alt="Grapo"
+            class="w-8 h-10"
+          />
           <span class="text-xl font-bold tracking-tight text-foreground uppercase">Grapo</span>
         </div>
 

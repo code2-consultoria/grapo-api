@@ -105,6 +105,12 @@ const router = createRouter({
               component: () => import("@/views/app/lotes/EditView.vue"),
               meta: { title: "Editar Lote" },
             },
+            {
+              path: ":id/rentabilidade",
+              name: "lotes.rentabilidade",
+              component: () => import("@/views/app/lotes/RentabilidadeView.vue"),
+              meta: { title: "Rentabilidade do Lote" },
+            },
           ],
         },
 
@@ -160,6 +166,19 @@ const router = createRouter({
               name: "contratos.show",
               component: () => import("@/views/app/contratos/ShowView.vue"),
               meta: { title: "Detalhes do Contrato" },
+            },
+          ],
+        },
+
+        // Relatorios
+        {
+          path: "relatorios",
+          children: [
+            {
+              path: "financeiro",
+              name: "relatorios.financeiro",
+              component: () => import("@/views/app/relatorios/FinanceiroView.vue"),
+              meta: { title: "Relatorio Financeiro" },
             },
           ],
         },

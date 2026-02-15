@@ -2,7 +2,7 @@
 
 Este documento lista funcionalidades implementadas, em andamento e planejadas para implementação futura.
 
-**Última atualização:** 2025-02-14
+**Última atualização:** 2026-02-14
 **Mantido por:** Equipe de Desenvolvimento
 
 ---
@@ -18,6 +18,7 @@ Este documento lista funcionalidades implementadas, em andamento e planejadas pa
 | 03 | Dashboard | Concluída |
 | 04 | Autenticação | Concluída |
 | 05 | Assinaturas e Pagamentos | Concluída |
+| 06 | Aditivos de Contrato | Concluída |
 
 ---
 
@@ -88,25 +89,45 @@ Este documento lista funcionalidades implementadas, em andamento e planejadas pa
 - [x] Majoração da diária configurável por locador
 - [x] 64+ testes automatizados passando
 
+### Sprint 06 - Aditivos de Contrato
+- **Status**: Concluída
+- **Arquivo**: `docs/sprints/sprint-06.md`
+- **Descrição**: Sistema de aditivos para contratos ativos
+
+**Entregáveis:**
+- [x] Tipos de aditivos: prorrogação, acréscimo, redução, alteração de valor
+- [x] Fluxo completo: rascunho → ativo → cancelado
+- [x] Alocação FIFO para acréscimos
+- [x] Liberação LIFO para reduções
+- [x] Integração Stripe (cobrança proporcional, atualização de subscription)
+- [x] Cancelamento com reversão completa
+- [x] Frontend com componente ContratoAditivos
+- [x] 38 testes automatizados passando
+
 ## BACKLOG (Funcionalidades Futuras)
 
-### Aditivos de Contrato
-- **Status**: Despriorizado
-- **Prioridade**: Baixa
-- **Dependencia**: Sprint 02 (Contratos)
-- **Descrição**: Alteracoes formais em contratos apos ativacao
+### Importacao de Historico de Pagamentos/Faturas
+- **Status**: Backlog
+- **Prioridade**: Media
+- **Dependencia**: Sprint 05 (Pagamentos)
+- **Descrição**: Permitir importacao em massa de historico de pagamentos/faturas de contratos existentes
 
-**Tipos de aditivos:**
-- Prorrogacao: Extensao do prazo
-- Acrescimo: Adicao de itens
-- Reducao: Remocao de itens
-- Alteracao de valor: Mudanca no valor sem alterar itens
+**Requisitos:**
+- Upload de arquivo CSV/Excel com dados de pagamentos
+- Mapeamento de colunas (contrato, valor, data vencimento, data pagamento, etc.)
+- Validacao de dados antes da importacao
+- Preview dos dados a serem importados
+- Importacao em lote com tratamento de erros
+- Relatorio de importacao (sucesso/erros)
 
-**Documentacao:**
-- Proposta: `docs/analises/features/contrato-aditivos-proposta.md`
-
-**Decisoes pendentes:**
-- Criterio para liberacao de itens na reducao (LIFO, proporcional ou manual)
+**Campos para importacao:**
+- Codigo do contrato (obrigatorio)
+- Valor (obrigatorio)
+- Desconto comercial (opcional)
+- Data de vencimento (obrigatorio)
+- Data de pagamento (opcional - se preenchido, marca como pago)
+- Origem (manual, pix)
+- Observacoes (opcional)
 
 ---
 
@@ -195,5 +216,5 @@ Este documento lista funcionalidades implementadas, em andamento e planejadas pa
 
 ---
 
-**Ultima revisao:** 2025-02-14 - Sprint 05 concluida
-**Proxima revisao:** Definicao da Sprint 06
+**Ultima revisao:** 2026-02-14 - Sprint 06 concluida
+**Proxima revisao:** Definicao da Sprint 07

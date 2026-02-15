@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { RouterView } from "vue-router"
-import { Wallet } from "lucide-vue-next"
 import { ToastContainer } from "@/components/ui/toast"
 </script>
 
@@ -12,9 +11,11 @@ import { ToastContainer } from "@/components/ui/toast"
     <div class="hidden lg:flex lg:w-1/2 bg-card items-center justify-center p-12">
       <div class="text-center">
         <div class="flex items-center justify-center gap-3 mb-8">
-          <div class="w-12 h-12 bg-primary rounded-lg flex items-center justify-center">
-            <Wallet class="w-7 h-7 text-primary-foreground" />
-          </div>
+          <img
+            src="/icons/icon-96x96.png"
+            alt="Grapo"
+            class="w-12 h-16"
+          />
           <span class="text-3xl font-bold text-foreground uppercase">Grapo</span>
         </div>
         <h1 class="text-2xl font-semibold text-foreground mb-4">
