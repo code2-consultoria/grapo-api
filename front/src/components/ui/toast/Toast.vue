@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import type { HTMLAttributes } from "vue"
-import type { ToastVariants } from "."
 import { cn } from "@/lib/utils"
 import { toastVariants } from "."
 import { X, CheckCircle2, AlertCircle, AlertTriangle, Info } from "lucide-vue-next"

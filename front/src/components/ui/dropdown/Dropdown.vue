@@ -12,7 +12,7 @@ interface Props {
   side?: "top" | "right" | "bottom" | "left"
 }
 
-const props = withDefaults(defineProps<Props>(), {
+withDefaults(defineProps<Props>(), {
   align: "end",
   side: "bottom",
 })

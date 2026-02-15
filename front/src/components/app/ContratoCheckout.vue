@@ -32,11 +32,11 @@ interface ConnectStatus {
 
 const props = defineProps<Props>()
 
-const emit = defineEmits<{
+const _emit = defineEmits<{
   (e: "updated"): void
 }>()
 
-const { success, error: showError } = useNotification()
+const { success: _success, error: showError } = useNotification()
 
 // Estado
 const connectStatus = ref<ConnectStatus | null>(null)

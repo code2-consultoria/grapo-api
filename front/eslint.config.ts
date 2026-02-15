@@ -23,4 +23,24 @@ export default defineConfigWithVueTs(
   ...pluginOxlint.buildFromOxlintConfigFile('.oxlintrc.json'),
 
   skipFormatting,
+
+  // Regras customizadas
+  {
+    name: 'app/custom-rules',
+    rules: {
+      // Permitir nomes de componentes de uma palavra (comum em libs UI)
+      'vue/multi-word-component-names': 'off',
+      // Permitir any em catch blocks
+      '@typescript-eslint/no-explicit-any': 'warn',
+      // Permitir vars nao usadas com prefixo _ ou em catch
+      '@typescript-eslint/no-unused-vars': [
+        'error',
+        {
+          argsIgnorePattern: '^_',
+          varsIgnorePattern: '^_',
+          caughtErrorsIgnorePattern: '^_|^err|^error',
+        },
+      ],
+    },
+  },
 )

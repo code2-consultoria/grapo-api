@@ -18,7 +18,7 @@ interface Props {
   description?: string
 }
 
-const props = defineProps<Props>()
+defineProps<Props>()
 
 const emit = defineEmits<{
   (e: "update:open", value: boolean): void

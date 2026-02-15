@@ -18,7 +18,6 @@ import {
   TableEmpty,
 } from "@/components/ui/table"
 import {
-  Banknote,
   Plus,
   CheckCircle,
   XCircle,

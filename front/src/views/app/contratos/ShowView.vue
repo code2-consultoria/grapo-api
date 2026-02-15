@@ -34,7 +34,6 @@ import {
   XCircle,
   CheckCircle,
   CreditCard,
-  Banknote,
 } from "lucide-vue-next"
 import api from "@/lib/api"
 import type { Contrato, ContratoItem, ContratoStatus, TipoCobranca, TipoAtivo, TipoAtivoForm, ContratoForm, Pessoa, ApiResponse, PaginatedResponse } from "@/types"
@@ -140,7 +139,7 @@ function openTipoAtivoDialog() {
 
 // Computed
 const isRascunho = computed(() => contrato.value?.status === "rascunho")
-const isAguardandoPagamento = computed(() => contrato.value?.status === "aguardando_pagamento")
+const _isAguardandoPagamento = computed(() => contrato.value?.status === "aguardando_pagamento")
 const isAtivo = computed(() => contrato.value?.status === "ativo")
 
 const diasLocacao = computed(() => {

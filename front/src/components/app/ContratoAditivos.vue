@@ -16,7 +16,6 @@ import {
   TableRow,
   TableHead,
   TableCell,
-  TableEmpty,
 } from "@/components/ui/table"
 import { Spinner } from "@/components/ui/spinner"
 import { useNotification } from "@/composables"
@@ -33,7 +32,7 @@ import {
   Clock,
 } from "lucide-vue-next"
 import api from "@/lib/api"
-import type { ContratoAditivo, ContratoAditivoItem, TipoAditivo, StatusAditivo, TipoAtivo, ApiResponse, PaginatedResponse } from "@/types"
+import type { ContratoAditivo, TipoAditivo, StatusAditivo, TipoAtivo, ApiResponse, PaginatedResponse } from "@/types"
 
 const props = defineProps<{
   contratoId: string
@@ -338,7 +337,7 @@ const showNovaDataTermino = computed(
 const showValorAjuste = computed(
   () => aditivoForm.value.tipo === "alteracao_valor"
 )
-const showItens = computed(
+const _showItens = computed(
   () =>
     aditivoForm.value.tipo === "acrescimo" ||
     aditivoForm.value.tipo === "reducao"
