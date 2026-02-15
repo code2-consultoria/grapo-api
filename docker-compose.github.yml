@@ -1,6 +1,6 @@
 services:
   api:
-    image: ${DOCKER_IMAGE:-ghcr.io/jukebar/api}:${DOCKER_TAG:-production}
+    image: ${DOCKER_IMAGE:-${DOCKER_IMAGE:-ghcr.io/code2-consultoria/grapo-api}}:${DOCKER_TAG:-production}
     hostname: api-${BUILD_ID:-latest}
     restart: unless-stopped
     volumes:
@@ -18,9 +18,9 @@ services:
       - NGINX_HTTP_PORT=8080
     networks:
       proxy:
-      jukebar-net:
+      grapo-net:
         aliases:
-          - api.jukebar.app
+          - api.grapo.app
     healthcheck:
       test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://127.0.1.1:8080/api/health"]
       interval: 30s
@@ -29,26 +29,26 @@ services:
       start_period: 30s
     labels:
       - "traefik.enable=true"
-      - "traefik.http.middlewares.jukebar-api-hsts.headers.stsincludesubdomains=true"
-      - "traefik.http.middlewares.jukebar-api-hsts.headers.stspreload=true"
-      - "traefik.http.middlewares.jukebar-api-hsts.headers.stsseconds=31536000"
-      - "traefik.http.middlewares.jukebar-api-hsts.headers.isdevelopment=false"
-      - "traefik.http.routers.jukebar-api.tls=true"
-      - "traefik.http.routers.jukebar-api.entrypoints=websecure"
-      - "traefik.http.routers.jukebar-api.rule=Host(`api.jukebar.app`)"
-      - "traefik.http.middlewares.api-headers.headers.customrequestheaders.X-Forwarded-Proto=https"
-      - "traefik.http.middlewares.api-headers.headers.customrequestheaders.X-Forwarded-Ssl=on"
-      - "traefik.http.middlewares.api-headers.headers.customrequestheaders.X-Forwarded-Port=443"
-      - "traefik.http.routers.jukebar-api.middlewares=jukebar-api-hsts,api-headers"
-      - "traefik.http.routers.jukebar-api.tls.certresolver=letsencrypt"
-      - "traefik.http.services.jukebar-api.loadbalancer.server.port=8080"
-      - "traefik.http.services.jukebar-api.loadbalancer.server.scheme=http"
+      - "traefik.http.middlewares.grapo-api-hsts.headers.stsincludesubdomains=true"
+      - "traefik.http.middlewares.grapo-api-hsts.headers.stspreload=true"
+      - "traefik.http.middlewares.grapo-api-hsts.headers.stsseconds=31536000"
+      - "traefik.http.middlewares.grapo-api-hsts.headers.isdevelopment=false"
+      - "traefik.http.routers.grapo-api.tls=true"
+      - "traefik.http.routers.grapo-api.entrypoints=websecure"
+      - "traefik.http.routers.grapo-api.rule=Host(`api.grapo.app`)"
+      - "traefik.http.middlewares.grapo-api-headers.headers.customrequestheaders.X-Forwarded-Proto=https"
+      - "traefik.http.middlewares.grapo-api-headers.headers.customrequestheaders.X-Forwarded-Ssl=on"
+      - "traefik.http.middlewares.grapo-api-headers.headers.customrequestheaders.X-Forwarded-Port=443"
+      - "traefik.http.routers.grapo-api.middlewares=grapo-api-hsts,grapo-api-headers"
+      - "traefik.http.routers.grapo-api.tls.certresolver=letsencrypt"
+      - "traefik.http.services.grapo-api.loadbalancer.server.port=8080"
+      - "traefik.http.services.grapo-api.loadbalancer.server.scheme=http"
     depends_on:
       - db
       - redis
 
   queue:
-    image: ${DOCKER_IMAGE:-ghcr.io/jukebar/api}:${DOCKER_TAG:-production}
+    image: ${DOCKER_IMAGE:-${DOCKER_IMAGE:-ghcr.io/code2-consultoria/grapo-api}}:${DOCKER_TAG:-production}
     hostname: queue-${BUILD_ID:-latest}
     command: ["sh", "-c", "php artisan config:clear && php artisan queue:work --sleep=3 --tries=3"]
     restart: unless-stopped
@@ -62,60 +62,11 @@ services:
       - PHP_MEMORY_LIMIT=256M
       - LANG=pt_BR.UTF-8
       - TZ=America/Fortaleza
-      # Reverb interno (HTTP na rede Docker)
-      - REVERB_HOST=ws
-      - REVERB_PORT=6001
-      - REVERB_SCHEME=http
-      # Callback URL interno para webhook do WhatsApp
-      - WHATSAPP_CALLBACK_URL=http://api:8080/api/webhook/whatsapp/profile
     networks:
-      - jukebar-net
+      - grapo-net
     depends_on:
       - api
       - db
-      - redis
-
-  ws:
-    image: ${DOCKER_IMAGE:-ghcr.io/jukebar/api}-ws:${DOCKER_TAG:-production}
-    hostname: ws-${BUILD_ID:-latest}
-    restart: unless-stopped
-    env_file:
-      - ./.env.static
-      - ./.env
-    environment:
-      - FRAMEWORK=laravel
-      - XDEBUG_ENABLED=false
-      - OPCACHE_MODE=normal
-      - PHP_MEMORY_LIMIT=256M
-      - LANG=pt_BR.UTF-8
-      - TZ=America/Fortaleza
-    networks:
-      proxy:
-      jukebar-net:
-        aliases:
-          - ws.jukebar.app
-    healthcheck:
-      # test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://127.0.0.1:8080/health"]
-      test: ["CMD", "sh", "-c", "nc -z 127.0.0.1 6001 || exit 1"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 10s
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.middlewares.jukebar-ws-hsts.headers.stsincludesubdomains=true"
-      - "traefik.http.middlewares.jukebar-ws-hsts.headers.stspreload=true"
-      - "traefik.http.middlewares.jukebar-ws-hsts.headers.stsseconds=31536000"
-      - "traefik.http.middlewares.jukebar-ws-hsts.headers.isdevelopment=false"
-      - "traefik.http.routers.jukebar-ws.tls=true"
-      - "traefik.http.routers.jukebar-ws.entrypoints=websecure"
-      - "traefik.http.routers.jukebar-ws.rule=Host(`ws.jukebar.app`)"
-      - "traefik.http.routers.jukebar-ws.middlewares=jukebar-ws-hsts"
-      - "traefik.http.routers.jukebar-ws.tls.certresolver=letsencrypt"
-      - "traefik.http.services.jukebar-ws.loadbalancer.server.port=6001"
-      - "traefik.http.services.jukebar-ws.loadbalancer.server.scheme=http"
-    depends_on:
-      - api
       - redis
 
   db:
@@ -125,14 +76,13 @@ services:
     volumes:
       - pgdata:/var/lib/postgresql/data
     environment:
-      - POSTGRES_USER=jukebar
+      - POSTGRES_USER=grapo
       - POSTGRES_PASSWORD=${DB_PASSWORD}
-      - POSTGRES_DB=jukebar
-      - TZ=America/Fortaleza
+      - POSTGRES_DB=grapo
     networks:
-      - jukebar-net
+      - grapo-net
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U jukebar"]
+      test: ["CMD-SHELL", "pg_isready -U grapo"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -145,7 +95,7 @@ services:
     volumes:
       - redis_data:/data
     networks:
-      - jukebar-net
+      - grapo-net
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]
       interval: 10s
@@ -161,7 +111,7 @@ volumes:
     driver: local
 
 networks:
-  jukebar-net:
+  grapo-net:
     external: true
   proxy:
     external: true
