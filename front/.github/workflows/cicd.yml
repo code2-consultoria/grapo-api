@@ -181,7 +181,7 @@ jobs:
             # Healthcheck - aguarda container iniciar e verifica saúde
             echo "Aguardando container iniciar..."
             sleep 5
-            CONTAINER_IP=$(docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' grapo_front)
+            CONTAINER_IP=$(docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' grapo-front)
             echo "Container IP: $CONTAINER_IP"
             curl -f http://$CONTAINER_IP:80/ || (echo "Healthcheck falhou!" && exit 1)
             echo "Container healthy!"
