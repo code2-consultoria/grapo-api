@@ -1,11 +1,14 @@
 # Dockerfile para desenvolvimento do frontend
-FROM node:20-alpine
+FROM node:22-alpine
+
+# Instala pnpm
+RUN corepack enable && corepack prepare pnpm@latest --activate
 
 WORKDIR /app
 
 # Instalar dependencias
-COPY package*.json ./
-RUN npm install
+COPY package.json pnpm-lock.yaml ./
+RUN pnpm install
 
 # Copiar codigo fonte
 COPY . .
@@ -14,4 +17,4 @@ COPY . .
 EXPOSE 5173
 
 # Comando para desenvolvimento com hot reload
-CMD ["npm", "run", "dev", "--", "--host", "0.0.0.0"]
+CMD ["pnpm", "dev", "--host", "0.0.0.0"]
