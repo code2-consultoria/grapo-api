@@ -81,6 +81,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::get('/{id}', \App\Http\Controllers\Lote\Show::class);
         Route::put('/{id}', \App\Http\Controllers\Lote\Update::class);
         Route::delete('/{id}', \App\Http\Controllers\Lote\Destroy::class);
+        Route::get('/{id}/rentabilidade', \App\Http\Controllers\Lote\Rentabilidade\Show::class);
     });
 
     // Contratos (requer assinatura ativa)
@@ -155,5 +156,10 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::get('/', \App\Http\Controllers\Contrato\Pagamento\Show::class);
         Route::post('/', \App\Http\Controllers\Contrato\Pagamento\Store::class);
         Route::delete('/', \App\Http\Controllers\Contrato\Pagamento\Destroy::class);
+    });
+
+    // Relatorios
+    Route::prefix('relatorios')->group(function () {
+        Route::get('/financeiro', \App\Http\Controllers\Relatorio\Financeiro\Show::class);
     });
 });

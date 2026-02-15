@@ -2,10 +2,14 @@
 
 namespace Database\Seeders;
 
+use App\Enums\StatusPagamento;
+use App\Enums\OrigemPagamento;
+use App\Models\AlocacaoLote;
 use App\Models\Contrato;
 use App\Models\ContratoItem;
 use App\Models\Documento;
 use App\Models\Lote;
+use App\Models\Pagamento;
 use App\Models\Pessoa;
 use App\Models\TipoAtivo;
 use App\Models\User;
@@ -172,13 +176,101 @@ class DatabaseSeeder extends Seeder
             'locatario_id' => $david->id,
         ]);
 
-        ContratoItem::create([
+        $item3 = ContratoItem::create([
             'contrato_id' => $contrato3->id,
             'tipo_ativo_id' => $tatame->id,
             'quantidade' => 18,
             'valor_unitario' => 10.02, // 2163.68 / 12 meses / 18 unidades
             'periodo_aluguel' => 'mensal',
             'valor_total_item' => 2163.68,
+        ]);
+
+        // Buscar os itens de contrato criados
+        $item1 = ContratoItem::where('contrato_id', $contrato1->id)->first();
+        $item2 = ContratoItem::where('contrato_id', $contrato2->id)->first();
+
+        // Criar alocacoes de lote
+        AlocacaoLote::create([
+            'contrato_item_id' => $item1->id,
+            'lote_id' => $lote1->id,
+            'quantidade_alocada' => 12,
+        ]);
+
+        AlocacaoLote::create([
+            'contrato_item_id' => $item2->id,
+            'lote_id' => $lote2->id,
+            'quantidade_alocada' => 12,
+        ]);
+
+        AlocacaoLote::create([
+            'contrato_item_id' => $item3->id,
+            'lote_id' => $lote3->id,
+            'quantidade_alocada' => 18,
+        ]);
+
+        // Criar pagamentos conforme dados fornecidos
+        // Lote 1 - Contrato 1: 3 pagamentos de R$ 150
+        Pagamento::create([
+            'contrato_id' => $contrato1->id,
+            'valor' => 150.00,
+            'desconto_comercial' => 0,
+            'data_vencimento' => '2025-10-14',
+            'data_pagamento' => '2025-10-14',
+            'status' => StatusPagamento::Pago,
+            'origem' => OrigemPagamento::Manual,
+        ]);
+
+        Pagamento::create([
+            'contrato_id' => $contrato1->id,
+            'valor' => 150.00,
+            'desconto_comercial' => 0,
+            'data_vencimento' => '2025-11-12',
+            'data_pagamento' => '2025-11-12',
+            'status' => StatusPagamento::Pago,
+            'origem' => OrigemPagamento::Manual,
+        ]);
+
+        Pagamento::create([
+            'contrato_id' => $contrato1->id,
+            'valor' => 150.00,
+            'desconto_comercial' => 0,
+            'data_vencimento' => '2025-12-12',
+            'data_pagamento' => '2025-12-12',
+            'status' => StatusPagamento::Pago,
+            'origem' => OrigemPagamento::Manual,
+        ]);
+
+        // Lote 2 - Contrato 2: 2 pagamentos de R$ 150
+        Pagamento::create([
+            'contrato_id' => $contrato2->id,
+            'valor' => 150.00,
+            'desconto_comercial' => 0,
+            'data_vencimento' => '2025-11-12',
+            'data_pagamento' => '2025-11-12',
+            'status' => StatusPagamento::Pago,
+            'origem' => OrigemPagamento::Manual,
+        ]);
+
+        Pagamento::create([
+            'contrato_id' => $contrato2->id,
+            'valor' => 150.00,
+            'desconto_comercial' => 0,
+            'data_vencimento' => '2025-12-12',
+            'data_pagamento' => '2025-12-12',
+            'status' => StatusPagamento::Pago,
+            'origem' => OrigemPagamento::Manual,
+        ]);
+
+        // Lote 3 - Contrato 3: 1 pagamento de R$ 225 com desconto de R$ 150
+        Pagamento::create([
+            'contrato_id' => $contrato3->id,
+            'valor' => 225.00,
+            'desconto_comercial' => 150.00,
+            'data_vencimento' => '2025-12-12',
+            'data_pagamento' => '2025-12-12',
+            'status' => StatusPagamento::Pago,
+            'origem' => OrigemPagamento::Manual,
+            'observacoes' => 'permuta avaliacao + plano de treino',
         ]);
     }
 }
