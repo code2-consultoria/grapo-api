@@ -2,7 +2,7 @@
 
 Este documento lista funcionalidades implementadas, em andamento e planejadas para implementação futura.
 
-**Última atualização:** 2026-02-14
+**Última atualização:** 2026-02-15
 **Mantido por:** Equipe de Desenvolvimento
 
 ---
@@ -19,6 +19,7 @@ Este documento lista funcionalidades implementadas, em andamento e planejadas pa
 | 04 | Autenticação | Concluída |
 | 05 | Assinaturas e Pagamentos | Concluída |
 | 06 | Aditivos de Contrato | Concluída |
+| 07 | Relatórios, PWA e Melhorias UX | Concluída |
 
 ---
 
@@ -104,6 +105,23 @@ Este documento lista funcionalidades implementadas, em andamento e planejadas pa
 - [x] Frontend com componente ContratoAditivos
 - [x] 38 testes automatizados passando
 
+### Sprint 07 - Relatórios, PWA e Melhorias UX
+- **Status**: Concluída
+- **Descrição**: Relatórios financeiros, rentabilidade por lote, PWA e melhorias de interface
+
+**Entregáveis:**
+- [x] Relatório Financeiro (faturamento, recebido, pendente, inadimplência)
+- [x] Relatório de Rentabilidade por Lote (ROI, ocupação, evolução)
+- [x] Accessor tipo_pessoa no Model Pessoa (PF/PJ por documentos)
+- [x] Conversão do frontend para PWA (vite-plugin-pwa)
+- [x] Ícones PWA em múltiplos tamanhos
+- [x] Toggle dark/light mode no perfil do usuário
+- [x] Tema verde com suporte a dark mode
+- [x] Renomeação de "Pagamentos" para "Faturas"
+- [x] Toggle "já paga" ao criar fatura
+- [x] Logo da uva verde no branding
+- [x] 10+ testes automatizados para tipo_pessoa
+
 ## BACKLOG (Funcionalidades Futuras)
 
 ### Importacao de Historico de Pagamentos/Faturas
@@ -148,14 +166,18 @@ Este documento lista funcionalidades implementadas, em andamento e planejadas pa
 ---
 
 ### Accessor tipo_pessoa no Model Pessoa
-- **Status**: Backlog
+- **Status**: Concluido (Sprint 07)
 - **Prioridade**: Media
 - **Dependencia**: Sprint 02 (Contratos)
-- **Descrição**: Criar accessor que descobre se pessoa e PF ou PJ baseado nos documentos
+- **Descrição**: Accessor que descobre se pessoa e PF ou PJ baseado nos documentos
 
-**Regras:**
+**Implementado:**
+- Accessor `tipo_pessoa` no Model Pessoa
+- Helpers `isPessoaJuridica()` e `isPessoaFisica()`
 - **PJ**: Se tem CNPJ, Inscricao Municipal ou Inscricao Estadual
 - **PF**: Se tem CPF, RG, CadUnico, Passaporte ou CNH
+- Prioriza PJ sobre PF quando tem ambos
+- 10 testes automatizados
 
 ---
 
@@ -216,5 +238,5 @@ Este documento lista funcionalidades implementadas, em andamento e planejadas pa
 
 ---
 
-**Ultima revisao:** 2026-02-14 - Sprint 06 concluida
-**Proxima revisao:** Definicao da Sprint 07
+**Ultima revisao:** 2026-02-15 - Sprint 07 concluida
+**Proxima revisao:** Definicao da Sprint 08
