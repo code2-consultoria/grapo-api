@@ -9,6 +9,7 @@ use App\Models\VinculoTime;
 
 beforeEach(function () {
     $this->locador = Pessoa::factory()->locador()->create([
+        'data_limite_acesso' => now()->addMonth(), // Assinatura ativa
         'stripe_connect_config' => [
             'account_id' => 'acct_test123',
             'onboarding_complete' => true,

@@ -11,7 +11,9 @@ use Carbon\Carbon;
 use Laravel\Sanctum\Sanctum;
 
 beforeEach(function () {
-    $this->locador = Pessoa::factory()->locador()->create();
+    $this->locador = Pessoa::factory()->locador()->create([
+        'data_limite_acesso' => now()->addMonth(), // Assinatura ativa
+    ]);
     $this->user = User::factory()->create();
     VinculoTime::factory()->create([
         'user_id' => $this->user->id,

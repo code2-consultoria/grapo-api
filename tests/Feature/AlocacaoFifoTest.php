@@ -11,7 +11,9 @@ use App\Models\Pessoa;
 use App\Models\TipoAtivo;
 
 beforeEach(function () {
-    $this->locador = Pessoa::factory()->locador()->create();
+    $this->locador = Pessoa::factory()->locador()->create([
+        'data_limite_acesso' => now()->addMonth(), // Assinatura ativa
+    ]);
     $this->tipoAtivo = TipoAtivo::factory()->create([
         'locador_id' => $this->locador->id,
         'nome' => 'Placa de EVA',

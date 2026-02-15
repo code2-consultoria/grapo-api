@@ -8,7 +8,9 @@ use App\Models\VinculoTime;
 // Cenário: Multi-tenant isolamento
 test('usuário visualiza apenas contratos do próprio locador', function () {
     // Locador A com 3 contratos
-    $locadorA = Pessoa::factory()->locador()->create();
+    $locadorA = Pessoa::factory()->locador()->create([
+        'data_limite_acesso' => now()->addMonth(), // Assinatura ativa
+    ]);
     $userA = User::factory()->create(['papel' => 'cliente']);
     VinculoTime::factory()->create([
         'user_id' => $userA->id,
@@ -43,7 +45,9 @@ test('usuário visualiza apenas contratos do próprio locador', function () {
 });
 
 test('usuário não pode acessar contrato de outro locador', function () {
-    $locadorA = Pessoa::factory()->locador()->create();
+    $locadorA = Pessoa::factory()->locador()->create([
+        'data_limite_acesso' => now()->addMonth(), // Assinatura ativa
+    ]);
     $userA = User::factory()->create(['papel' => 'cliente']);
     VinculoTime::factory()->create([
         'user_id' => $userA->id,
@@ -64,7 +68,9 @@ test('usuário não pode acessar contrato de outro locador', function () {
 });
 
 test('usuário não pode criar contrato com locatário de outro locador', function () {
-    $locadorA = Pessoa::factory()->locador()->create();
+    $locadorA = Pessoa::factory()->locador()->create([
+        'data_limite_acesso' => now()->addMonth(), // Assinatura ativa
+    ]);
     $userA = User::factory()->create(['papel' => 'cliente']);
     VinculoTime::factory()->create([
         'user_id' => $userA->id,
