@@ -10,7 +10,7 @@ import { Button } from '@/components/ui/button'
         <!-- Logo -->
         <div class="flex items-center gap-2">
           <img
-            src="/images/uva-verde.svg"
+            src="/icons/icon-96x96.png"
             alt="Grapo"
             class="w-8 h-10"
           />

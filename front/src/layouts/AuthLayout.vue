@@ -12,7 +12,7 @@ import { ToastContainer } from "@/components/ui/toast"
       <div class="text-center">
         <div class="flex items-center justify-center gap-3 mb-8">
           <img
-            src="/images/uva-verde.svg"
+            src="/icons/icon-96x96.png"
             alt="Grapo"
             class="w-12 h-16"
           />
