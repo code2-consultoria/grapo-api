@@ -41,7 +41,7 @@ function toggleSidebar(): void {
       <div class="flex-1 flex flex-col min-h-screen">
         <Header @toggle-sidebar="toggleSidebar" />
 
-        <main class="flex-1 p-6">
+        <main class="flex-1 p-4 sm:p-6 overflow-x-hidden">
           <RouterView />
         </main>
       </div>

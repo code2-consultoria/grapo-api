@@ -123,15 +123,15 @@ const ocupacaoPercent = computed(() => {
 </script>
 
 <template>
-  <div class="space-y-6">
+  <div class="space-y-6 overflow-x-hidden">
     <!-- Cabecalho -->
-    <div class="flex items-center justify-between">
+    <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
       <div>
         <h1 class="text-2xl font-bold">Dashboard</h1>
         <p class="text-muted-foreground">Bem-vindo de volta, {{ userName }}!</p>
       </div>
       <RouterLink :to="{ name: 'contratos.create' }">
-        <Button class="gap-2">
+        <Button class="gap-2 w-full sm:w-auto">
           <Plus class="size-4" />
           Novo Contrato
         </Button>
@@ -145,7 +145,7 @@ const ocupacaoPercent = computed(() => {
       :class="acessoExpirado ? 'border-destructive bg-destructive/5' : 'border-amber-500 bg-amber-50'"
     >
       <CardContent class="p-4">
-        <div class="flex items-start gap-4">
+        <div class="flex flex-col gap-4 sm:flex-row sm:items-start">
           <div
             class="size-12 rounded-full flex items-center justify-center shrink-0"
             :class="acessoExpirado ? 'bg-destructive/10' : 'bg-amber-100'"
@@ -170,8 +170,8 @@ const ocupacaoPercent = computed(() => {
               </template>
             </p>
           </div>
-          <RouterLink :to="{ name: 'perfil' }">
-            <Button :variant="acessoExpirado ? 'default' : 'outline'" class="shrink-0 gap-2">
+          <RouterLink :to="{ name: 'perfil' }" class="w-full sm:w-auto">
+            <Button :variant="acessoExpirado ? 'default' : 'outline'" class="shrink-0 gap-2 w-full sm:w-auto">
               <Crown class="size-4" />
               Renovar Assinatura
             </Button>
