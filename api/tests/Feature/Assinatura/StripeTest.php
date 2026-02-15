@@ -6,7 +6,9 @@ use App\Models\User;
 use App\Models\VinculoTime;
 
 beforeEach(function () {
-    $this->locador = Pessoa::factory()->locador()->create();
+    $this->locador = Pessoa::factory()->locador()->create([
+        'data_limite_acesso' => now()->addMonth(), // Assinatura ativa
+    ]);
     $this->user = User::factory()->create(['papel' => 'cliente']);
     VinculoTime::factory()->create([
         'user_id' => $this->user->id,
