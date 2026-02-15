@@ -12,7 +12,7 @@ interface ForgotPasswordForm {
   email: string
 }
 
-const { showSuccess, showError } = useNotification()
+const { success, error: showError } = useNotification()
 const emailSent = ref(false)
 
 const form = useForm<ForgotPasswordForm>({
@@ -34,7 +34,7 @@ const form = useForm<ForgotPasswordForm>({
     try {
       await api.post("/auth/forgot-password", values)
       emailSent.value = true
-      showSuccess("Email enviado com sucesso!")
+      success("Email enviado com sucesso!")
     } catch (error: unknown) {
       const apiError = error as { message?: string }
       showError(apiError.message || "Erro ao enviar email")

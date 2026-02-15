@@ -1,0 +1,120 @@
+@import 'tailwindcss';
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+}
+
+/* Paleta Grapo - Modo Escuro (padrão) */
+/* Baseado em paleta-tema-tailwind-4.png */
+/* Primary: Burgundy/Wine | Accent: Green */
+:root {
+  --radius: 0.5rem;
+
+  /* Cores principais do Grapo - Tema Uva */
+  --background: #1A1215;
+  --foreground: #F5F0F1;
+
+  --card: #261A1E;
+  --card-foreground: #F5F0F1;
+
+  --popover: #261A1E;
+  --popover-foreground: #F5F0F1;
+
+  /* Burgundy/Vinho como cor primária */
+  --primary: #7A334F;
+  --primary-foreground: #F5F0F1;
+
+  --secondary: #3A2530;
+  --secondary-foreground: #F5F0F1;
+
+  --muted: #3A2530;
+  --muted-foreground: #B0667C;
+
+  /* Verde como cor de destaque */
+  --accent: #5DB858;
+  --accent-foreground: #1A1215;
+
+  --destructive: #EF4444;
+
+  --border: rgba(122, 51, 79, 0.2);
+  --input: rgba(122, 51, 79, 0.25);
+  --ring: #7A334F;
+}
+
+/* Paleta Grapo - Modo Claro */
+/* Baseado em paleta-tema-tailwind-4.png */
+.light {
+  --background: #F5F0F1;
+  --foreground: #1A1215;
+
+  --card: #FFFFFF;
+  --card-foreground: #1A1215;
+
+  --popover: #FFFFFF;
+  --popover-foreground: #1A1215;
+
+  /* Burgundy/Vinho como cor primária */
+  --primary: #7A334F;
+  --primary-foreground: #F5F0F1;
+
+  --secondary: #F0E5E8;
+  --secondary-foreground: #1A1215;
+
+  --muted: #F0E5E8;
+  --muted-foreground: #4A2020;
+
+  /* Verde como cor de destaque */
+  --accent: #5DB858;
+  --accent-foreground: #1A1215;
+
+  --destructive: #EF4444;
+
+  --border: rgba(74, 32, 32, 0.15);
+  --input: rgba(74, 32, 32, 0.1);
+  --ring: #7A334F;
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+    font-family: 'Inter', sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+}
+
+#app {
+  min-height: 100dvh;
+}

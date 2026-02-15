@@ -79,7 +79,7 @@ function formatCurrency(value: number): string {
 }
 
 function formatMonth(mes: string): string {
-  const [ano, mesNum] = mes.split("-")
+  const [ano = "", mesNum = "1"] = mes.split("-")
   const meses = ["Jan", "Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago", "Set", "Out", "Nov", "Dez"]
   return `${meses[parseInt(mesNum) - 1]}/${ano.slice(2)}`
 }

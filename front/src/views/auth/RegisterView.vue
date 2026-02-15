@@ -110,8 +110,12 @@ const form = useForm<RegisterForm>({
       }
     }>("/auth/register", values)
 
-    // Salva token e dados do usuario
-    authStore.setAuthData(response.data.token, response.data.user, response.data.locador)
+    // Salva token e dados do usuario (cast parcial, fetchMe completa depois)
+    authStore.setAuthData(
+      response.data.token,
+      response.data.user as Parameters<typeof authStore.setAuthData>[1],
+      response.data.locador as Parameters<typeof authStore.setAuthData>[2]
+    )
 
     // Se selecionou um plano, redireciona para checkout
     if (selectedPlano.value) {

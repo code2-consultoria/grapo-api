@@ -18,6 +18,10 @@ export type {
   Pagamento,
   PagamentoResumo,
   VinculoTime,
+  TipoAditivo,
+  StatusAditivo,
+  ContratoAditivo,
+  ContratoAditivoItem,
 } from './models'
 
 // API

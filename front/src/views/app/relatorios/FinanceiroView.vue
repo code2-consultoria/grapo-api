@@ -95,8 +95,8 @@ onMounted(() => {
   const hoje = new Date()
   const inicio = new Date(hoje.getFullYear(), hoje.getMonth() - 11, 1)
 
-  dataFim.value = hoje.toISOString().split("T")[0]
-  dataInicio.value = inicio.toISOString().split("T")[0]
+  dataFim.value = hoje.toISOString().split("T")[0] ?? ""
+  dataInicio.value = inicio.toISOString().split("T")[0] ?? ""
 
   loadData()
 })
@@ -133,7 +133,7 @@ function formatCurrency(value: number): string {
 }
 
 function formatMonth(mes: string): string {
-  const [ano, mesNum] = mes.split("-")
+  const [ano = "", mesNum = "1"] = mes.split("-")
   const meses = ["Jan", "Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago", "Set", "Out", "Nov", "Dez"]
   return `${meses[parseInt(mesNum) - 1]}/${ano.slice(2)}`
 }
@@ -156,7 +156,7 @@ function getBarHeight(valor: number): string {
 // Cor da barra de ativo
 function getAtivoBarColor(index: number): string {
   const colors = ["bg-blue-500", "bg-green-500", "bg-amber-500", "bg-purple-500", "bg-pink-500", "bg-cyan-500"]
-  return colors[index % colors.length]
+  return colors[index % colors.length] ?? "bg-gray-500"
 }
 
 // Percentual do ativo em relacao ao total

@@ -1,0 +1,353 @@
+name: CI/CD
+
+on:
+  push:
+    branches: [main, staging]
+  pull_request:
+    branches: [main, staging]
+
+env:
+  REGISTRY: ghcr.io
+  DOCKER_IMAGE: ghcr.io/${{ github.repository }}
+  NODE_VERSION: "20"
+
+jobs:
+  test:
+    name: Test (Playwright E2E)
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Install Playwright browsers
+        run: pnpm exec playwright install --with-deps chromium
+
+      - name: Run Playwright tests
+        run: pnpm test:e2e --project=chromium
+        env:
+          CI: true
+
+      - name: Upload Playwright report
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: playwright-report
+          path: playwright-report/
+          retention-days: 7
+
+  lint:
+    name: Lint (ESLint)
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Run ESLint
+        run: pnpm lint:check
+
+  build-pr:
+    name: Build (PR Validation)
+    runs-on: ubuntu-latest
+    needs: [test, lint]
+    if: github.event_name == 'pull_request'
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build Docker image (no push)
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: docker/Dockerfile
+          push: false
+          tags: ${{ env.DOCKER_IMAGE }}:pr-${{ github.event.number }}
+          build-args: |
+            VITE_API_URL=${{ env.VITE_API_URL }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+  build-and-push:
+    name: Build and Push Docker Image
+    runs-on: ubuntu-latest
+    needs: [test]
+    if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/staging')
+    environment: ${{ github.ref == 'refs/heads/main' && 'production' || 'staging' }}
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set environment tag
+        id: env-vars
+        run: |
+          if [ "${{ github.ref }}" == "refs/heads/main" ]; then
+            echo "tag=production" >> $GITHUB_OUTPUT
+          else
+            echo "tag=staging" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: docker/Dockerfile
+          push: true
+          tags: |
+            ${{ env.DOCKER_IMAGE }}:${{ steps.env-vars.outputs.tag }}
+            ${{ env.DOCKER_IMAGE }}:build-${{ github.run_number }}
+          build-args: |
+            VITE_API_URL=${{ vars.VITE_API_URL }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+  deploy-production:
+    name: Deploy to Production
+    runs-on: ubuntu-latest
+    needs: build-and-push
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    environment: production
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Copy docker-compose to server
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USERNAME }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          port: ${{ secrets.SSH_PORT }}
+          source: "docker-compose.github.yml"
+          target: "/home/evaldobarbosa/grapo/front"
+
+      - name: Deploy via SSH
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USERNAME }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          port: ${{ secrets.SSH_PORT }}
+          script: |
+            cd /home/evaldobarbosa/grapo/front
+
+            # Login no GitHub Container Registry
+            echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+
+            # Pull da nova imagem e deploy com docker compose
+            docker compose -f docker-compose.github.yml pull
+            docker compose -f docker-compose.github.yml up -d
+
+            # Healthcheck - aguarda container iniciar e verifica saúde
+            echo "Aguardando container iniciar..."
+            sleep 5
+            CONTAINER_IP=$(docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' grapo_front)
+            echo "Container IP: $CONTAINER_IP"
+            curl -f http://$CONTAINER_IP:3000/health || (echo "Healthcheck falhou!" && exit 1)
+            echo "Container healthy!"
+
+            # Limpa imagens antigas
+            docker image prune -f
+
+  notify:
+    name: Notify Telegram
+    runs-on: ubuntu-latest
+    if: always() && github.event_name == 'push'
+    needs: [test, build-and-push, deploy-staging, deploy-production]
+    environment: production
+
+    steps:
+      - name: Get workflow conclusion
+        id: conclusion
+        run: |
+          FAILED_JOB=""
+          FAILED_REASON=""
+
+          if [ "${{ needs.test.result }}" == "failure" ]; then
+            FAILED_JOB="Test (Playwright)"
+            FAILED_REASON="Testes E2E falharam"
+          elif [ "${{ needs.build-and-push.result }}" == "failure" ]; then
+            FAILED_JOB="Build Docker"
+            FAILED_REASON="Falha ao construir imagem Docker"
+          elif [ "${{ needs.deploy-staging.result }}" == "failure" ]; then
+            FAILED_JOB="Deploy Staging"
+            FAILED_REASON="Falha no deploy para staging"
+          elif [ "${{ needs.deploy-production.result }}" == "failure" ]; then
+            FAILED_JOB="Deploy Production"
+            FAILED_REASON="Falha no deploy para produção"
+          fi
+
+          if [ -n "$FAILED_JOB" ]; then
+            echo "status=failure" >> $GITHUB_OUTPUT
+            echo "failed_job=$FAILED_JOB" >> $GITHUB_OUTPUT
+            echo "failed_reason=$FAILED_REASON" >> $GITHUB_OUTPUT
+          else
+            echo "status=success" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Set environment info
+        id: env-info
+        run: |
+          if [ "${{ github.ref }}" == "refs/heads/main" ]; then
+            echo "environment=Produção" >> $GITHUB_OUTPUT
+          else
+            echo "environment=Staging" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Check Telegram secrets
+        id: telegram-check
+        run: |
+          if [ -z "${{ secrets.TELEGRAM_BOT_TOKEN }}" ]; then
+            echo "::warning::TELEGRAM_BOT_TOKEN não configurado"
+            echo "configured=false" >> $GITHUB_OUTPUT
+          elif [ -z "${{ secrets.TELEGRAM_CHAT_ID }}" ]; then
+            echo "::warning::TELEGRAM_CHAT_ID não configurado"
+            echo "configured=false" >> $GITHUB_OUTPUT
+          else
+            echo "configured=true" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Send Telegram notification (Success)
+        if: steps.conclusion.outputs.status == 'success' && steps.telegram-check.outputs.configured == 'true'
+        uses: appleboy/telegram-action@master
+        with:
+          to: ${{ secrets.TELEGRAM_CHAT_ID }}
+          token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          format: markdown
+          message: |
+            ✅ *Pipeline grapo Front*
+
+            *Status:* Sucesso
+            *Ambiente:* ${{ steps.env-info.outputs.environment }}
+            *Branch:* `${{ github.ref_name }}`
+            *Commit:* `${{ github.sha }}`
+            *Autor:* ${{ github.actor }}
+
+            [Ver no GitHub](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})
+
+      - name: Send Telegram notification (Failure)
+        if: steps.conclusion.outputs.status == 'failure' && steps.telegram-check.outputs.configured == 'true'
+        uses: appleboy/telegram-action@master
+        with:
+          to: ${{ secrets.TELEGRAM_CHAT_ID }}
+          token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          format: markdown
+          message: |
+            ❌ *Pipeline grapo Front*
+
+            *Status:* Falhou
+            *Etapa:* ${{ steps.conclusion.outputs.failed_job }}
+            *Motivo:* ${{ steps.conclusion.outputs.failed_reason }}
+            *Branch:* `${{ github.ref_name }}`
+            *Commit:* `${{ github.sha }}`
+            *Autor:* ${{ github.actor }}
+
+            [Ver detalhes](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})
+
+  notify-pr:
+    name: Notify PR Status
+    runs-on: ubuntu-latest
+    if: always() && github.event_name == 'pull_request'
+    needs: [test, lint, build-pr]
+    environment: production
+
+    steps:
+      - name: Get workflow conclusion
+        id: conclusion
+        run: |
+          FAILED_JOB=""
+          FAILED_REASON=""
+
+          if [ "${{ needs.test.result }}" == "failure" ]; then
+            FAILED_JOB="Test (Playwright)"
+            FAILED_REASON="Testes E2E falharam"
+          elif [ "${{ needs.lint.result }}" == "failure" ]; then
+            FAILED_JOB="Lint (ESLint)"
+            FAILED_REASON="Problemas de estilo de código"
+          elif [ "${{ needs.build-pr.result }}" == "failure" ]; then
+            FAILED_JOB="Build Docker"
+            FAILED_REASON="Falha ao construir imagem Docker"
+          fi
+
+          if [ -n "$FAILED_JOB" ]; then
+            echo "status=failure" >> $GITHUB_OUTPUT
+            echo "failed_job=$FAILED_JOB" >> $GITHUB_OUTPUT
+            echo "failed_reason=$FAILED_REASON" >> $GITHUB_OUTPUT
+          else
+            echo "status=success" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Check Telegram secrets
+        id: telegram-check
+        run: |
+          if [ -z "${{ secrets.TELEGRAM_BOT_TOKEN }}" ] || [ -z "${{ secrets.TELEGRAM_CHAT_ID }}" ]; then
+            echo "configured=false" >> $GITHUB_OUTPUT
+          else
+            echo "configured=true" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Send Telegram notification (PR)
+        if: steps.telegram-check.outputs.configured == 'true'
+        uses: appleboy/telegram-action@master
+        with:
+          to: ${{ secrets.TELEGRAM_CHAT_ID }}
+          token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          format: markdown
+          message: |
+            ${{ steps.conclusion.outputs.status == 'success' && '✅' || '❌' }} *Pull Request #${{ github.event.number }} (Front)*
+
+            *Status:* ${{ steps.conclusion.outputs.status == 'success' && 'Validação OK' || 'Falhou' }}
+            ${{ steps.conclusion.outputs.status == 'failure' && format('*Etapa:* {0}', steps.conclusion.outputs.failed_job) || '' }}
+            ${{ steps.conclusion.outputs.status == 'failure' && format('*Motivo:* {0}', steps.conclusion.outputs.failed_reason) || '' }}
+            *PR:* ${{ github.event.pull_request.title }}
+            *Autor:* ${{ github.actor }}
+
+            [Ver PR](${{ github.event.pull_request.html_url }})

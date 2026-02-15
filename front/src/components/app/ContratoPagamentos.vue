@@ -65,7 +65,7 @@ const isAdding = ref(false)
 // Quando ja_paga muda, limpa ou preenche data_pagamento
 watch(() => addForm.value.ja_paga, (jaPaga) => {
   if (jaPaga && !addForm.value.data_pagamento) {
-    addForm.value.data_pagamento = new Date().toISOString().split("T")[0]
+    addForm.value.data_pagamento = new Date().toISOString().split("T")[0] ?? ""
   } else if (!jaPaga) {
     addForm.value.data_pagamento = ""
   }

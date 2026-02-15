@@ -16,7 +16,7 @@ interface ResetPasswordForm {
 
 const route = useRoute()
 const router = useRouter()
-const { showSuccess, showError } = useNotification()
+const { success, error: showError } = useNotification()
 
 const token = route.params.token as string
 const emailFromQuery = (route.query.email as string) || ""
@@ -60,7 +60,7 @@ const form = useForm<ResetPasswordForm>({
         password_confirmation: values.password_confirmation,
       })
       resetSuccess.value = true
-      showSuccess("Senha alterada com sucesso!")
+      success("Senha alterada com sucesso!")
 
       // Redireciona para login apos 3 segundos
       setTimeout(() => {
@@ -68,7 +68,7 @@ const form = useForm<ResetPasswordForm>({
       }, 3000)
     } catch (error: unknown) {
       const apiError = error as { message?: string; errors?: Record<string, string[]> }
-      if (apiError.errors?.email) {
+      if (apiError.errors?.email?.[0]) {
         showError(apiError.errors.email[0])
       } else {
         showError(apiError.message || "Erro ao alterar senha")

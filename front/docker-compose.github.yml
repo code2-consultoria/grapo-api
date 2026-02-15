@@ -1,0 +1,33 @@
+services:
+  front:
+    image: ${DOCKER_IMAGE:-ghcr.io/code2-consultoria/grapo-front}:${DOCKER_TAG:-latest}
+    restart: unless-stopped
+    environment:
+      - NODE_ENV=production
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "http://127.0.0.1:80/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+    networks:
+      proxy:
+        aliases:
+          - grapo.app
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.middlewares.grapo-front-hsts.headers.stsincludesubdomains=true"
+      - "traefik.http.middlewares.grapo-front-hsts.headers.stspreload=true"
+      - "traefik.http.middlewares.grapo-front-hsts.headers.stsseconds=31536000"
+      - "traefik.http.middlewares.grapo-front-hsts.headers.isdevelopment=false"
+      - "traefik.http.routers.grapo-front.tls=true"
+      - "traefik.http.routers.grapo-front.entrypoints=websecure"
+      - "traefik.http.routers.grapo-front.rule=Host(`grapo.app`)||Host(`www.grapo.app`)"
+      - "traefik.http.routers.grapo-front.middlewares=grapo-front-hsts"
+      - "traefik.http.routers.grapo-front.tls.certresolver=letsencrypt"
+      - "traefik.http.services.grapo-front.loadbalancer.server.port=80"
+      - "traefik.http.services.grapo-front.loadbalancer.server.scheme=http"
+
+networks:
+  proxy:
+    external: true

@@ -21,6 +21,7 @@ const form = useForm<PessoaForm>({
   initialValues: {
     tipo: "locatario",
     nome: "",
+    documento: "",
     email: "",
     telefone: "",
     endereco: "",
