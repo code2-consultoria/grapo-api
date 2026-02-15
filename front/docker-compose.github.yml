@@ -11,7 +11,7 @@ services:
       retries: 3
       start_period: 10s
     networks:
-      proxy:
+      proxymng:
         aliases:
           - grapo.app
     labels:
@@ -29,5 +29,5 @@ services:
       - "traefik.http.services.grapo-front.loadbalancer.server.scheme=http"
 
 networks:
-  proxy:
+  proxymng:
     external: true
