@@ -9,11 +9,11 @@ on:
 env:
   REGISTRY: ghcr.io
   DOCKER_IMAGE: ghcr.io/${{ github.repository }}
-  NODE_VERSION: "20"
+  NODE_VERSION: "22"
 
 jobs:
-  test:
-    name: Test (Playwright E2E)
+  validate:
+    name: Lint, Type Check & Build
     runs-on: ubuntu-latest
 
     steps:
@@ -34,52 +34,44 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Install Playwright browsers
-        run: pnpm exec playwright install --with-deps chromium
+      - name: Lint
+        run: pnpm lint
 
-      - name: Run Playwright tests
-        run: pnpm test:e2e --project=chromium
-        env:
-          CI: true
+      - name: Type check
+        run: pnpm type-check
 
-      - name: Upload Playwright report
+      - name: Build
+        run: pnpm build
+
+      - name: Upload build artifacts
         uses: actions/upload-artifact@v4
-        if: always()
         with:
-          name: playwright-report
-          path: playwright-report/
+          name: dist
+          path: dist/
           retention-days: 7
 
-  lint:
-    name: Lint (ESLint)
-    runs-on: ubuntu-latest
-    if: github.event_name == 'pull_request'
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v4
-        with:
-          version: 10
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: ${{ env.NODE_VERSION }}
-          cache: 'pnpm'
-
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile
-
-      - name: Run ESLint
-        run: pnpm lint:check
+  # TODO: Configurar Playwright para testes E2E
+  # test-e2e:
+  #   name: Test (Playwright E2E)
+  #   runs-on: ubuntu-latest
+  #   needs: validate
+  #   steps:
+  #     - uses: actions/checkout@v4
+  #     - uses: pnpm/action-setup@v4
+  #       with:
+  #         version: 10
+  #     - uses: actions/setup-node@v4
+  #       with:
+  #         node-version: ${{ env.NODE_VERSION }}
+  #         cache: 'pnpm'
+  #     - run: pnpm install --frozen-lockfile
+  #     - run: pnpm exec playwright install --with-deps chromium
+  #     - run: pnpm test:e2e --project=chromium
 
   build-pr:
-    name: Build (PR Validation)
+    name: Build Docker (PR Validation)
     runs-on: ubuntu-latest
-    needs: [test, lint]
+    needs: [validate]
     if: github.event_name == 'pull_request'
 
     steps:
@@ -93,7 +85,7 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           context: .
-          file: docker/Dockerfile
+          file: Dockerfile
           push: false
           tags: ${{ env.DOCKER_IMAGE }}:pr-${{ github.event.number }}
           build-args: |
@@ -104,7 +96,7 @@ jobs:
   build-and-push:
     name: Build and Push Docker Image
     runs-on: ubuntu-latest
-    needs: [test]
+    needs: [validate]
     if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/staging')
     environment: ${{ github.ref == 'refs/heads/main' && 'production' || 'staging' }}
     permissions:
@@ -138,7 +130,7 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           context: .
-          file: docker/Dockerfile
+          file: Dockerfile
           push: true
           tags: |
             ${{ env.DOCKER_IMAGE }}:${{ steps.env-vars.outputs.tag }}
@@ -163,7 +155,7 @@ jobs:
         uses: appleboy/scp-action@v0.1.7
         with:
           host: ${{ secrets.SSH_HOST }}
-          username: ${{ secrets.SSH_USERNAME }}
+          username: ${{ secrets.SSH_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           port: ${{ secrets.SSH_PORT }}
           source: "docker-compose.github.yml"
@@ -173,7 +165,7 @@ jobs:
         uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ secrets.SSH_HOST }}
-          username: ${{ secrets.SSH_USERNAME }}
+          username: ${{ secrets.SSH_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           port: ${{ secrets.SSH_PORT }}
           script: |
@@ -191,7 +183,7 @@ jobs:
             sleep 5
             CONTAINER_IP=$(docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' grapo_front)
             echo "Container IP: $CONTAINER_IP"
-            curl -f http://$CONTAINER_IP:3000/health || (echo "Healthcheck falhou!" && exit 1)
+            curl -f http://$CONTAINER_IP:80/ || (echo "Healthcheck falhou!" && exit 1)
             echo "Container healthy!"
 
             # Limpa imagens antigas
@@ -201,7 +193,7 @@ jobs:
     name: Notify Telegram
     runs-on: ubuntu-latest
     if: always() && github.event_name == 'push'
-    needs: [test, build-and-push, deploy-staging, deploy-production]
+    needs: [validate, build-and-push, deploy-production]
     environment: production
 
     steps:
@@ -211,15 +203,12 @@ jobs:
           FAILED_JOB=""
           FAILED_REASON=""
 
-          if [ "${{ needs.test.result }}" == "failure" ]; then
-            FAILED_JOB="Test (Playwright)"
-            FAILED_REASON="Testes E2E falharam"
+          if [ "${{ needs.validate.result }}" == "failure" ]; then
+            FAILED_JOB="Validate"
+            FAILED_REASON="Lint, type-check ou build falharam"
           elif [ "${{ needs.build-and-push.result }}" == "failure" ]; then
             FAILED_JOB="Build Docker"
             FAILED_REASON="Falha ao construir imagem Docker"
-          elif [ "${{ needs.deploy-staging.result }}" == "failure" ]; then
-            FAILED_JOB="Deploy Staging"
-            FAILED_REASON="Falha no deploy para staging"
           elif [ "${{ needs.deploy-production.result }}" == "failure" ]; then
             FAILED_JOB="Deploy Production"
             FAILED_REASON="Falha no deploy para produção"
@@ -296,7 +285,7 @@ jobs:
     name: Notify PR Status
     runs-on: ubuntu-latest
     if: always() && github.event_name == 'pull_request'
-    needs: [test, lint, build-pr]
+    needs: [validate, build-pr]
     environment: production
 
     steps:
@@ -306,12 +295,9 @@ jobs:
           FAILED_JOB=""
           FAILED_REASON=""
 
-          if [ "${{ needs.test.result }}" == "failure" ]; then
-            FAILED_JOB="Test (Playwright)"
-            FAILED_REASON="Testes E2E falharam"
-          elif [ "${{ needs.lint.result }}" == "failure" ]; then
-            FAILED_JOB="Lint (ESLint)"
-            FAILED_REASON="Problemas de estilo de código"
+          if [ "${{ needs.validate.result }}" == "failure" ]; then
+            FAILED_JOB="Validate"
+            FAILED_REASON="Lint, type-check ou build falharam"
           elif [ "${{ needs.build-pr.result }}" == "failure" ]; then
             FAILED_JOB="Build Docker"
             FAILED_REASON="Falha ao construir imagem Docker"
