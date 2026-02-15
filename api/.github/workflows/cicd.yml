@@ -244,7 +244,7 @@ jobs:
             STRIPE_KEY=${{ secrets.STRIPE_KEY }}
             STRIPE_SECRET=${{ secrets.STRIPE_SECRET }}
             STRIPE_WEBHOOK_SECRET=${{ secrets.STRIPE_WEBHOOK_SECRET }}
-            MAILERSEND_API_KEY=${{ secrets.MAILERSEND_API_KEY }}
+            RESEND_API_KEY=${{ secrets.RESEND_API_KEY }}
             DB_PASSWORD=${{ secrets.DB_PASSWORD }}
             BUILD_ID=${{ steps.vars.outputs.short_sha }}
             DOCKER_IMAGE=ghcr.io/${{ github.repository }}
@@ -299,7 +299,7 @@ jobs:
             STRIPE_KEY=${{ secrets.STRIPE_KEY }}
             STRIPE_SECRET=${{ secrets.STRIPE_SECRET }}
             STRIPE_WEBHOOK_SECRET=${{ secrets.STRIPE_WEBHOOK_SECRET }}
-            MAILERSEND_API_KEY=${{ secrets.MAILERSEND_API_KEY }}
+            RESEND_API_KEY=${{ secrets.RESEND_API_KEY }}
             DB_PASSWORD=${{ secrets.DB_PASSWORD }}
             BUILD_ID=${{ steps.vars.outputs.short_sha }}
             DOCKER_IMAGE=ghcr.io/${{ github.repository }}
