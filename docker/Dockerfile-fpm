@@ -122,8 +122,8 @@ RUN echo "---> Adding the code2 user" && \
     mkdir -p /var/www/app && \
     chown -R code2:code2 /var/www
 
-COPY ./Docker/etc /etc
-COPY ./Docker/scripts /scripts
+COPY ./docker/etc /etc
+COPY ./docker/scripts /scripts
 
 RUN chown -R code2:code2 /home/code2 && \
     chown -R code2:code2 /scripts && \
@@ -177,11 +177,11 @@ ENV PATH=/scripts:/home/code2/.local/bin:/home/code2/.cache/npm-packages/bin:/ho
 # Application directory
 WORKDIR "/var/www/app"
 
-COPY ./src .
+COPY . .
 
 RUN [ -d "bootstrap/cache" ] || mkdir bootstrap/cache 2> /dev/null && \
-    sudo chown -R code2:code2 ./bootstrap/cache storage Jukebar && \
-    sudo chmod -R ug+rwX ./bootstrap/cache ./storage ./Jukebar
+    sudo chown -R code2:code2 ./bootstrap/cache storage && \
+    sudo chmod -R ug+rwX ./bootstrap/cache ./storage
 
 # Não cria .env na imagem - variáveis vêm do docker-compose env_file em produção
 RUN composer install --no-dev
@@ -200,6 +200,6 @@ ENTRYPOINT ["/scripts/entrypoint.sh"]
 EXPOSE ${NGINX_HTTP_PORT}
 EXPOSE ${NGINX_HTTPS_PORT}
 
-COPY ./Docker/etc/supervisord/default.conf /etc/supervisord.conf
+COPY ./docker/etc/supervisord/default.conf /etc/supervisord.conf
 
 CMD ["supervisord", "--configuration", "/etc/supervisord.conf"]
