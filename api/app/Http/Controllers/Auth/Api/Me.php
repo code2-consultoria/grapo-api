@@ -35,6 +35,8 @@ class Me extends Controller
                     'email' => $locador->email,
                     'telefone' => $locador->telefone,
                     'ativo' => $locador->ativo,
+                    'data_limite_acesso' => $locador->data_limite_acesso?->format('Y-m-d'),
+                    'has_acesso_ativo' => $locador->hasAcessoAtivo(),
                 ] : null,
             ],
         ]);
