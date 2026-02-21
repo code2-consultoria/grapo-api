@@ -151,43 +151,37 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Copy docker-compose to server
+      - name: Copy deploy files to server
         uses: appleboy/scp-action@v0.1.7
         with:
           host: ${{ secrets.SSH_HOST }}
           username: ${{ secrets.SSH_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           port: ${{ secrets.SSH_PORT }}
-          source: "docker-compose.github.yml"
+          source: "docker-compose.github.yml,deploy.sh"
           target: "/home/evaldobarbosa/grapo/front"
 
       - name: Deploy via SSH
         uses: appleboy/ssh-action@v1.0.3
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_USER: ${{ github.actor }}
         with:
           host: ${{ secrets.SSH_HOST }}
           username: ${{ secrets.SSH_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           port: ${{ secrets.SSH_PORT }}
+          envs: GITHUB_TOKEN,GITHUB_USER
           script: |
             cd /home/evaldobarbosa/grapo/front
 
-            # Login no GitHub Container Registry
-            echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+            # Cria/atualiza arquivo de token
+            echo "$GITHUB_TOKEN" > .github_token
+            chmod 600 .github_token
 
-            # Pull da nova imagem e deploy com docker compose
-            docker compose -f docker-compose.github.yml pull
-            docker compose -f docker-compose.github.yml up -d --force-recreate
-
-            # Healthcheck - aguarda container iniciar e verifica saúde
-            echo "Aguardando container iniciar..."
-            sleep 5
-            CONTAINER_IP=$(docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' grapo-front)
-            echo "Container IP: $CONTAINER_IP"
-            curl -f http://$CONTAINER_IP:80/ || (echo "Healthcheck falhou!" && exit 1)
-            echo "Container healthy!"
-
-            # Limpa imagens antigas
-            docker image prune -f
+            # Torna o script executavel e executa
+            chmod +x deploy.sh
+            GITHUB_USER="$GITHUB_USER" ./deploy.sh
 
   notify:
     name: Notify Telegram
