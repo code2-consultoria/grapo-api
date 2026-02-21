@@ -19,6 +19,8 @@ class Status extends Controller
         return response()->json([
             'data' => [
                 'has_subscription' => $hasSubscription,
+                'data_limite_acesso' => $locador->data_limite_acesso?->format('Y-m-d'),
+                'has_acesso_ativo' => $locador->hasAcessoAtivo(),
                 'subscription' => $hasSubscription
                     ? new StripeSubscriptionResource($subscription)
                     : null,
