@@ -114,6 +114,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::prefix('/{contratoId}/pagamentos')->group(function () {
             Route::get('/', \App\Http\Controllers\Contrato\Pagamentos\Index::class);
             Route::post('/', \App\Http\Controllers\Contrato\Pagamentos\Store::class);
+            Route::post('/gerar-automaticamente', \App\Http\Controllers\Contrato\Parcela\GerarAutomaticamente::class);
             Route::get('/resumo', \App\Http\Controllers\Contrato\Pagamentos\Resumo::class);
             Route::post('/{pagamentoId}/pagar', \App\Http\Controllers\Contrato\Pagamentos\Pagar::class);
             Route::delete('/{pagamentoId}', \App\Http\Controllers\Contrato\Pagamentos\Destroy::class);

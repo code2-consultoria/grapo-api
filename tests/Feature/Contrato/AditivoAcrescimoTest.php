@@ -266,7 +266,7 @@ test('acrescimo falha se nao houver disponibilidade', function () {
         ->postJson("/api/contratos/{$contrato->id}/aditivos/{$aditivo->id}/ativar");
 
     $response->assertStatus(422);
-    $response->assertJsonPath('message', fn ($m) => str_contains($m, 'Quantidade indisponível'));
+    $response->assertJsonPath('message', fn ($m) => str_contains($m, 'unidades disponíveis'));
 });
 
 // Cenário: Cancelar acréscimo libera itens alocados

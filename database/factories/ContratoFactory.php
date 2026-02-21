@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Enums\TipoCobranca;
 use App\Models\Contrato;
 use App\Models\Pessoa;
 use Illuminate\Database\Eloquent\Factories\Factory;
@@ -93,6 +94,16 @@ class ContratoFactory extends Factory
     {
         return $this->state(fn (array $attributes) => [
             'valor_total' => $valor,
+        ]);
+    }
+
+    /**
+     * Contrato sem cobranca (nao exige parcelas).
+     */
+    public function semCobranca(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'tipo_cobranca' => TipoCobranca::SemCobranca,
         ]);
     }
 }
