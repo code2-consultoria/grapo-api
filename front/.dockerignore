@@ -1,0 +1,44 @@
+# Git
+.git
+.gitignore
+.gitattributes
+
+# CI/CD
+.github
+
+# IDE
+.idea
+.vscode
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Dependencies (installed during build)
+node_modules
+
+# Local environment files (CRITICAL: prevents localhost URLs in production)
+.env
+.env.local
+.env.*.local
+
+# Build output (generated during build)
+dist
+
+# Tests
+tests
+e2e
+*.spec.ts
+*.test.ts
+coverage
+playwright-report
+test-results
+
+# Documentation
+docs
+*.md
+
+# Editor configs
+.editorconfig
