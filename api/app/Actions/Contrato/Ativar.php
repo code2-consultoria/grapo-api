@@ -7,6 +7,7 @@ use App\Contracts\Command;
 use App\Enums\StatusContrato;
 use App\Exceptions\ContratoNaoPodeSerAtivadoException;
 use App\Exceptions\ContratoSemItensException;
+use App\Exceptions\ContratoSemParcelasException;
 use App\Exceptions\QuantidadeIndisponivelException;
 use App\Models\Contrato;
 use Illuminate\Support\Facades\DB;
@@ -25,6 +26,7 @@ class Ativar implements Command
      *
      * @throws ContratoNaoPodeSerAtivadoException
      * @throws ContratoSemItensException
+     * @throws ContratoSemParcelasException
      * @throws QuantidadeIndisponivelException
      */
     public function handle(): void
@@ -40,6 +42,11 @@ class Ativar implements Command
         // Valida se tem itens
         if ($this->contrato->itens->isEmpty()) {
             throw new ContratoSemItensException($this->contrato->codigo);
+        }
+
+        // Valida se contrato recorrente manual tem parcelas
+        if ($this->contrato->temCobrancaManual() && $this->contrato->pagamentos->isEmpty()) {
+            throw new ContratoSemParcelasException($this->contrato->codigo);
         }
 
         // Executa alocação e ativação em transação

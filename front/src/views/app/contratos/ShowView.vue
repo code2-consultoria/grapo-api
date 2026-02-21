@@ -59,17 +59,17 @@ const editForm = ref<ContratoForm>({
   data_inicio: "",
   data_termino: "",
   observacoes: "",
-  tipo_cobranca: "sem_cobranca",
+  tipo_cobranca: "recorrente_manual",
 })
 const isSubmittingEdit = ref(false)
 
 // Opcoes de tipo de cobranca
 const tiposCobranca: { value: TipoCobranca; label: string }[] = [
+  { value: "recorrente_manual", label: "Recorrente - Manual" },
   { value: "sem_cobranca", label: "Sem cobranca via sistema" },
   { value: "antecipado_stripe", label: "Antecipado - Cartao" },
   { value: "antecipado_pix", label: "Antecipado - PIX" },
   { value: "recorrente_stripe", label: "Recorrente - Stripe" },
-  { value: "recorrente_manual", label: "Recorrente - Manual" },
 ]
 
 // Estado do dialog de item
@@ -99,6 +99,9 @@ const estoqueError = ref<{
   quantidadeDisponivel: number
   quantidadeFaltante: number
 } | null>(null)
+
+// Estado do dialog de erro de parcelas
+const showParcelasErrorDialog = ref(false)
 
 // Estado do dialog de tipo de cobranca
 const showTipoCobrancaDialog = ref(false)
@@ -149,6 +152,10 @@ const tipoAtivoForm = useForm<TipoAtivoForm>({
 
     showTipoAtivoDialog.value = false
     tipoAtivoForm.reset()
+  },
+  onError() {
+    // Fecha o modal antes de mostrar a notificacao de erro
+    showTipoAtivoDialog.value = false
   },
 })
 
@@ -491,6 +498,12 @@ async function executeConfirmAction(): Promise<void> {
         quantidadeFaltante: apiError.quantidade_faltante || 0,
       }
       showEstoqueErrorDialog.value = true
+    } else if (apiError.error_type === 'contrato_sem_parcelas') {
+      showConfirmDialog.value = false
+      showParcelasErrorDialog.value = true
+    } else if (apiError.error_type === 'contrato_sem_itens') {
+      showConfirmDialog.value = false
+      error("Erro", "O contrato nao possui itens. Adicione itens antes de ativar.")
     } else {
       error("Erro", apiError.message || "Erro ao executar acao")
     }
@@ -528,8 +541,9 @@ async function gerarDocumento(): Promise<void> {
 
 function onFileChange(event: Event): void {
   const target = event.target as HTMLInputElement
-  if (target.files && target.files.length > 0) {
-    documentFile.value = target.files[0]
+  const file = target.files?.[0]
+  if (file) {
+    documentFile.value = file
   }
 }
 
@@ -788,7 +802,7 @@ async function downloadDocumentoAssinado(): Promise<void> {
         :contrato-id="contrato.id"
         :contrato-status="contrato.status"
         :tipo-cobranca="contrato.tipo_cobranca"
-        :valor-total="contrato.valor_total"
+        :valor-total="Number(contrato.valor_total)"
         @updated="loadContrato"
       />
 
@@ -1213,6 +1227,36 @@ async function downloadDocumentoAssinado(): Promise<void> {
           >
             <Package class="size-4 mr-2" />
             Criar Lote
+          </Button>
+        </DialogFooter>
+      </div>
+    </Dialog>
+
+    <!-- Dialog Erro de Parcelas -->
+    <Dialog
+      v-model:open="showParcelasErrorDialog"
+      title="Parcelas Necessarias"
+    >
+      <div class="space-y-4">
+        <!-- Icone e mensagem principal -->
+        <div class="flex items-start gap-4">
+          <div class="rounded-full bg-destructive/10 p-3">
+            <AlertTriangle class="size-6 text-destructive" />
+          </div>
+          <div class="flex-1">
+            <p class="font-medium">O contrato nao possui parcelas cadastradas.</p>
+            <p class="text-sm text-muted-foreground mt-1">
+              Contratos com cobranca recorrente manual precisam ter parcelas definidas antes de serem ativados.
+            </p>
+          </div>
+        </div>
+
+        <DialogFooter>
+          <Button
+            variant="outline"
+            @click="showParcelasErrorDialog = false"
+          >
+            Fechar
           </Button>
         </DialogFooter>
       </div>

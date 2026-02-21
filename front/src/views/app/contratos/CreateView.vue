@@ -11,7 +11,8 @@ import { Spinner } from "@/components/ui/spinner"
 import { useForm, useNotification } from "@/composables"
 import { ArrowLeft } from "lucide-vue-next"
 import api from "@/lib/api"
-import type { ContratoForm, PessoaForm, Pessoa, PaginatedResponse } from "@/types"
+import { Select } from "@/components/ui/select"
+import type { ContratoForm, PessoaForm, Pessoa, PaginatedResponse, TipoCobranca } from "@/types"
 
 const router = useRouter()
 const { success } = useNotification()
@@ -19,6 +20,15 @@ const { success } = useNotification()
 const locatarios = ref<{ value: string; label: string }[]>([])
 const loadingLocatarios = ref(true)
 const showLocatarioDialog = ref(false)
+
+// Opcoes de tipo de cobranca
+const tiposCobranca: { value: TipoCobranca; label: string }[] = [
+  { value: "recorrente_manual", label: "Recorrente - Manual" },
+  { value: "sem_cobranca", label: "Sem cobranca via sistema" },
+  { value: "antecipado_stripe", label: "Antecipado - Cartao" },
+  { value: "antecipado_pix", label: "Antecipado - PIX" },
+  { value: "recorrente_stripe", label: "Recorrente - Stripe" },
+]
 
 async function loadLocatarios() {
   loadingLocatarios.value = true
@@ -43,6 +53,7 @@ const form = useForm<ContratoForm>({
     data_inicio: "",
     data_termino: "",
     observacoes: "",
+    tipo_cobranca: "recorrente_manual",
   },
   validate(values) {
     const errors: Partial<Record<keyof ContratoForm, string>> = {}
@@ -108,6 +119,10 @@ const locatarioForm = useForm<PessoaForm>({
     // Fecha o dialog e reseta o form
     showLocatarioDialog.value = false
     locatarioForm.reset()
+  },
+  onError() {
+    // Fecha o modal antes de mostrar a notificacao de erro
+    showLocatarioDialog.value = false
   },
 })
 
@@ -180,6 +195,14 @@ function openLocatarioDialog() {
               />
             </FormField>
           </FormGroup>
+
+          <FormField label="Tipo de Cobranca" :error="form.getError('tipo_cobranca')">
+            <Select
+              v-model="form.values.tipo_cobranca"
+              :options="tiposCobranca"
+              placeholder="Selecione o tipo..."
+            />
+          </FormField>
 
           <FormField label="Observacoes" :error="form.getError('observacoes')">
             <Input

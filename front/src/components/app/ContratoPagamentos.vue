@@ -85,6 +85,10 @@ const showCancelDialog = ref(false)
 const cancelingPagamento = ref<Pagamento | null>(null)
 const isCanceling = ref(false)
 
+// Dialog gerar parcelas automaticamente
+const showGerarParcelasDialog = ref(false)
+const isGerandoParcelas = ref(false)
+
 // Computed
 const podeGerenciarPagamentos = computed(() => {
   return ["ativo", "aguardando_pagamento"].includes(props.contratoStatus)
@@ -120,6 +124,16 @@ async function loadData() {
 
 // Adiciona fatura
 function openAddDialog() {
+  // Se é um contrato recorrente manual sem parcelas, pergunta se quer gerar automaticamente
+  if (props.tipoCobranca === "recorrente_manual" && pagamentos.value.length === 0) {
+    showGerarParcelasDialog.value = true
+    return
+  }
+
+  openAddDialogDirect()
+}
+
+function openAddDialogDirect() {
   addForm.value = {
     valor: 0,
     desconto_comercial: 0,
@@ -130,6 +144,30 @@ function openAddDialog() {
     ja_paga: false,
   }
   showAddDialog.value = true
+}
+
+// Gera parcelas automaticamente
+async function gerarParcelasAutomaticamente() {
+  try {
+    isGerandoParcelas.value = true
+
+    await api.post(`/contratos/${props.contratoId}/pagamentos/gerar-automaticamente`)
+
+    success("Sucesso!", "Parcelas geradas automaticamente")
+    showGerarParcelasDialog.value = false
+    emit("updated")
+    await loadData()
+  } catch (err: unknown) {
+    const apiError = err as { message?: string }
+    showError("Erro", apiError.message || "Erro ao gerar parcelas")
+  } finally {
+    isGerandoParcelas.value = false
+  }
+}
+
+function gerarManualmente() {
+  showGerarParcelasDialog.value = false
+  openAddDialogDirect()
 }
 
 async function submitAdd() {
@@ -600,6 +638,49 @@ defineExpose({ loadData })
         >
           <Spinner v-if="isCanceling" size="sm" class="mr-2" />
           Cancelar Fatura
+        </Button>
+      </DialogFooter>
+    </div>
+  </Dialog>
+
+  <!-- Dialog Gerar Parcelas Automaticamente -->
+  <Dialog
+    v-model:open="showGerarParcelasDialog"
+    title="Gerar Parcelas"
+    description="Este contrato ainda nao possui parcelas cadastradas."
+  >
+    <div class="space-y-4">
+      <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
+        <div class="flex items-start gap-3">
+          <Receipt class="size-5 text-blue-600 mt-0.5" />
+          <div class="text-sm">
+            <p class="font-medium text-blue-800">Geracao automatica</p>
+            <p class="text-blue-700">
+              O sistema pode gerar automaticamente todas as parcelas do contrato
+              com base no periodo e valor total.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <p class="text-sm text-muted-foreground">
+        Deseja gerar as parcelas automaticamente ou cadastrar manualmente?
+      </p>
+
+      <DialogFooter>
+        <Button
+          variant="outline"
+          @click="gerarManualmente"
+          :disabled="isGerandoParcelas"
+        >
+          Cadastrar Manualmente
+        </Button>
+        <Button
+          @click="gerarParcelasAutomaticamente"
+          :disabled="isGerandoParcelas"
+        >
+          <Spinner v-if="isGerandoParcelas" size="sm" class="mr-2" />
+          Gerar Automaticamente
         </Button>
       </DialogFooter>
     </div>

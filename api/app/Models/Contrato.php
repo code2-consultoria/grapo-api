@@ -141,4 +141,29 @@ class Contrato extends Model
     {
         return !empty($this->documento_assinado_path);
     }
+
+    public function calcularMesesLocacao(): int
+    {
+        // Calcula o numero de meses entre data_inicio e data_termino
+        // Considera cada mes iniciado como um mes completo
+        // Ex: 31/01 a 30/04 = 4 meses (jan, fev, mar, abr)
+
+        // Usa o primeiro dia de cada mes para evitar problemas com meses de dias diferentes
+        $anoInicio = $this->data_inicio->year;
+        $mesInicio = $this->data_inicio->month;
+        $anoTermino = $this->data_termino->year;
+        $mesTermino = $this->data_termino->month;
+
+        $meses = ($anoTermino - $anoInicio) * 12 + ($mesTermino - $mesInicio) + 1;
+
+        return max(1, $meses);
+    }
+
+    public function calcularValorMensal(): float
+    {
+        // Soma o valor total dos itens e divide pelos meses
+        $meses = $this->calcularMesesLocacao();
+
+        return $meses > 0 ? round($this->valor_total / $meses, 2) : 0;
+    }
 }

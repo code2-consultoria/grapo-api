@@ -131,8 +131,8 @@ test('ativa contrato e aloca lotes usando FIFO', function () {
         'created_at' => now()->subMonth(),
     ]);
 
-    // Cria contrato com item
-    $contrato = Contrato::factory()->rascunho()->create([
+    // Cria contrato com item (sem cobranca para nao exigir parcelas)
+    $contrato = Contrato::factory()->rascunho()->semCobranca()->create([
         'locador_id' => $this->locador->id,
         'locatario_id' => $this->locatario->id,
     ]);
@@ -166,7 +166,7 @@ test('retorna erro ao ativar contrato sem disponibilidade suficiente', function 
         'tipo_ativo_id' => $this->tipoAtivo->id,
     ]);
 
-    $contrato = Contrato::factory()->rascunho()->create([
+    $contrato = Contrato::factory()->rascunho()->semCobranca()->create([
         'locador_id' => $this->locador->id,
         'locatario_id' => $this->locatario->id,
     ]);

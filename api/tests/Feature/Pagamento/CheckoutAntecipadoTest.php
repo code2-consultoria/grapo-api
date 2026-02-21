@@ -3,7 +3,11 @@
 use App\Enums\StatusContrato;
 use App\Enums\TipoCobranca;
 use App\Models\Contrato;
+use App\Models\ContratoItem;
+use App\Models\Lote;
+use App\Models\Pagamento;
 use App\Models\Pessoa;
+use App\Models\TipoAtivo;
 use App\Models\User;
 use App\Models\VinculoTime;
 
@@ -29,12 +33,29 @@ beforeEach(function () {
         'locador_id' => $this->locador->id,
     ]);
 
+    // Cria tipo de ativo e lote para testes de ativacao
+    $this->tipoAtivo = TipoAtivo::factory()->create([
+        'locador_id' => $this->locador->id,
+    ]);
+
+    Lote::factory()->comQuantidade(100)->create([
+        'tipo_ativo_id' => $this->tipoAtivo->id,
+        'locador_id' => $this->locador->id,
+    ]);
+
     $this->contrato = Contrato::factory()->create([
         'locador_id' => $this->locador->id,
         'locatario_id' => $this->locatario->id,
         'status' => StatusContrato::Rascunho,
         'tipo_cobranca' => TipoCobranca::SemCobranca,
         'valor_total' => 1500.00,
+    ]);
+
+    // Adiciona item ao contrato para testes de ativacao
+    ContratoItem::factory()->create([
+        'contrato_id' => $this->contrato->id,
+        'tipo_ativo_id' => $this->tipoAtivo->id,
+        'quantidade' => 10,
     ]);
 });
 
@@ -204,6 +225,16 @@ test('contrato com cobranca recorrente vai direto para ativo', function () {
     $this->contrato->update([
         'tipo_cobranca' => TipoCobranca::RecorrenteManual,
     ]);
+
+    // Adiciona uma parcela para contrato recorrente manual
+    $pagamento = new Pagamento([
+        'valor' => 1500.00,
+        'data_vencimento' => now()->addMonth(),
+        'status' => 'pendente',
+        'origem' => 'manual',
+    ]);
+    $pagamento->contrato()->associate($this->contrato);
+    $pagamento->save();
 
     $response = $this->actingAs($this->user)
         ->postJson("/api/contratos/{$this->contrato->id}/ativar");

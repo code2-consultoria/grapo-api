@@ -6,12 +6,13 @@ interface UseFormOptions<T> {
   initialValues: T
   validate?: (values: T) => FormErrors<T>
   onSubmit: (values: T) => Promise<void>
+  onError?: (error: ApiError) => void
 }
 
 // Composable generico para gerenciamento de formularios
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function useForm<T extends Record<string, any>>(options: UseFormOptions<T>) {
-  const { initialValues, validate, onSubmit } = options
+  const { initialValues, validate, onSubmit, onError } = options
 
   // Estado reativo do formulario
   const values = reactive({ ...initialValues }) as T
@@ -102,6 +103,12 @@ export function useForm<T extends Record<string, any>>(options: UseFormOptions<T
       return true
     } catch (err) {
       const apiError = err as ApiError
+
+      // Chama callback de erro primeiro (para fechar modais, etc)
+      if (onError) {
+        onError(apiError)
+      }
+
       setServerErrors(apiError)
       notifications.error('Erro ao salvar', apiError.message)
       return false
