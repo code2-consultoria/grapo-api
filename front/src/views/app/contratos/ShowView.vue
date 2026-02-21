@@ -34,6 +34,7 @@ import {
   XCircle,
   CheckCircle,
   CreditCard,
+  AlertTriangle,
 } from "lucide-vue-next"
 import api from "@/lib/api"
 import type { Contrato, ContratoItem, ContratoStatus, TipoCobranca, TipoAtivo, TipoAtivoForm, ContratoForm, Pessoa, ApiResponse, PaginatedResponse } from "@/types"
@@ -84,6 +85,17 @@ const showConfirmDialog = ref(false)
 const confirmAction = ref<"ativar" | "cancelar" | "finalizar" | "remover-item" | null>(null)
 const confirmItemId = ref<string | null>(null)
 const isConfirming = ref(false)
+
+// Estado do dialog de erro de estoque
+const showEstoqueErrorDialog = ref(false)
+const estoqueError = ref<{
+  message: string
+  tipoAtivo: string
+  tipoAtivoId: string
+  quantidadeSolicitada: number
+  quantidadeDisponivel: number
+  quantidadeFaltante: number
+} | null>(null)
 
 // Estado do dialog de tipo de cobranca
 const showTipoCobrancaDialog = ref(false)
@@ -449,8 +461,31 @@ async function executeConfirmAction(): Promise<void> {
     showConfirmDialog.value = false
     await loadContrato()
   } catch (err: unknown) {
-    const apiError = err as { message?: string }
-    error("Erro", apiError.message || "Erro ao executar acao")
+    const apiError = err as {
+      message?: string
+      error_type?: string
+      tipo_ativo?: string
+      tipo_ativo_id?: string
+      quantidade_solicitada?: number
+      quantidade_disponivel?: number
+      quantidade_faltante?: number
+    }
+
+    // Trata erro de quantidade indisponivel com dialog especial
+    if (apiError.error_type === 'quantidade_indisponivel') {
+      showConfirmDialog.value = false
+      estoqueError.value = {
+        message: apiError.message || 'Estoque insuficiente',
+        tipoAtivo: apiError.tipo_ativo || '',
+        tipoAtivoId: apiError.tipo_ativo_id || '',
+        quantidadeSolicitada: apiError.quantidade_solicitada || 0,
+        quantidadeDisponivel: apiError.quantidade_disponivel || 0,
+        quantidadeFaltante: apiError.quantidade_faltante || 0,
+      }
+      showEstoqueErrorDialog.value = true
+    } else {
+      error("Erro", apiError.message || "Erro ao executar acao")
+    }
   } finally {
     isConfirming.value = false
   }
@@ -966,6 +1001,59 @@ async function executeConfirmAction(): Promise<void> {
           </Button>
         </DialogFooter>
       </form>
+    </Dialog>
+
+    <!-- Dialog Erro de Estoque -->
+    <Dialog
+      v-model:open="showEstoqueErrorDialog"
+      title="Estoque Insuficiente"
+    >
+      <div v-if="estoqueError" class="space-y-4">
+        <!-- Icone e mensagem principal -->
+        <div class="flex items-start gap-4">
+          <div class="rounded-full bg-destructive/10 p-3">
+            <AlertTriangle class="size-6 text-destructive" />
+          </div>
+          <div class="flex-1">
+            <p class="font-medium">{{ estoqueError.message }}</p>
+          </div>
+        </div>
+
+        <!-- Detalhes -->
+        <div class="rounded-lg bg-muted p-4 space-y-2">
+          <div class="flex justify-between text-sm">
+            <span class="text-muted-foreground">Ativo:</span>
+            <span class="font-medium">{{ estoqueError.tipoAtivo }}</span>
+          </div>
+          <div class="flex justify-between text-sm">
+            <span class="text-muted-foreground">Quantidade necessaria:</span>
+            <span class="font-medium">{{ estoqueError.quantidadeSolicitada }}</span>
+          </div>
+          <div class="flex justify-between text-sm">
+            <span class="text-muted-foreground">Quantidade disponivel:</span>
+            <span class="font-medium">{{ estoqueError.quantidadeDisponivel }}</span>
+          </div>
+          <div class="flex justify-between text-sm border-t pt-2">
+            <span class="text-muted-foreground">Quantidade faltante:</span>
+            <span class="font-semibold text-destructive">{{ estoqueError.quantidadeFaltante }}</span>
+          </div>
+        </div>
+
+        <DialogFooter>
+          <Button
+            variant="outline"
+            @click="showEstoqueErrorDialog = false"
+          >
+            Fechar
+          </Button>
+          <Button
+            @click="router.push({ name: 'tipos-ativos.edit', params: { id: estoqueError.tipoAtivoId } }); showEstoqueErrorDialog = false"
+          >
+            <Package class="size-4 mr-2" />
+            Criar Lote
+          </Button>
+        </DialogFooter>
+      </div>
     </Dialog>
   </div>
 </template>
