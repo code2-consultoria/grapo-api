@@ -184,14 +184,7 @@ RUN [ -d "bootstrap/cache" ] || mkdir bootstrap/cache 2> /dev/null && \
     sudo chmod -R ug+rwX ./bootstrap/cache ./storage
 
 # Não cria .env na imagem - variáveis vêm do docker-compose env_file em produção
-RUN composer install --no-dev
-
-# Build frontend assets with Vite
-USER root
-RUN apk add --no-cache nodejs npm && \
-    chown -R code2:code2 /var/www/app/public
-USER code2
-RUN npm ci && npm run build && rm -rf node_modules
+RUN composer install --no-dev --optimize-autoloader
 
 # Define the entry point that tries to enable newrelic
 ENTRYPOINT ["/scripts/entrypoint.sh"]
