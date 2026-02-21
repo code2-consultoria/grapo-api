@@ -9,6 +9,7 @@ RUN apk add --no-cache \
     libxml2-dev \
     zip \
     unzip \
+    libzip-dev \
     postgresql-dev \
     icu-dev \
     oniguruma-dev \
@@ -26,7 +27,8 @@ RUN docker-php-ext-install \
     bcmath \
     gd \
     intl \
-    opcache
+    opcache \
+    zip
 
 # Instalar Redis extension
 RUN pecl install redis && docker-php-ext-enable redis

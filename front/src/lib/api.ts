@@ -80,6 +80,71 @@ async function request<T>(endpoint: string, config: RequestConfig = {}): Promise
   return data
 }
 
+// Funcao para download de arquivo (blob)
+async function requestBlob(endpoint: string, params?: RequestConfig['params']): Promise<Blob> {
+  const token = getToken()
+
+  const headers: HeadersInit = {
+    Accept: '*/*',
+  }
+
+  if (token) {
+    ;(headers as Record<string, string>)['Authorization'] = `Bearer ${token}`
+  }
+
+  const response = await fetch(buildUrl(endpoint, params), {
+    method: 'GET',
+    headers,
+  })
+
+  if (!response.ok) {
+    const data = await response.json()
+    const error = {
+      ...data,
+      message: data.message || 'Erro na requisicao',
+    }
+    throw error
+  }
+
+  return response.blob()
+}
+
+// Funcao para upload de FormData
+async function requestFormData<T>(endpoint: string, formData: FormData): Promise<T> {
+  const token = getToken()
+
+  const headers: HeadersInit = {
+    Accept: 'application/json',
+    // Nao define Content-Type para FormData - o browser faz automaticamente com boundary
+  }
+
+  if (token) {
+    ;(headers as Record<string, string>)['Authorization'] = `Bearer ${token}`
+  }
+
+  const response = await fetch(`${API_BASE_URL}${endpoint}`, {
+    method: 'POST',
+    headers,
+    body: formData,
+  })
+
+  if (response.status === 204) {
+    return {} as T
+  }
+
+  const data = await response.json()
+
+  if (!response.ok) {
+    const error = {
+      ...data,
+      message: data.message || 'Erro na requisicao',
+    }
+    throw error
+  }
+
+  return data
+}
+
 // Metodos HTTP
 export const api = {
   get: <T>(endpoint: string, params?: RequestConfig['params']) =>
@@ -104,6 +169,14 @@ export const api = {
     }),
 
   delete: <T>(endpoint: string) => request<T>(endpoint, { method: 'DELETE' }),
+
+  // Download de arquivo (retorna Blob)
+  getBlob: (endpoint: string, params?: RequestConfig['params']) =>
+    requestBlob(endpoint, params),
+
+  // Upload de arquivo via FormData
+  postFormData: <T>(endpoint: string, formData: FormData) =>
+    requestFormData<T>(endpoint, formData),
 }
 
 export default api

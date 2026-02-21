@@ -99,6 +99,7 @@ export interface Contrato {
   status: ContratoStatus
   tipo_cobranca: TipoCobranca
   observacoes: string | null
+  documento_assinado_path: string | null
   locador_id: string
   locatario_id: string
   stripe_subscription_id: string | null

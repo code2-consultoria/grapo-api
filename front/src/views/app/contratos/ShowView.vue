@@ -35,6 +35,9 @@ import {
   CheckCircle,
   CreditCard,
   AlertTriangle,
+  Download,
+  Upload,
+  FileCheck,
 } from "lucide-vue-next"
 import api from "@/lib/api"
 import type { Contrato, ContratoItem, ContratoStatus, TipoCobranca, TipoAtivo, TipoAtivoForm, ContratoForm, Pessoa, ApiResponse, PaginatedResponse } from "@/types"
@@ -101,6 +104,11 @@ const estoqueError = ref<{
 const showTipoCobrancaDialog = ref(false)
 const tipoCobrancaForm = ref<TipoCobranca>("sem_cobranca")
 const isSubmittingTipoCobranca = ref(false)
+
+// Estado do documento
+const isGeneratingDocument = ref(false)
+const isUploadingDocument = ref(false)
+const documentFile = ref<File | null>(null)
 
 // Estado do dialog de ativo
 const showTipoAtivoDialog = ref(false)
@@ -490,6 +498,81 @@ async function executeConfirmAction(): Promise<void> {
     isConfirming.value = false
   }
 }
+
+// Handlers de documento
+async function gerarDocumento(): Promise<void> {
+  if (!contrato.value) return
+
+  isGeneratingDocument.value = true
+  try {
+    const blob = await api.getBlob(`/contratos/${contrato.value.id}/documento`)
+
+    // Cria link de download
+    const url = window.URL.createObjectURL(blob)
+    const link = document.createElement('a')
+    link.href = url
+    link.setAttribute('download', `contrato-${contrato.value.codigo}.docx`)
+    document.body.appendChild(link)
+    link.click()
+    link.remove()
+    window.URL.revokeObjectURL(url)
+
+    success("Sucesso!", "Documento gerado com sucesso")
+  } catch (err: unknown) {
+    const apiError = err as { message?: string }
+    error("Erro", apiError.message || "Erro ao gerar documento")
+  } finally {
+    isGeneratingDocument.value = false
+  }
+}
+
+function onFileChange(event: Event): void {
+  const target = event.target as HTMLInputElement
+  if (target.files && target.files.length > 0) {
+    documentFile.value = target.files[0]
+  }
+}
+
+async function uploadDocumentoAssinado(): Promise<void> {
+  if (!contrato.value || !documentFile.value) return
+
+  isUploadingDocument.value = true
+  try {
+    const formData = new FormData()
+    formData.append('documento', documentFile.value)
+
+    await api.postFormData(`/contratos/${contrato.value.id}/documento`, formData)
+
+    success("Sucesso!", "Documento assinado enviado com sucesso")
+    documentFile.value = null
+    await loadContrato()
+  } catch (err: unknown) {
+    const apiError = err as { message?: string }
+    error("Erro", apiError.message || "Erro ao enviar documento")
+  } finally {
+    isUploadingDocument.value = false
+  }
+}
+
+async function downloadDocumentoAssinado(): Promise<void> {
+  if (!contrato.value) return
+
+  try {
+    const blob = await api.getBlob(`/contratos/${contrato.value.id}/documento/assinado`)
+
+    const url = window.URL.createObjectURL(blob)
+    const link = document.createElement('a')
+    link.href = url
+    link.setAttribute('download', `contrato-${contrato.value.codigo}-assinado.pdf`)
+    document.body.appendChild(link)
+    link.click()
+    link.remove()
+    window.URL.revokeObjectURL(url)
+  } catch (err: unknown) {
+    const apiError = err as { message?: string }
+    error("Erro", apiError.message || "Erro ao baixar documento")
+  }
+}
 </script>
 
 <template>
@@ -731,6 +814,85 @@ async function executeConfirmAction(): Promise<void> {
         :contrato-status="contrato.status"
         @updated="loadContrato"
       />
+
+      <!-- Documento do Contrato -->
+      <Card>
+        <CardHeader>
+          <CardTitle class="flex items-center gap-2">
+            <FileText class="size-5" />
+            Documento do Contrato
+          </CardTitle>
+        </CardHeader>
+        <CardContent class="space-y-4">
+          <!-- Gerar documento -->
+          <div class="flex items-center justify-between p-4 rounded-lg bg-muted">
+            <div>
+              <p class="font-medium">Gerar Documento DOCX</p>
+              <p class="text-sm text-muted-foreground">
+                Gere o contrato preenchido para edição e assinatura
+              </p>
+            </div>
+            <Button
+              :disabled="isGeneratingDocument || !contrato.locatario"
+              @click="gerarDocumento"
+            >
+              <Spinner v-if="isGeneratingDocument" size="sm" class="mr-2" />
+              <Download v-else class="size-4 mr-2" />
+              Gerar Documento
+            </Button>
+          </div>
+
+          <!-- Upload documento assinado -->
+          <div class="p-4 rounded-lg border border-dashed space-y-3">
+            <div class="flex items-center gap-2">
+              <Upload class="size-5 text-muted-foreground" />
+              <div>
+                <p class="font-medium">Upload do Documento Assinado</p>
+                <p class="text-sm text-muted-foreground">
+                  Envie o contrato assinado (PDF, max 10MB)
+                </p>
+              </div>
+            </div>
+            <div class="flex items-center gap-2">
+              <input
+                type="file"
+                accept=".pdf,application/pdf"
+                class="flex-1 text-sm file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-medium file:bg-primary file:text-primary-foreground hover:file:bg-primary/90"
+                @change="onFileChange"
+              />
+              <Button
+                :disabled="!documentFile || isUploadingDocument"
+                @click="uploadDocumentoAssinado"
+              >
+                <Spinner v-if="isUploadingDocument" size="sm" class="mr-2" />
+                Enviar
+              </Button>
+            </div>
+          </div>
+
+          <!-- Documento assinado existente -->
+          <div
+            v-if="contrato.documento_assinado_path"
+            class="flex items-center justify-between p-4 rounded-lg bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800"
+          >
+            <div class="flex items-center gap-3">
+              <FileCheck class="size-5 text-green-600 dark:text-green-400" />
+              <div>
+                <p class="font-medium text-green-800 dark:text-green-200">
+                  Documento Assinado
+                </p>
+                <p class="text-sm text-green-600 dark:text-green-400">
+                  O contrato assinado esta disponivel para download
+                </p>
+              </div>
+            </div>
+            <Button variant="outline" @click="downloadDocumentoAssinado">
+              <Download class="size-4 mr-2" />
+              Baixar PDF
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
 
     </template>
 
