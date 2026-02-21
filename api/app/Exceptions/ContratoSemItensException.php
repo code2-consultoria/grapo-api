@@ -9,7 +9,7 @@ class ContratoSemItensException extends Exception
     public function __construct(
         public readonly string $codigoContrato
     ) {
-        $message = "O contrato '{$codigoContrato}' não pode ser ativado sem itens. " .
+        $message = "O contrato '{$codigoContrato}' não pode ser ativado sem itens. ".
             'Adicione pelo menos um item ao contrato antes de ativá-lo.';
 
         parent::__construct($message, 422);

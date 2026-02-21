@@ -26,7 +26,7 @@ class LoteFactory extends Factory
         return [
             'locador_id' => Pessoa::factory()->locador(),
             'tipo_ativo_id' => TipoAtivo::factory(),
-            'codigo' => 'LOT-' . fake()->unique()->numerify('####'),
+            'codigo' => 'LOT-'.fake()->unique()->numerify('####'),
             'quantidade_total' => $quantidade,
             'quantidade_disponivel' => $quantidade,
             'fornecedor' => fake()->company(),

@@ -2,8 +2,8 @@
 
 namespace Database\Factories;
 
-use App\Models\ContratoItem;
 use App\Models\Contrato;
+use App\Models\ContratoItem;
 use App\Models\TipoAtivo;
 use Illuminate\Database\Eloquent\Factories\Factory;
 

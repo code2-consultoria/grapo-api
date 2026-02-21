@@ -1,8 +1,6 @@
 <?php
 
-use App\Models\Pessoa;
 use App\Models\User;
-use App\Models\VinculoTime;
 
 beforeEach(function () {
     $this->admin = User::factory()->create(['papel' => 'admin']);

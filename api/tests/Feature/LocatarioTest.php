@@ -1,6 +1,5 @@
 <?php
 
-use App\Enums\TipoPessoa;
 use App\Models\Pessoa;
 use App\Models\User;
 use App\Models\VinculoTime;

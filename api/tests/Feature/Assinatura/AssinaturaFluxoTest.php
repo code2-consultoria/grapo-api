@@ -1,6 +1,5 @@
 <?php
 
-use App\Enums\TipoPessoa;
 use App\Models\Pessoa;
 use App\Models\Plano;
 use App\Models\User;

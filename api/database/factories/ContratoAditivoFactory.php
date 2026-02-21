@@ -63,7 +63,7 @@ class ContratoAditivoFactory extends Factory
     /**
      * Aditivo de alteracao de valor.
      */
-    public function alteracaoValor(float $valor = null): static
+    public function alteracaoValor(?float $valor = null): static
     {
         return $this->state(fn () => [
             'tipo' => TipoAditivo::AlteracaoValor,

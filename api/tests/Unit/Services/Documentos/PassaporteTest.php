@@ -3,7 +3,7 @@
 use App\Services\Documentos\Passaporte;
 
 beforeEach(function () {
-    $this->passaporte = new Passaporte();
+    $this->passaporte = new Passaporte;
 });
 
 // Testes de validação - formato brasileiro

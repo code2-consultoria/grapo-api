@@ -41,8 +41,8 @@ class Refresh extends Controller
         $onboardingUrl = null;
         if ($hasPendingRequirements || ! $account->charges_enabled) {
             $frontendUrl = config('app.frontend_url', 'http://localhost:5180');
-            $returnUrl = $request->input('return_url', $frontendUrl . '/app/perfil');
-            $refreshUrl = $request->input('refresh_url', $returnUrl . '?refresh=true');
+            $returnUrl = $request->input('return_url', $frontendUrl.'/app/perfil');
+            $refreshUrl = $request->input('refresh_url', $returnUrl.'?refresh=true');
 
             $accountLink = $stripe->accountLinks->create([
                 'account' => $connectConfig->accountId,

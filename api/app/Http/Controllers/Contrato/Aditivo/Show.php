@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Contrato\Aditivo;
 
 use App\Http\Controllers\Controller;
 use App\Models\Contrato;
-use App\Models\ContratoAditivo;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 

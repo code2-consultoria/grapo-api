@@ -1,6 +1,5 @@
 <?php
 
-use App\Enums\OrigemPagamento;
 use App\Enums\StatusContrato;
 use App\Enums\StatusPagamento;
 use App\Enums\TipoCobranca;

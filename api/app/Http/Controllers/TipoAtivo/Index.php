@@ -27,6 +27,7 @@ class Index extends Controller
         // Adiciona quantidade disponível em cada item
         $items = collect($tiposAtivos->items())->map(function ($tipoAtivo) {
             $tipoAtivo->quantidade_disponivel = $tipoAtivo->quantidadeDisponivel();
+
             return $tipoAtivo;
         });
 

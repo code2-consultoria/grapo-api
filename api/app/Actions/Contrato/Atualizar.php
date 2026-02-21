@@ -68,6 +68,7 @@ class Atualizar implements Command
     private function calcularDiasLocacao(): int
     {
         $diff = $this->dataInicio->diff($this->dataTermino);
+
         return $diff->days + 1;
     }
 

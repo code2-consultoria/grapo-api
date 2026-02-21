@@ -8,7 +8,6 @@ use App\Enums\StatusPagamento;
 use App\Models\AlocacaoLote;
 use App\Models\Contrato;
 use App\Models\Lote;
-use App\Models\Pagamento;
 use Carbon\Carbon;
 use Illuminate\Support\Collection;
 
@@ -95,12 +94,12 @@ class Rentabilidade implements Query
 
         foreach ($alocacoes as $alocacao) {
             $contratoItem = $alocacao->contratoItem;
-            if (!$contratoItem) {
+            if (! $contratoItem) {
                 continue;
             }
 
             $contrato = $contratoItem->contrato;
-            if (!$contrato) {
+            if (! $contrato) {
                 continue;
             }
 
@@ -133,7 +132,7 @@ class Rentabilidade implements Query
         return AlocacaoLote::where('lote_id', $this->lote->id)
             ->with('contratoItem')
             ->get()
-            ->map(fn($alocacao) => $alocacao->contratoItem?->contrato_id)
+            ->map(fn ($alocacao) => $alocacao->contratoItem?->contrato_id)
             ->filter()
             ->unique();
     }
@@ -155,12 +154,12 @@ class Rentabilidade implements Query
 
         foreach ($alocacoes as $alocacao) {
             $contratoItem = $alocacao->contratoItem;
-            if (!$contratoItem) {
+            if (! $contratoItem) {
                 continue;
             }
 
             $contrato = $contratoItem->contrato;
-            if (!$contrato) {
+            if (! $contrato) {
                 continue;
             }
 
@@ -180,7 +179,7 @@ class Rentabilidade implements Query
                 $valorFinal = (float) $pagamento->valor - (float) ($pagamento->desconto_comercial ?? 0);
                 $valorProporcional = $valorFinal * $proporcao;
 
-                if (!isset($pagamentosPorMes[$mes])) {
+                if (! isset($pagamentosPorMes[$mes])) {
                     $pagamentosPorMes[$mes] = 0;
                 }
                 $pagamentosPorMes[$mes] += $valorProporcional;
@@ -248,12 +247,12 @@ class Rentabilidade implements Query
 
         foreach ($alocacoes as $alocacao) {
             $contrato = $alocacao->contratoItem?->contrato;
-            if (!$contrato) {
+            if (! $contrato) {
                 continue;
             }
 
             // Apenas contratos ativos ou finalizados
-            if (!in_array($contrato->status, [StatusContrato::Ativo, StatusContrato::Finalizado])) {
+            if (! in_array($contrato->status, [StatusContrato::Ativo, StatusContrato::Finalizado])) {
                 continue;
             }
 
@@ -281,6 +280,7 @@ class Rentabilidade implements Query
 
         // Limita a 100% para evitar inconsistencias
         $percentual = ($totalDiasUnidades / $capacidadeMaxima) * 100;
+
         return min($percentual, 100);
     }
 }

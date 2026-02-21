@@ -12,7 +12,7 @@ class QuantidadeIndisponivelException extends Exception
         public readonly int $quantidadeSolicitada,
         public readonly int $quantidadeDisponivel
     ) {
-        $message = "Não há unidades disponíveis. Crie um lote com novas unidades.";
+        $message = 'Não há unidades disponíveis. Crie um lote com novas unidades.';
 
         parent::__construct($message, 422);
     }

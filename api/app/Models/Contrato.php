@@ -139,7 +139,7 @@ class Contrato extends Model
 
     public function temDocumentoAssinado(): bool
     {
-        return !empty($this->documento_assinado_path);
+        return ! empty($this->documento_assinado_path);
     }
 
     public function calcularMesesLocacao(): int

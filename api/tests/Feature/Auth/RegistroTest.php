@@ -90,7 +90,7 @@ describe('Registro de Usuario via API', function () {
         expect($token)->not->toBeNull();
 
         // Verifica que o token funciona
-        $meResponse = $this->withHeader('Authorization', 'Bearer ' . $token)
+        $meResponse = $this->withHeader('Authorization', 'Bearer '.$token)
             ->getJson('/api/auth/me');
 
         $meResponse->assertOk();

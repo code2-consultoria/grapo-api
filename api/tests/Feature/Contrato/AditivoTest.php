@@ -1,13 +1,8 @@
 <?php
 
-use App\Enums\StatusAditivo;
-use App\Enums\StatusContrato;
-use App\Enums\TipoAditivo;
 use App\Models\Contrato;
 use App\Models\ContratoAditivo;
 use App\Models\ContratoAditivoItem;
-use App\Models\ContratoItem;
-use App\Models\Lote;
 use App\Models\Pessoa;
 use App\Models\TipoAtivo;
 use App\Models\User;

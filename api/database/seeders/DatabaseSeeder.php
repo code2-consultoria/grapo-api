@@ -2,8 +2,8 @@
 
 namespace Database\Seeders;
 
-use App\Enums\StatusPagamento;
 use App\Enums\OrigemPagamento;
+use App\Enums\StatusPagamento;
 use App\Models\AlocacaoLote;
 use App\Models\Contrato;
 use App\Models\ContratoItem;

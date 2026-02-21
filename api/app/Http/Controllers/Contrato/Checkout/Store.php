@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers\Contrato\Checkout;
 
-use App\Enums\StatusContrato;
 use App\Http\Controllers\Controller;
 use App\Models\Contrato;
 use Illuminate\Http\JsonResponse;
@@ -66,7 +65,7 @@ class Store extends Controller
                 ],
             ],
             'customer_email' => $contrato->locatario->email,
-            'success_url' => $validated['success_url'] . '?checkout_id={CHECKOUT_SESSION_ID}',
+            'success_url' => $validated['success_url'].'?checkout_id={CHECKOUT_SESSION_ID}',
             'cancel_url' => $validated['cancel_url'],
             'metadata' => [
                 'contrato_id' => $contrato->id,

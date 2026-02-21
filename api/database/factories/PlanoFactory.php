@@ -31,8 +31,8 @@ class PlanoFactory extends Factory
     public function comStripe(): static
     {
         return $this->state(fn (array $attributes) => [
-            'stripe_product_id' => 'prod_' . fake()->regexify('[A-Za-z0-9]{14}'),
-            'stripe_price_id' => 'price_' . fake()->regexify('[A-Za-z0-9]{14}'),
+            'stripe_product_id' => 'prod_'.fake()->regexify('[A-Za-z0-9]{14}'),
+            'stripe_price_id' => 'price_'.fake()->regexify('[A-Za-z0-9]{14}'),
         ]);
     }
 

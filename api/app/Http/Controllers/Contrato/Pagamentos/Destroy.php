@@ -5,7 +5,6 @@ namespace App\Http\Controllers\Contrato\Pagamentos;
 use App\Enums\StatusPagamento;
 use App\Http\Controllers\Controller;
 use App\Models\Contrato;
-use App\Models\Pagamento;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 

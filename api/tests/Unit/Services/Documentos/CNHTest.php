@@ -3,7 +3,7 @@
 use App\Services\Documentos\CNH;
 
 beforeEach(function () {
-    $this->cnh = new CNH();
+    $this->cnh = new CNH;
 });
 
 // Testes de validação

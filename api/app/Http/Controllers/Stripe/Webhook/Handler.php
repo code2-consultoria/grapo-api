@@ -44,7 +44,7 @@ class Handler extends Controller
 
     protected function handleEvent(\Stripe\Event $event): void
     {
-        $method = 'handle' . str_replace('.', '', ucwords($event->type, '.'));
+        $method = 'handle'.str_replace('.', '', ucwords($event->type, '.'));
 
         if (method_exists($this, $method)) {
             $this->{$method}($event);

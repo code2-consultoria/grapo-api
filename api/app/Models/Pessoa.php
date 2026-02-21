@@ -48,7 +48,7 @@ class Pessoa extends Model
      */
     public function stripeConnect(): StripeConnectConfig
     {
-        return $this->stripe_connect_config ?? new StripeConnectConfig();
+        return $this->stripe_connect_config ?? new StripeConnectConfig;
     }
 
     /**

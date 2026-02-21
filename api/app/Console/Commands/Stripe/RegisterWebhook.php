@@ -27,7 +27,7 @@ class RegisterWebhook extends Command
     {
         $stripe = new StripeClient(config('cashier.secret'));
 
-        $url = $this->option('url') ?? config('app.url') . '/api/stripe/webhook';
+        $url = $this->option('url') ?? config('app.url').'/api/stripe/webhook';
 
         $this->info("Registrando webhook para: {$url}");
 

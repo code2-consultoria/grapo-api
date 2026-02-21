@@ -1,7 +1,5 @@
 <?php
 
-use App\Enums\StatusContrato;
-use App\Enums\StatusPagamento;
 use App\Models\AlocacaoLote;
 use App\Models\Contrato;
 use App\Models\ContratoItem;
@@ -400,7 +398,7 @@ test('calcula ocupacao baseada em contratos ativos e finalizados', function () {
 
     // Verifica que temos ocupacao nos meses apropriados
     $ocupacao = $response->json('ocupacao_por_mes');
-    $ocupacaoComValor = array_filter($ocupacao, fn($item) => $item['percentual'] > 0);
+    $ocupacaoComValor = array_filter($ocupacao, fn ($item) => $item['percentual'] > 0);
 
     expect(count($ocupacaoComValor))->toBeGreaterThanOrEqual(1);
 });
