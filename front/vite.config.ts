@@ -70,7 +70,10 @@ export default defineConfig({
         ],
       },
       workbox: {
-        globPatterns: ['**/*.{js,css,html,ico,png,svg,woff2}'],
+        // Não cachear ícones no precache - usar NetworkFirst para eles
+        globPatterns: ['**/*.{js,css,html,woff2}'],
+        // Ignora ícones do precache para evitar cache stale
+        globIgnores: ['**/icons/**', '**/images/**'],
         runtimeCaching: [
           {
             urlPattern: /^https:\/\/fonts\.googleapis\.com\/.*/i,
@@ -94,6 +97,21 @@ export default defineConfig({
               expiration: {
                 maxEntries: 10,
                 maxAgeSeconds: 60 * 60 * 24 * 365, // 1 year
+              },
+              cacheableResponse: {
+                statuses: [0, 200],
+              },
+            },
+          },
+          {
+            // Ícones e imagens: NetworkFirst para sempre buscar versão mais recente
+            urlPattern: /\/(icons|images)\/.*\.(png|svg|ico)$/i,
+            handler: 'NetworkFirst',
+            options: {
+              cacheName: 'icons-images-cache',
+              expiration: {
+                maxEntries: 50,
+                maxAgeSeconds: 60 * 60 * 24 * 7, // 7 dias
               },
               cacheableResponse: {
                 statuses: [0, 200],
