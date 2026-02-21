@@ -26,6 +26,7 @@ class Contrato extends Model
         'status',
         'tipo_cobranca',
         'observacoes',
+        'documento_assinado_path',
         // Stripe Connect - pagamento recorrente
         'stripe_subscription_id',
         'stripe_customer_id',
@@ -134,5 +135,10 @@ class Contrato extends Model
     public function semCobranca(): bool
     {
         return $this->tipo_cobranca === TipoCobranca::SemCobranca;
+    }
+
+    public function temDocumentoAssinado(): bool
+    {
+        return !empty($this->documento_assinado_path);
     }
 }

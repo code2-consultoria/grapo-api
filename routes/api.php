@@ -105,6 +105,11 @@ Route::middleware(['auth:sanctum'])->group(function () {
         // Checkout para pagamento antecipado
         Route::post('/{id}/checkout', \App\Http\Controllers\Contrato\Checkout\Store::class);
 
+        // Documento do contrato
+        Route::get('/{id}/documento', \App\Http\Controllers\Contrato\Documento\Download::class);
+        Route::post('/{id}/documento', \App\Http\Controllers\Contrato\Documento\Upload::class);
+        Route::get('/{id}/documento/assinado', \App\Http\Controllers\Contrato\Documento\Assinado::class);
+
         // Pagamentos do contrato
         Route::prefix('/{contratoId}/pagamentos')->group(function () {
             Route::get('/', \App\Http\Controllers\Contrato\Pagamentos\Index::class);
