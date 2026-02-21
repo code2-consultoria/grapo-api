@@ -41,7 +41,7 @@ function isActive(itemName: string): boolean {
     <!-- Logo -->
     <div class="flex h-16 items-center gap-2 border-b px-6">
       <img
-        src="/icons/icon-96x96.png"
+        src="/icons/icon-96x96.png?v=2"
         alt="Grapo"
         class="w-8 h-10"
       />
