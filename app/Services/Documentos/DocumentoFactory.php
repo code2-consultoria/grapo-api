@@ -17,14 +17,14 @@ class DocumentoFactory
     public static function criar(TipoDocumento $tipo): ValidaDocumento&FormataDocumento
     {
         return match ($tipo) {
-            TipoDocumento::Cpf => new CPF(),
-            TipoDocumento::Cnpj => new CNPJ(),
-            TipoDocumento::Rg => new RG(),
-            TipoDocumento::Cnh => new CNH(),
-            TipoDocumento::Passaporte => new Passaporte(),
-            TipoDocumento::InscricaoMunicipal => new InscricaoMunicipal(),
-            TipoDocumento::InscricaoEstadual => new InscricaoEstadual(),
-            TipoDocumento::CadUnico => new CadUnico(),
+            TipoDocumento::Cpf => new CPF,
+            TipoDocumento::Cnpj => new CNPJ,
+            TipoDocumento::Rg => new RG,
+            TipoDocumento::Cnh => new CNH,
+            TipoDocumento::Passaporte => new Passaporte,
+            TipoDocumento::InscricaoMunicipal => new InscricaoMunicipal,
+            TipoDocumento::InscricaoEstadual => new InscricaoEstadual,
+            TipoDocumento::CadUnico => new CadUnico,
         };
     }
 

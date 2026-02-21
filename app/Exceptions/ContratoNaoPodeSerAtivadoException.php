@@ -10,7 +10,7 @@ class ContratoNaoPodeSerAtivadoException extends Exception
         public readonly string $codigoContrato,
         public readonly string $statusAtual
     ) {
-        $message = "O contrato '{$codigoContrato}' não pode ser ativado. " .
+        $message = "O contrato '{$codigoContrato}' não pode ser ativado. ".
             "Status atual: {$statusAtual}. Apenas contratos em rascunho podem ser ativados.";
 
         parent::__construct($message, 422);

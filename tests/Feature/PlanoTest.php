@@ -43,7 +43,7 @@ test('exibe plano específico', function () {
 });
 
 test('retorna 404 para plano inexistente', function () {
-    $response = $this->getJson('/api/planos/' . \Illuminate\Support\Str::uuid());
+    $response = $this->getJson('/api/planos/'.\Illuminate\Support\Str::uuid());
 
     $response->assertStatus(404);
 });

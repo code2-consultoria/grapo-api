@@ -3,7 +3,7 @@
 use App\Services\Documentos\RG;
 
 beforeEach(function () {
-    $this->rg = new RG();
+    $this->rg = new RG;
 });
 
 // Testes de validação

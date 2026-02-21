@@ -3,7 +3,7 @@
 use App\Services\Documentos\CPF;
 
 beforeEach(function () {
-    $this->cpf = new CPF();
+    $this->cpf = new CPF;
 });
 
 // Testes de validação

@@ -76,7 +76,7 @@ test('usuário autenticado pode fazer logout', function () {
     $user = User::factory()->create();
     $token = $user->createToken('test-token');
 
-    $response = $this->withHeader('Authorization', 'Bearer ' . $token->plainTextToken)
+    $response = $this->withHeader('Authorization', 'Bearer '.$token->plainTextToken)
         ->postJson('/api/auth/logout');
 
     $response->assertStatus(200);
@@ -98,7 +98,7 @@ test('usuário autenticado pode obter seus dados', function () {
     ]);
     $token = $user->createToken('test-token');
 
-    $response = $this->withHeader('Authorization', 'Bearer ' . $token->plainTextToken)
+    $response = $this->withHeader('Authorization', 'Bearer '.$token->plainTextToken)
         ->getJson('/api/auth/me');
 
     $response->assertStatus(200);
@@ -119,7 +119,7 @@ test('token expirado não permite acesso', function () {
     // Expira o token manualmente
     PersonalAccessToken::where('tokenable_id', $user->id)->delete();
 
-    $response = $this->withHeader('Authorization', 'Bearer ' . $token->plainTextToken)
+    $response = $this->withHeader('Authorization', 'Bearer '.$token->plainTextToken)
         ->getJson('/api/auth/me');
 
     $response->assertStatus(401);

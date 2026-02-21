@@ -4,7 +4,6 @@ namespace App\Queries\Relatorio;
 
 use App\Contracts\Query;
 use App\Enums\StatusPagamento;
-use App\Models\Contrato;
 use App\Models\Pagamento;
 use App\Models\Pessoa;
 use Carbon\Carbon;
@@ -16,6 +15,7 @@ use Illuminate\Support\Collection;
 class Financeiro implements Query
 {
     private Carbon $dataInicio;
+
     private Carbon $dataFim;
 
     public function __construct(
@@ -53,14 +53,14 @@ class Financeiro implements Query
     {
         $pagamentos = $this->getPagamentosNoPeriodo();
 
-        $totalFaturado = $pagamentos->sum(fn($p) => $this->valorFinal($p));
+        $totalFaturado = $pagamentos->sum(fn ($p) => $this->valorFinal($p));
         $totalRecebido = $pagamentos
             ->where('status', StatusPagamento::Pago)
-            ->sum(fn($p) => $this->valorFinal($p));
+            ->sum(fn ($p) => $this->valorFinal($p));
 
         $totalPendente = $pagamentos
             ->where('status', StatusPagamento::Pendente)
-            ->sum(fn($p) => $this->valorFinal($p));
+            ->sum(fn ($p) => $this->valorFinal($p));
 
         $totalAtrasado = $this->getValorInadimplente($pagamentos);
 
@@ -86,19 +86,19 @@ class Financeiro implements Query
             ->where('status', StatusPagamento::Pago)
             ->whereNotNull('data_pagamento');
 
-        $agrupado = $pagamentos->groupBy(fn($p) => Carbon::parse($p->data_pagamento)->format('Y-m'));
+        $agrupado = $pagamentos->groupBy(fn ($p) => Carbon::parse($p->data_pagamento)->format('Y-m'));
 
         $resultado = [];
         foreach ($agrupado as $mes => $pagamentosMes) {
             $resultado[] = [
                 'mes' => $mes,
-                'valor' => round($pagamentosMes->sum(fn($p) => $this->valorFinal($p)), 2),
+                'valor' => round($pagamentosMes->sum(fn ($p) => $this->valorFinal($p)), 2),
                 'quantidade' => $pagamentosMes->count(),
             ];
         }
 
         // Ordena por mes
-        usort($resultado, fn($a, $b) => strcmp($a['mes'], $b['mes']));
+        usort($resultado, fn ($a, $b) => strcmp($a['mes'], $b['mes']));
 
         return $resultado;
     }
@@ -115,7 +115,7 @@ class Financeiro implements Query
 
         foreach ($pagamentos as $pagamento) {
             $contrato = $pagamento->contrato;
-            if (!$contrato) {
+            if (! $contrato) {
                 continue;
             }
 
@@ -125,6 +125,7 @@ class Financeiro implements Query
             if ($itens->isEmpty()) {
                 // Se nao tem itens, agrupa como "Sem ativo"
                 $this->addToAtivoResult($resultado, 'Sem ativo', null, $this->valorFinal($pagamento));
+
                 continue;
             }
 
@@ -147,7 +148,7 @@ class Financeiro implements Query
 
         // Converte para array e ordena por valor
         $resultadoArray = array_values($resultado);
-        usort($resultadoArray, fn($a, $b) => $b['valor'] <=> $a['valor']);
+        usort($resultadoArray, fn ($a, $b) => $b['valor'] <=> $a['valor']);
 
         return $resultadoArray;
     }
@@ -159,7 +160,7 @@ class Financeiro implements Query
     {
         $key = $id ?? 'sem_ativo';
 
-        if (!isset($resultado[$key])) {
+        if (! isset($resultado[$key])) {
             $resultado[$key] = [
                 'tipo_ativo_id' => $id,
                 'tipo_ativo' => $nome,
@@ -194,7 +195,7 @@ class Financeiro implements Query
 
         return [
             'quantidade' => $pagamentos->count(),
-            'valor_total' => round($pagamentos->sum(fn($p) => $this->valorFinal($p)), 2),
+            'valor_total' => round($pagamentos->sum(fn ($p) => $this->valorFinal($p)), 2),
             'pagamentos' => $listaPagamentos,
         ];
     }
@@ -207,27 +208,27 @@ class Financeiro implements Query
         $pagamentos = $this->getPagamentosNoPeriodo()
             ->where('status', StatusPagamento::Pago);
 
-        $agrupado = $pagamentos->groupBy(fn($p) => $p->contrato?->locatario_id);
+        $agrupado = $pagamentos->groupBy(fn ($p) => $p->contrato?->locatario_id);
 
         $resultado = [];
         foreach ($agrupado as $locatarioId => $pagamentosLocatario) {
-            if (!$locatarioId) {
+            if (! $locatarioId) {
                 continue;
             }
 
             $locatario = $pagamentosLocatario->first()->contrato?->locatario;
-            if (!$locatario) {
+            if (! $locatario) {
                 continue;
             }
 
-            $totalPago = $pagamentosLocatario->sum(fn($p) => $this->valorFinal($p));
+            $totalPago = $pagamentosLocatario->sum(fn ($p) => $this->valorFinal($p));
             $qtdPagamentos = $pagamentosLocatario->count();
 
             // Calcula inadimplencia do locatario
             $pagamentosAtrasados = $this->getPagamentosInadimplentes()
-                ->filter(fn($p) => $p->contrato?->locatario_id === $locatarioId);
+                ->filter(fn ($p) => $p->contrato?->locatario_id === $locatarioId);
 
-            $totalAtrasado = $pagamentosAtrasados->sum(fn($p) => $this->valorFinal($p));
+            $totalAtrasado = $pagamentosAtrasados->sum(fn ($p) => $this->valorFinal($p));
 
             $resultado[] = [
                 'locatario_id' => $locatarioId,
@@ -240,7 +241,7 @@ class Financeiro implements Query
         }
 
         // Ordena por total pago
-        usort($resultado, fn($a, $b) => $b['total_pago'] <=> $a['total_pago']);
+        usort($resultado, fn ($a, $b) => $b['total_pago'] <=> $a['total_pago']);
 
         return $resultado;
     }
@@ -251,7 +252,7 @@ class Financeiro implements Query
     private function getPagamentosNoPeriodo(): Collection
     {
         return Pagamento::query()
-            ->whereHas('contrato', fn($q) => $q->where('locador_id', $this->locador->id))
+            ->whereHas('contrato', fn ($q) => $q->where('locador_id', $this->locador->id))
             ->where(function ($query) {
                 $query->where(function ($q) {
                     // Pagamentos pagos no periodo
@@ -275,7 +276,7 @@ class Financeiro implements Query
         $hoje = Carbon::now()->startOfDay();
 
         return Pagamento::query()
-            ->whereHas('contrato', fn($q) => $q->where('locador_id', $this->locador->id))
+            ->whereHas('contrato', fn ($q) => $q->where('locador_id', $this->locador->id))
             ->where(function ($query) use ($hoje) {
                 $query->where('status', StatusPagamento::Atrasado)
                     ->orWhere(function ($q) use ($hoje) {
@@ -301,8 +302,9 @@ class Financeiro implements Query
             if ($pagamento->status === StatusPagamento::Pendente && $pagamento->data_vencimento < $hoje) {
                 return true;
             }
+
             return false;
-        })->sum(fn($p) => $this->valorFinal($p));
+        })->sum(fn ($p) => $this->valorFinal($p));
     }
 
     /**

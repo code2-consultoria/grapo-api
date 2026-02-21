@@ -47,7 +47,7 @@ class GerarParcelas implements Command
                     'data_vencimento' => $dataVencimento,
                     'status' => StatusPagamento::Pendente,
                     'origem' => OrigemPagamento::Manual,
-                    'observacoes' => "Parcela " . ($i + 1) . " de {$meses}",
+                    'observacoes' => 'Parcela '.($i + 1)." de {$meses}",
                 ]);
 
                 $parcela->contrato()->associate($this->contrato);

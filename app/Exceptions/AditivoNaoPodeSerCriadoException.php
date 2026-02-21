@@ -11,7 +11,7 @@ class AditivoNaoPodeSerCriadoException extends Exception
         public readonly string $codigoContrato,
         public readonly StatusContrato $statusAtual
     ) {
-        $message = "Aditivos só podem ser criados para contratos ativos. " .
+        $message = 'Aditivos só podem ser criados para contratos ativos. '.
             "O contrato '{$codigoContrato}' está em status '{$statusAtual->label()}'.";
 
         parent::__construct($message, 422);

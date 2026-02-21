@@ -1,7 +1,5 @@
 <?php
 
-use App\Enums\StatusAditivo;
-use App\Enums\TipoAditivo;
 use App\Models\Contrato;
 use App\Models\ContratoAditivo;
 use App\Models\ContratoItem;

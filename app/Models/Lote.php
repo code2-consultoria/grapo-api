@@ -69,7 +69,7 @@ class Lote extends Model
      */
     public function getCustoUnitarioAttribute(): ?float
     {
-        if (!$this->quantidade_total || $this->quantidade_total <= 0) {
+        if (! $this->quantidade_total || $this->quantidade_total <= 0) {
             return null;
         }
 

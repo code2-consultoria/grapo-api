@@ -23,7 +23,7 @@ final class StripeConnectConfig implements Arrayable, JsonSerializable
     public static function fromArray(?array $data): self
     {
         if ($data === null) {
-            return new self();
+            return new self;
         }
 
         return new self(

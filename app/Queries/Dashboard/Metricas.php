@@ -9,7 +9,6 @@ use App\Models\Lote;
 use App\Models\Pessoa;
 use App\Models\TipoAtivo;
 use Carbon\Carbon;
-use Illuminate\Support\Collection;
 
 /**
  * Query para obter metricas do dashboard.
@@ -53,6 +52,7 @@ class Metricas implements Query
             ->get(['id', 'codigo', 'data_termino', 'valor_total', 'locatario_id'])
             ->map(function ($contrato) {
                 $diasRestantes = Carbon::now()->diffInDays(Carbon::parse($contrato->data_termino), false);
+
                 return [
                     'id' => $contrato->id,
                     'codigo' => $contrato->codigo,
@@ -160,7 +160,7 @@ class Metricas implements Query
             $alertas[] = [
                 'tipo' => 'info',
                 'titulo' => 'Estoque baixo',
-                'mensagem' => count($ativosEstoqueBaixo) . ' ativo(s) com menos de 5 unidades',
+                'mensagem' => count($ativosEstoqueBaixo).' ativo(s) com menos de 5 unidades',
                 'icone' => 'package',
                 'detalhes' => $ativosEstoqueBaixo,
             ];
@@ -178,7 +178,7 @@ class Metricas implements Query
             $alertas[] = [
                 'tipo' => 'destructive',
                 'titulo' => 'Ativos esgotados',
-                'mensagem' => count($ativosEsgotados) . ' ativo(s) sem estoque disponivel',
+                'mensagem' => count($ativosEsgotados).' ativo(s) sem estoque disponivel',
                 'icone' => 'alert-triangle',
                 'detalhes' => $ativosEsgotados,
             ];

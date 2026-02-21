@@ -20,12 +20,12 @@ class ContratoFactory extends Factory
     public function definition(): array
     {
         $dataInicio = fake()->dateTimeBetween('now', '+1 month');
-        $dataTermino = (clone $dataInicio)->modify('+' . fake()->numberBetween(1, 6) . ' months');
+        $dataTermino = (clone $dataInicio)->modify('+'.fake()->numberBetween(1, 6).' months');
 
         return [
             'locador_id' => Pessoa::factory()->locador(),
             'locatario_id' => Pessoa::factory()->locatario(),
-            'codigo' => 'CTR-' . fake()->unique()->numerify('####'),
+            'codigo' => 'CTR-'.fake()->unique()->numerify('####'),
             'data_inicio' => $dataInicio,
             'data_termino' => $dataTermino,
             'valor_total' => 0,

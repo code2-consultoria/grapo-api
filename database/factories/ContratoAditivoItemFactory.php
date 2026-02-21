@@ -30,7 +30,7 @@ class ContratoAditivoItemFactory extends Factory
     /**
      * Item de acrescimo (quantidade positiva).
      */
-    public function acrescimo(int $quantidade = null): static
+    public function acrescimo(?int $quantidade = null): static
     {
         return $this->state(fn () => [
             'quantidade_alterada' => $quantidade ?? fake()->numberBetween(1, 10),
@@ -40,7 +40,7 @@ class ContratoAditivoItemFactory extends Factory
     /**
      * Item de reducao (quantidade negativa).
      */
-    public function reducao(int $quantidade = null): static
+    public function reducao(?int $quantidade = null): static
     {
         $qtd = $quantidade ?? fake()->numberBetween(1, 5);
 

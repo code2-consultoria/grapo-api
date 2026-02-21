@@ -56,7 +56,7 @@ class Registrar
             $locador->definirTrial();
 
             // Cria o vinculo entre user e locador
-            $vinculo = new VinculoTime();
+            $vinculo = new VinculoTime;
             $vinculo->user()->associate($user);
             $vinculo->locador()->associate($locador);
             $vinculo->save();

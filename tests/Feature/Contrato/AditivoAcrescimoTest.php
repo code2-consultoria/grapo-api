@@ -1,6 +1,5 @@
 <?php
 
-use App\Models\AlocacaoLote;
 use App\Models\Contrato;
 use App\Models\ContratoAditivo;
 use App\Models\ContratoAditivoItem;

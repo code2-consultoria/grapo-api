@@ -40,7 +40,7 @@ class Upload extends Controller
 
         // Faz upload do novo documento
         $arquivo = $request->file('documento');
-        $nomeArquivo = "contrato-{$contrato->codigo}-assinado-" . time() . '.pdf';
+        $nomeArquivo = "contrato-{$contrato->codigo}-assinado-".time().'.pdf';
         $caminho = $arquivo->storeAs('contratos/assinados', $nomeArquivo, 'local');
 
         // Atualiza o contrato

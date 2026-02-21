@@ -8,8 +8,8 @@ class ContratoAtivoImutavelException extends Exception
 {
     public function __construct(public readonly string $codigoContrato)
     {
-        $message = "O contrato '{$codigoContrato}' está ativo e não pode ser alterado. " .
-            "Utilize um aditivo para realizar alterações.";
+        $message = "O contrato '{$codigoContrato}' está ativo e não pode ser alterado. ".
+            'Utilize um aditivo para realizar alterações.';
 
         parent::__construct($message, 422);
     }

@@ -5,7 +5,7 @@ namespace App\Services\Documentos;
 use App\Contracts\Documentos\FormataDocumento;
 use App\Contracts\Documentos\ValidaDocumento;
 
-class RG implements ValidaDocumento, FormataDocumento
+class RG implements FormataDocumento, ValidaDocumento
 {
     public function validar(string $numero): bool
     {

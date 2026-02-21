@@ -42,7 +42,7 @@ test('requer autenticação para criar assinatura de contrato', function () {
 
 test('valida contrato existente', function () {
     $response = $this->actingAs($this->user)
-        ->postJson('/api/contratos/' . \Illuminate\Support\Str::uuid() . '/pagamento-stripe', [
+        ->postJson('/api/contratos/'.\Illuminate\Support\Str::uuid().'/pagamento-stripe', [
             'dia_vencimento' => 10,
         ]);
 

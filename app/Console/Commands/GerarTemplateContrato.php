@@ -3,9 +3,8 @@
 namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
-use PhpOffice\PhpWord\PhpWord;
-use PhpOffice\PhpWord\Style\Font;
 use PhpOffice\PhpWord\IOFactory;
+use PhpOffice\PhpWord\PhpWord;
 
 class GerarTemplateContrato extends Command
 {
@@ -15,7 +14,7 @@ class GerarTemplateContrato extends Command
 
     public function handle(): int
     {
-        $phpWord = new PhpWord();
+        $phpWord = new PhpWord;
 
         // Estilos
         $phpWord->addTitleStyle(1, ['bold' => true, 'size' => 16], ['alignment' => 'center', 'spaceAfter' => 240]);

@@ -3,7 +3,7 @@
 use App\Services\Documentos\CNPJ;
 
 beforeEach(function () {
-    $this->cnpj = new CNPJ();
+    $this->cnpj = new CNPJ;
 });
 
 // Testes de validação

@@ -3,7 +3,7 @@
 use App\Services\Documentos\InscricaoMunicipal;
 
 beforeEach(function () {
-    $this->inscricao = new InscricaoMunicipal();
+    $this->inscricao = new InscricaoMunicipal;
 });
 
 // Testes de validação

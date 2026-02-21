@@ -17,7 +17,7 @@ class Index extends Controller
         $user = $request->user();
         $locador = $user->locador();
 
-        if (!$locador) {
+        if (! $locador) {
             return response()->json([
                 'message' => 'Usuario nao vinculado a um locador.',
             ], 403);

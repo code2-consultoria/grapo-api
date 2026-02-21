@@ -3,7 +3,7 @@
 use App\Services\Documentos\CadUnico;
 
 beforeEach(function () {
-    $this->cadUnico = new CadUnico();
+    $this->cadUnico = new CadUnico;
 });
 
 // Testes de validação

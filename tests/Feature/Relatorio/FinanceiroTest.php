@@ -1,6 +1,5 @@
 <?php
 
-use App\Enums\StatusPagamento;
 use App\Models\AlocacaoLote;
 use App\Models\Contrato;
 use App\Models\ContratoItem;

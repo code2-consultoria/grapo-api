@@ -11,7 +11,7 @@ class ReducaoExcedeQuantidadeException extends Exception
         public readonly int $quantidadeReduzir,
         public readonly int $quantidadeAlocada
     ) {
-        $message = "Não é possível reduzir {$quantidadeReduzir} unidades de '{$tipoAtivoNome}'. " .
+        $message = "Não é possível reduzir {$quantidadeReduzir} unidades de '{$tipoAtivoNome}'. ".
             "Quantidade atual alocada: {$quantidadeAlocada}.";
 
         parent::__construct($message, 422);

@@ -29,7 +29,7 @@ class Checkout extends Controller
         // Cria a sessão de checkout do Stripe
         $checkout = $locador->newSubscription('default', $plano->stripe_price_id)
             ->checkout([
-                'success_url' => $validated['success_url'] . '?session_id={CHECKOUT_SESSION_ID}',
+                'success_url' => $validated['success_url'].'?session_id={CHECKOUT_SESSION_ID}',
                 'cancel_url' => $validated['cancel_url'],
             ]);
 

@@ -56,7 +56,7 @@ class Store extends Controller
         // Usa tipo do body ou da rota
         $tipo = $validated['tipo'] ?? $tipoDefault;
 
-        $pessoa = DB::transaction(function () use ($request, $validated, $tipo, $locador) {
+        $pessoa = DB::transaction(function () use ($validated, $tipo, $locador) {
             $tipoPessoa = TipoPessoa::from($tipo);
 
             $criarPessoa = new Criar(

@@ -3,7 +3,7 @@
 use App\Services\Documentos\InscricaoEstadual;
 
 beforeEach(function () {
-    $this->inscricao = new InscricaoEstadual();
+    $this->inscricao = new InscricaoEstadual;
 });
 
 // Testes de validação

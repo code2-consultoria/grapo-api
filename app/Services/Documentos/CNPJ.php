@@ -5,7 +5,7 @@ namespace App\Services\Documentos;
 use App\Contracts\Documentos\FormataDocumento;
 use App\Contracts\Documentos\ValidaDocumento;
 
-class CNPJ implements ValidaDocumento, FormataDocumento
+class CNPJ implements FormataDocumento, ValidaDocumento
 {
     public function validar(string $numero): bool
     {

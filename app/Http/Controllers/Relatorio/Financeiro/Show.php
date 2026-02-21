@@ -17,7 +17,7 @@ class Show extends Controller
         $user = $request->user();
         $locador = $user->locador();
 
-        if (!$locador) {
+        if (! $locador) {
             return response()->json([
                 'message' => 'Locador nao encontrado.',
             ], 403);
