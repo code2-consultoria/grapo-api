@@ -1,4 +1,4 @@
-# Build stage
+# Build stage - v2 (force rebuild)
 FROM node:22-alpine AS build
 
 # Instala pnpm
