@@ -246,6 +246,7 @@ jobs:
             STRIPE_WEBHOOK_SECRET=${{ secrets.STRIPE_WEBHOOK_SECRET }}
             RESEND_API_KEY=${{ secrets.RESEND_API_KEY }}
             DB_PASSWORD=${{ secrets.DB_PASSWORD }}
+            INSPECTOR_INGESTION_KEY=${{ secrets.INSPECTOR_INGESTION_KEY }}
             BUILD_ID=${{ steps.vars.outputs.short_sha }}
             DOCKER_IMAGE=ghcr.io/${{ github.repository }}
             ENVEOF
@@ -301,6 +302,7 @@ jobs:
             STRIPE_WEBHOOK_SECRET=${{ secrets.STRIPE_WEBHOOK_SECRET }}
             RESEND_API_KEY=${{ secrets.RESEND_API_KEY }}
             DB_PASSWORD=${{ secrets.DB_PASSWORD }}
+            INSPECTOR_INGESTION_KEY=${{ secrets.INSPECTOR_INGESTION_KEY }}
             BUILD_ID=${{ steps.vars.outputs.short_sha }}
             DOCKER_IMAGE=ghcr.io/${{ github.repository }}
             ENVEOF
