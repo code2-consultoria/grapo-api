@@ -45,6 +45,7 @@ class Alocar implements Command
         if ($totalDisponivel < $quantidadeNecessaria) {
             throw new QuantidadeIndisponivelException(
                 $this->item->tipoAtivo->nome,
+                $this->item->tipo_ativo_id,
                 $quantidadeNecessaria,
                 $totalDisponivel
             );

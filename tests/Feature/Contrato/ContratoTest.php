@@ -181,7 +181,8 @@ test('retorna erro ao ativar contrato sem disponibilidade suficiente', function 
         ->postJson("/api/contratos/{$contrato->id}/ativar");
 
     $response->assertStatus(422);
-    $response->assertJsonPath('message', fn ($m) => str_contains($m, 'Quantidade indisponível'));
+    $response->assertJsonPath('error_type', 'quantidade_indisponivel');
+    $response->assertJsonPath('message', 'Não há unidades disponíveis. Crie um lote com novas unidades.');
 
     // Contrato permanece em rascunho
     $contrato->refresh();

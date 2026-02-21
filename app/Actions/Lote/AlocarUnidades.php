@@ -26,6 +26,7 @@ class AlocarUnidades implements Command
         if (! $this->lote->temDisponibilidade($this->quantidade)) {
             throw new QuantidadeIndisponivelException(
                 $this->lote->tipoAtivo->nome,
+                $this->lote->tipo_ativo_id,
                 $this->quantidade,
                 $this->lote->quantidade_disponivel
             );
