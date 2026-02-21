@@ -8,6 +8,9 @@ use Illuminate\Support\Facades\Route;
 |--------------------------------------------------------------------------
 */
 
+// Health check (para monitoramento e deploy)
+Route::get('/health', fn () => response()->json(['status' => 'ok']));
+
 // Autenticação (rotas públicas)
 Route::prefix('auth')->group(function () {
     Route::post('/login', \App\Http\Controllers\Auth\Api\Login::class);
