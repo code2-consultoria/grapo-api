@@ -17,7 +17,7 @@ services:
       - TZ=America/Fortaleza
       - NGINX_HTTP_PORT=8080
     networks:
-      proxy:
+      proxymng:
       grapo-net:
         aliases:
           - api.grapo.app
@@ -113,5 +113,5 @@ volumes:
 networks:
   grapo-net:
     external: true
-  proxy:
+  proxymng:
     external: true
