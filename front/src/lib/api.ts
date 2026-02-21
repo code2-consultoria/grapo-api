@@ -1,4 +1,4 @@
-// Cliente HTTP baseado em fetch
+// Cliente HTTP baseado em fetch - v2
 import type { ApiError } from '@/types'
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api'
