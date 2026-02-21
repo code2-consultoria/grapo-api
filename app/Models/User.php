@@ -20,6 +20,7 @@ class User extends Authenticatable
         'password',
         'papel',
         'ativo',
+        'accepted_terms_at',
     ];
 
     protected $hidden = [
@@ -36,6 +37,7 @@ class User extends Authenticatable
             'password' => 'hashed',
             'two_factor_confirmed_at' => 'datetime',
             'ativo' => 'boolean',
+            'accepted_terms_at' => 'datetime',
         ];
     }
 

@@ -21,12 +21,17 @@ class Register extends Controller
         $validated = $request->validate([
             ...$this->profileRules(),
             'password' => $this->passwordRules(),
+            'accepted_terms' => ['required', 'accepted'],
+        ], [
+            'accepted_terms.required' => 'Voce deve aceitar os termos de uso.',
+            'accepted_terms.accepted' => 'Voce deve aceitar os termos de uso.',
         ]);
 
         $action = new Registrar(
             name: $validated['name'],
             email: $validated['email'],
-            password: $validated['password']
+            password: $validated['password'],
+            acceptedTerms: true
         );
 
         $result = $action->handle();

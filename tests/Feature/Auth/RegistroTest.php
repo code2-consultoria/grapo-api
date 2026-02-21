@@ -11,6 +11,7 @@ describe('Registro de Usuario via API', function () {
             'email' => 'joao@teste.com',
             'password' => 'Senha@123',
             'password_confirmation' => 'Senha@123',
+            'accepted_terms' => true,
         ]);
 
         $response->assertStatus(201);
@@ -28,6 +29,7 @@ describe('Registro de Usuario via API', function () {
         expect($user->name)->toBe('João Silva');
         expect($user->papel)->toBe('cliente');
         expect($user->ativo)->toBeTrue();
+        expect($user->accepted_terms_at)->not->toBeNull();
     });
 
     test('registro cria locador automaticamente', function () {
@@ -36,6 +38,7 @@ describe('Registro de Usuario via API', function () {
             'email' => 'maria@teste.com',
             'password' => 'Senha@123',
             'password_confirmation' => 'Senha@123',
+            'accepted_terms' => true,
         ]);
 
         $response->assertStatus(201);
@@ -54,6 +57,7 @@ describe('Registro de Usuario via API', function () {
             'email' => 'pedro@teste.com',
             'password' => 'Senha@123',
             'password_confirmation' => 'Senha@123',
+            'accepted_terms' => true,
         ]);
 
         $response->assertStatus(201);
@@ -77,6 +81,7 @@ describe('Registro de Usuario via API', function () {
             'email' => 'ana@teste.com',
             'password' => 'Senha@123',
             'password_confirmation' => 'Senha@123',
+            'accepted_terms' => true,
         ]);
 
         $response->assertStatus(201);
@@ -94,6 +99,31 @@ describe('Registro de Usuario via API', function () {
 });
 
 describe('Validacoes de Registro', function () {
+    test('registro falha sem aceitar termos de uso', function () {
+        $response = $this->postJson('/api/auth/register', [
+            'name' => 'Teste',
+            'email' => 'teste@teste.com',
+            'password' => 'Senha@123',
+            'password_confirmation' => 'Senha@123',
+        ]);
+
+        $response->assertStatus(422);
+        $response->assertJsonValidationErrors(['accepted_terms']);
+    });
+
+    test('registro falha com termos recusados', function () {
+        $response = $this->postJson('/api/auth/register', [
+            'name' => 'Teste',
+            'email' => 'teste@teste.com',
+            'password' => 'Senha@123',
+            'password_confirmation' => 'Senha@123',
+            'accepted_terms' => false,
+        ]);
+
+        $response->assertStatus(422);
+        $response->assertJsonValidationErrors(['accepted_terms']);
+    });
+
     test('registro falha sem nome', function () {
         $response = $this->postJson('/api/auth/register', [
             'email' => 'teste@teste.com',

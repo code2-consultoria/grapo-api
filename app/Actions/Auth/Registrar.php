@@ -21,7 +21,8 @@ class Registrar
     public function __construct(
         private string $name,
         private string $email,
-        private string $password
+        private string $password,
+        private bool $acceptedTerms = false
     ) {}
 
     /**
@@ -39,6 +40,7 @@ class Registrar
                 'password' => $this->password,
                 'papel' => 'cliente',
                 'ativo' => true,
+                'accepted_terms_at' => $this->acceptedTerms ? now() : null,
             ]);
 
             // Cria o locador (Pessoa)
