@@ -71,9 +71,10 @@ async function request<T>(endpoint: string, config: RequestConfig = {}): Promise
   const data = await response.json()
 
   if (!response.ok) {
-    const error: ApiError = {
+    // Passa todos os campos da resposta de erro (message, errors, error_type, etc)
+    const error = {
+      ...data,
       message: data.message || 'Erro na requisicao',
-      errors: data.errors,
     }
     throw error
   }
