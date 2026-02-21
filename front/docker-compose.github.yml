@@ -1,6 +1,6 @@
 services:
   front:
-    image: ${DOCKER_IMAGE:-ghcr.io/code2-consultoria/grapo-front}:${DOCKER_TAG:-latest}
+    image: ${DOCKER_IMAGE:-ghcr.io/code2-consultoria/grapo-front}:${DOCKER_TAG:-production}
     container_name: grapo-front
     restart: unless-stopped
     environment:
