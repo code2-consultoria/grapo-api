@@ -193,6 +193,24 @@ test('retorna erro ao ativar contrato sem disponibilidade suficiente', function 
     expect($lote->quantidade_disponivel)->toBe(10);
 });
 
+// Cenário: Não pode ativar contrato sem itens
+test('retorna erro ao ativar contrato sem itens', function () {
+    $contrato = Contrato::factory()->rascunho()->create([
+        'locador_id' => $this->locador->id,
+        'locatario_id' => $this->locatario->id,
+    ]);
+
+    $response = $this->actingAs($this->user)
+        ->postJson("/api/contratos/{$contrato->id}/ativar");
+
+    $response->assertStatus(422);
+    $response->assertJsonPath('error_type', 'contrato_sem_itens');
+
+    // Contrato permanece em rascunho
+    $contrato->refresh();
+    expect($contrato->status)->toBe(StatusContrato::Rascunho);
+});
+
 // Cenário: Cancelar contrato libera itens
 test('cancela contrato ativo e libera itens alocados', function () {
     $lote = Lote::factory()->create([

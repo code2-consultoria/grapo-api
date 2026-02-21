@@ -2,7 +2,7 @@
 import { ref, onMounted } from "vue"
 import { useRouter } from "vue-router"
 import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
+import { Input, InputTelefone } from "@/components/ui/input"
 import { Combobox } from "@/components/ui/combobox"
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card"
 import { Dialog, DialogFooter } from "@/components/ui/dialog"
@@ -239,10 +239,7 @@ function openLocatarioDialog() {
           </FormField>
 
           <FormField label="Telefone" :error="locatarioForm.getError('telefone')">
-            <Input
-              v-model="locatarioForm.values.telefone"
-              placeholder="(00) 00000-0000"
-            />
+            <InputTelefone v-model="locatarioForm.values.telefone" />
           </FormField>
         </FormGroup>
 

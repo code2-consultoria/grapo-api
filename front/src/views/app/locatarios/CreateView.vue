@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { useRouter } from "vue-router"
 import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
+import { Input, InputTelefone } from "@/components/ui/input"
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card"
 import { FormField, FormGroup, FormActions } from "@/components/forms"
 import { Spinner } from "@/components/ui/spinner"
@@ -92,10 +92,7 @@ const form = useForm<PessoaForm>({
             </FormField>
 
             <FormField label="Telefone" :error="form.getError('telefone')">
-              <Input
-                v-model="form.values.telefone"
-                placeholder="(00) 00000-0000"
-              />
+              <InputTelefone v-model="form.values.telefone" />
             </FormField>
           </FormGroup>
 

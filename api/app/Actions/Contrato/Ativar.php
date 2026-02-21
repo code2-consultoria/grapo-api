@@ -6,6 +6,7 @@ use App\Actions\Alocacao\Alocar;
 use App\Contracts\Command;
 use App\Enums\StatusContrato;
 use App\Exceptions\ContratoNaoPodeSerAtivadoException;
+use App\Exceptions\ContratoSemItensException;
 use App\Exceptions\QuantidadeIndisponivelException;
 use App\Models\Contrato;
 use Illuminate\Support\Facades\DB;
@@ -23,6 +24,7 @@ class Ativar implements Command
      * Executa a ativação do contrato.
      *
      * @throws ContratoNaoPodeSerAtivadoException
+     * @throws ContratoSemItensException
      * @throws QuantidadeIndisponivelException
      */
     public function handle(): void
@@ -33,6 +35,11 @@ class Ativar implements Command
                 $this->contrato->codigo,
                 $this->contrato->status
             );
+        }
+
+        // Valida se tem itens
+        if ($this->contrato->itens->isEmpty()) {
+            throw new ContratoSemItensException($this->contrato->codigo);
         }
 
         // Executa alocação e ativação em transação

@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Contrato;
 
 use App\Actions\Contrato\Ativar as AtivarAction;
 use App\Exceptions\ContratoNaoPodeSerAtivadoException;
+use App\Exceptions\ContratoSemItensException;
 use App\Exceptions\QuantidadeIndisponivelException;
 use App\Http\Controllers\Controller;
 use App\Models\Contrato;
@@ -36,7 +37,7 @@ class Ativar extends Controller
                 'data' => $ativar->getContrato()->load(['locador', 'locatario', 'itens.tipoAtivo']),
                 'message' => 'Contrato ativado com sucesso.',
             ]);
-        } catch (ContratoNaoPodeSerAtivadoException|QuantidadeIndisponivelException $e) {
+        } catch (ContratoNaoPodeSerAtivadoException|ContratoSemItensException|QuantidadeIndisponivelException $e) {
             return $e->render($request);
         }
     }
