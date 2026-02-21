@@ -11,6 +11,20 @@ const router = createRouter({
       component: () => import("@/views/HomeView.vue"),
     },
 
+    // Rotas publicas - Legal
+    {
+      path: "/termos-de-uso",
+      name: "termos-de-uso",
+      component: () => import("@/views/legal/TermosDeUsoView.vue"),
+      meta: { title: "Termos de Uso" },
+    },
+    {
+      path: "/politica-de-privacidade",
+      name: "politica-de-privacidade",
+      component: () => import("@/views/legal/PoliticaPrivacidadeView.vue"),
+      meta: { title: "Politica de Privacidade" },
+    },
+
     // Rotas de autenticacao (guest only)
     {
       path: "/auth",

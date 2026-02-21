@@ -65,6 +65,10 @@ function getValorMensal(valor: string, meses: number): string {
   return formatCurrency(valorNum / meses)
 }
 
+// Estado do checkbox de termos
+const acceptedTerms = ref(false)
+const termsError = ref("")
+
 const form = useForm<RegisterForm>({
   initialValues: {
     name: "",
@@ -99,16 +103,32 @@ const form = useForm<RegisterForm>({
       errors.password_confirmation = "Senhas nao conferem"
     }
 
+    // Valida aceite dos termos
+    if (!acceptedTerms.value) {
+      termsError.value = "Voce deve aceitar os termos para continuar"
+    } else {
+      termsError.value = ""
+    }
+
     return errors
   },
   async onSubmit(values) {
+    // Valida aceite dos termos antes de submeter
+    if (!acceptedTerms.value) {
+      termsError.value = "Voce deve aceitar os termos para continuar"
+      return
+    }
+
     const response = await api.post<{
       data: {
         token: string
         user: { id: number; name: string; email: string }
         locador: { id: string; nome: string; email: string }
       }
-    }>("/auth/register", values)
+    }>("/auth/register", {
+      ...values,
+      accepted_terms: true,
+    })
 
     // Salva token e dados do usuario (cast parcial, fetchMe completa depois)
     authStore.setAuthData(
@@ -254,6 +274,39 @@ const form = useForm<RegisterForm>({
             </div>
           </button>
         </div>
+      </div>
+
+      <!-- Aceite dos Termos -->
+      <div class="border-t pt-6">
+        <label class="flex items-start gap-3 cursor-pointer">
+          <input
+            type="checkbox"
+            v-model="acceptedTerms"
+            class="mt-1 size-4 rounded border-input accent-primary"
+            @change="termsError = ''"
+          />
+          <span class="text-sm text-muted-foreground">
+            Li e aceito os
+            <RouterLink
+              :to="{ name: 'termos-de-uso' }"
+              target="_blank"
+              class="text-primary hover:underline"
+            >
+              Termos de Uso
+            </RouterLink>
+            e a
+            <RouterLink
+              :to="{ name: 'politica-de-privacidade' }"
+              target="_blank"
+              class="text-primary hover:underline"
+            >
+              Politica de Privacidade
+            </RouterLink>
+          </span>
+        </label>
+        <p v-if="termsError" class="text-sm text-destructive mt-2">
+          {{ termsError }}
+        </p>
       </div>
 
       <FormActions class="pt-2">

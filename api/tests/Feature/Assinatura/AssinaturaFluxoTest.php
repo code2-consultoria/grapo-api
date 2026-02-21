@@ -97,6 +97,7 @@ test('registro cria locador com trial de 7 dias', function () {
         'email' => 'novo@locador.com',
         'password' => 'password123',
         'password_confirmation' => 'password123',
+        'accepted_terms' => true,
     ]);
 
     $response->assertStatus(201);
