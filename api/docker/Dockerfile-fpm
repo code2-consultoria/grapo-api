@@ -82,7 +82,6 @@ RUN apk add --no-cache --virtual build-essentials \
     docker-php-ext-install curl
 
 RUN pecl channel-update pecl.php.net && \
-   pecl install zip zlib_filter \
    docker-php-ext-install zip && \
    docker-php-ext-install opcache && \
    docker-php-ext-install exif
