@@ -16,19 +16,19 @@ class PlanoSeeder extends Seeder
             [
                 'nome' => 'Trimestral',
                 'duracao_meses' => 3,
-                'valor' => 75.00,
+                'valor' => 60.00,
                 'ativo' => true,
             ],
             [
                 'nome' => 'Semestral',
                 'duracao_meses' => 6,
-                'valor' => 140.00,
+                'valor' => 110.00,
                 'ativo' => true,
             ],
             [
                 'nome' => 'Anual',
                 'duracao_meses' => 12,
-                'valor' => 250.00,
+                'valor' => 200.00,
                 'ativo' => true,
             ],
         ];

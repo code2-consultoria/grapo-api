@@ -1,6 +1,7 @@
 #!/usr/bin/env ash
 
-echo "99-migrations.sh revogado"
+echo "Executando migrations..."
 
-# php artisan migrate --force
-# php artisan db:seed
+php artisan migrate --force
+
+echo "Migrations concluidas."
